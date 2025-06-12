@@ -1,0 +1,56 @@
+Log {
+    params: [
+        LogParam {
+            name: "reserve0",
+            value: Uint(
+                5833204611475492232500792,
+            ),
+        },
+        LogParam {
+            name: "reserve1",
+            value: Uint(
+                2125496460347310670358,
+            ),
+        },
+    ],
+}
+Log {
+    params: [
+        LogParam {
+            name: "sender",
+            value: Address(
+                0xd71baacbcb10720b16a63620605cb4b962c47d20,
+            ),
+        },
+        LogParam {
+            name: "amount0In",
+            value: Uint(
+                58825000000000000000,
+            ),
+        },
+        LogParam {
+            name: "amount1In",
+            value: Uint(
+                0,
+            ),
+        },
+        LogParam {
+            name: "amount0Out",
+            value: Uint(
+                0,
+            ),
+        },
+        LogParam {
+            name: "amount1Out",
+            value: Uint(
+                21370498330611970,
+            ),
+        },
+        LogParam {
+            name: "to",
+            value: Address(
+                0xd71baacbcb10720b16a63620605cb4b962c47d20,
+            ),
+        },
+    ],
+}

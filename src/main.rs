@@ -1,10 +1,12 @@
 use crate::{errors::*, helper::*, parser::*, structs::*};
+use colored::Colorize;
 use dotenv::dotenv;
 use futures::StreamExt;
 use hex::FromHexError;
 use num_bigint::BigInt;
 use num_traits::{One, ToPrimitive};
 use std::env::{self, VarError};
+use std::fmt::Display;
 use std::{collections::HashMap, str::FromStr};
 use thiserror::Error;
 use web3::{
@@ -42,42 +44,27 @@ async fn main() -> Result<(), anyhow::Error> {
         .ok_or(CustomError::EventNameError("Swap"))?;
     let swap_event_signature = swap_event.signature();
 
+    let sync_event = contract
+        .abi()
+        .events_by_name("Sync")?
+        .first()
+        .ok_or(CustomError::EventNameError("Sync"))?;
+    let sync_event_signature = sync_event.signature();
+
     let mut block_stream = web3.eth_subscribe().subscribe_new_heads().await?;
-    let mut data: HashMap<U64, BlockData> = HashMap::new();
 
     while let Some(Ok(block)) = block_stream.next().await {
         let block_number = block.number.ok_or(CustomError::NotFound("block number"))?;
         let block_hash = block.hash.ok_or(CustomError::NotFound("block hash"))?;
 
-        println!("current block: {}", block_number);
+        println!("{}", format!("current block: {}", block_number).blue());
 
-        read_and_add_logs(
-            web3.clone(),
-            block_hash,
-            contract_address,
-            swap_event_signature,
-            &mut data,
-            block_number,
-        )
-        .await?;
-
-        // Showing blocks N - 5 to protect against reorganisation
         show(
             web3.clone(),
             contract_address,
-            swap_event,
-            swap_event_signature,
-            &mut data,
-            block_number - 5,
-        )
-        .await?;
-
-        check_for_reorganization(
-            &mut data,
-            block_number,
-            web3.clone(),
-            contract_address,
-            swap_event_signature,
+            &[swap_event.clone(), sync_event.clone()],
+            vec![swap_event_signature, sync_event_signature],
+            block_hash,
         )
         .await?;
     }

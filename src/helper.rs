@@ -4,7 +4,7 @@ async fn read_logs(
     web3: Web3<WebSocket>,
     block_hash: H256,
     contract_address: H160,
-    swap_event_signature: H256,
+    event_signatures: Vec<H256>,
 ) -> Result<Vec<web3::types::Log>, anyhow::Error> {
     let logs = web3
         .eth()
@@ -12,7 +12,7 @@ async fn read_logs(
             web3::types::FilterBuilder::default()
                 .block_hash(block_hash)
                 .address(vec![contract_address])
-                .topics(Some(vec![swap_event_signature]), None, None, None)
+                .topics(Some(event_signatures), None, None, None)
                 .build(),
         )
         .await?;
@@ -20,138 +20,42 @@ async fn read_logs(
     Ok(logs)
 }
 
-pub async fn read_and_add_logs(
-    web3: Web3<WebSocket>,
-    block_hash: H256,
-    contract_address: H160,
-    swap_event_signature: H256,
-    data: &mut HashMap<U64, BlockData>,
-    block_number: U64,
-) -> Result<Vec<web3::types::Log>, anyhow::Error> {
-    let logs = read_logs(web3, block_hash, contract_address, swap_event_signature).await?;
-
-    if !logs.is_empty() {
-        data.insert(
-            block_number,
-            BlockData {
-                block_hash,
-                log: logs.clone(),
-            },
-        );
-    }
-
-    Ok(logs)
-}
-
 pub async fn show(
     web3: Web3<WebSocket>,
     contract_address: H160,
-    swap_event: &Event,
-    swap_event_signature: H256,
-    data: &mut HashMap<U64, BlockData>,
-    block_number: U64,
+    events: &[Event],
+    event_signatures: Vec<H256>,
+    block_hash: H256,
 ) -> Result<(), anyhow::Error> {
-    if let Some(block_data) = data.get(&block_number) {
-        println!("show block: {}", block_number);
-
-        let swap_logs_in_block = read_logs(
-            web3,
-            block_data.block_hash,
-            contract_address,
-            swap_event_signature,
-        )
-        .await?;
-
-        for log in swap_logs_in_block {
-            let parsed_log = swap_event.parse_log(web3::ethabi::RawLog {
-                topics: log.topics,
-                data: log.data.0,
-            })?;
-            println!("{:#?}", get_output_fields(parsed_log));
-        }
-    };
-
-    Ok(())
-}
-
-fn get_output_fields<'a>(log: Log) -> Result<Output, CustomError<'a>> {
     let mut output = Output::new();
-    let mut dai = Int::max_value();
-    let mut usdc = Int::max_value();
 
-    for param in log.params {
-        match param.name.as_str() {
-            "sender" => {
-                output.sender = param
-                    .value
-                    .into_address()
-                    .ok_or(CustomError::NotFound("recipient address"))?
-            }
-            "recipient" => {
-                output.recipient = param
-                    .value
-                    .into_address()
-                    .ok_or(CustomError::NotFound("recipient address"))?
-            }
-            "amount0" => dai = param.value.into_int().unwrap_or_default(),
-            "amount1" => usdc = param.value.into_int().unwrap_or_default(),
-            _ => (),
+    let logs = read_logs(web3, block_hash, contract_address, event_signatures).await?;
+
+    if logs.is_empty() {
+        return Ok(());
+    }
+
+    for log in logs {
+        if let Ok(parsed_log) = events[0].parse_log(web3::ethabi::RawLog {
+            topics: log.topics.clone(),
+            data: log.data.0.clone(),
+        }) {
+            output.update(parsed_log)?;
+        } else if let Ok(parsed_log) = events[1].parse_log(web3::ethabi::RawLog {
+            topics: log.topics,
+            data: log.data.0,
+        }) {
+            output.update(parsed_log)?;
         }
     }
 
-    if dai > usdc {
-        output.dai =
-            twos_complement(dai)?.to_f64().unwrap_or_default() / 1_000000_000000_000000.0f64;
-        output.usdc = (usdc.as_u128() as f64) / 1_000000.0f64;
-        output.direction = String::from("USDC -> DAI");
-    } else {
-        output.usdc = twos_complement(usdc)?.to_f64().unwrap_or_default() / 1_000000.0f64;
-        output.dai = (dai.as_u128() as f64) / 1_000000_000000_000000.0f64;
-        output.direction = String::from("DAI -> USDC");
-    }
-
-    Ok(output)
-}
-
-fn twos_complement<'a>(value: Int) -> Result<BigInt, CustomError<'a>> {
-    // Convert web3::ethabi::Int to num_bigint::BigInt
-    let big_int_value = BigInt::from_str(&value.to_string())?;
-
-    // Calculate 2^bit_size
-    let two_power = BigInt::one() << 256;
-
-    // Calculate two's complement
-    Ok(&two_power - big_int_value)
-}
-
-pub async fn check_for_reorganization(
-    data: &mut HashMap<U64, BlockData>,
-    block_number: U64,
-    web3: Web3<WebSocket>,
-    contract_address: H160,
-    swap_event_signature: H256,
-) -> Result<(), anyhow::Error> {
-    for (block, block_data) in data {
-        // Skipping for first N + 5 depth
-        let depth_opt = block_number.checked_sub(block + 5);
-
-        if let Some(depth) = depth_opt {
-            if depth > U64::zero() {
-                let logs = read_logs(
-                    web3.clone(),
-                    block_data.block_hash,
-                    contract_address,
-                    swap_event_signature,
-                )
-                .await?;
-
-                anyhow::ensure!(
-                    logs.eq(&block_data.log),
-                    "Error: Reorganization happen after depth 5!"
-                );
-            }
-        }
-    }
+    output.show();
 
     Ok(())
+}
+
+pub fn format_with_decimals(value: u128) -> String {
+    let int_part = value / 1_000_000_000_000_000_000u128;
+    let frac_part = value % 1_000_000_000_000_000_000u128;
+    format!("{}.{}", int_part, format!("{:018}", frac_part))
 }
