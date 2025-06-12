@@ -8,6 +8,9 @@ pub enum CustomError<'a> {
     #[error("Environment variable error: `{0}`!")]
     EnvVarError(#[from] VarError),
 
+    #[error("IO error: `{0}`!")]
+    IoError(#[from] io::Error),
+
     #[error("Error while getting event by name: `{0}`!")]
     EventNameError(&'a str),
 
