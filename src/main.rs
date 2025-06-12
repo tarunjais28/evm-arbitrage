@@ -1,9 +1,9 @@
-use crate::{errors::*, helper::*, parser::*, structs::*};
+use crate::{errors::*, parser::*, process::*, structs::*, util::*};
 use colored::Colorize;
 use dotenv::dotenv;
 use futures::StreamExt;
 use hex::FromHexError;
-use num_bigint::BigInt;
+use num_bigint::ParseBigIntError;
 use num_traits::{One, ToPrimitive};
 use std::env::{self, VarError};
 use std::fmt::Display;
@@ -17,9 +17,11 @@ use web3::{
 };
 
 mod errors;
-mod helper;
 mod parser;
+mod process;
 mod structs;
+mod util;
+
 #[cfg(test)]
 mod tests;
 

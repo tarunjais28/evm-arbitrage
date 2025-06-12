@@ -1,5 +1,3 @@
-use num_bigint::ParseBigIntError;
-
 use super::*;
 
 #[derive(Debug, Error)]
