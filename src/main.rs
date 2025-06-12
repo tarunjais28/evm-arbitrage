@@ -1,8 +1,12 @@
-use crate::{helper::*, structs::*};
+use crate::{errors::*, helper::*, parser::*, structs::*};
+use dotenv::dotenv;
 use futures::StreamExt;
+use hex::FromHexError;
 use num_bigint::BigInt;
 use num_traits::{One, ToPrimitive};
+use std::env::{self, VarError};
 use std::{collections::HashMap, str::FromStr};
+use thiserror::Error;
 use web3::{
     ethabi::{Address, Event, Int, Log},
     transports::WebSocket,
@@ -10,22 +14,22 @@ use web3::{
     Web3,
 };
 
+mod errors;
 mod helper;
+mod parser;
 mod structs;
 #[cfg(test)]
 mod tests;
 
 #[tokio::main]
 async fn main() -> Result<(), anyhow::Error> {
-    const WEBSOCKET_INFURA_ENDPOINT: &str =
-        "wss://mainnet.infura.io/ws/v3/e29db00fcc5142e993209387d6219168";
+    dotenv().ok();
 
-    let web3 =
-        web3::Web3::new(web3::transports::ws::WebSocket::new(WEBSOCKET_INFURA_ENDPOINT).await?);
-    let contract_address = web3::types::H160::from_slice(
-        &hex::decode("5777d92f208679db4b9778590fa3cab3ac9e2168")
-            .expect("Error while decoding to hex!")[..],
-    );
+    let env_parser = EnvParser::new()?;
+
+    let web3 = web3::Web3::new(web3::transports::ws::WebSocket::new(&env_parser.ws_address).await?);
+    let contract_address =
+        web3::types::H160::from_slice(&hex::decode(env_parser.contract_address)?[..]);
     let contract = web3::contract::Contract::from_json(
         web3.eth(),
         contract_address,
@@ -35,15 +39,15 @@ async fn main() -> Result<(), anyhow::Error> {
         .abi()
         .events_by_name("Swap")?
         .first()
-        .expect("Error while getting event by name!");
+        .ok_or(CustomError::EventNameError("Swap"))?;
     let swap_event_signature = swap_event.signature();
 
     let mut block_stream = web3.eth_subscribe().subscribe_new_heads().await?;
     let mut data: HashMap<U64, BlockData> = HashMap::new();
 
     while let Some(Ok(block)) = block_stream.next().await {
-        let block_number = block.number.expect("Error getting block number!");
-        let block_hash = block.hash.expect("Error getting block hash!");
+        let block_number = block.number.ok_or(CustomError::NotFound("block number"))?;
+        let block_hash = block.hash.ok_or(CustomError::NotFound("block hash"))?;
 
         println!("current block: {}", block_number);
 

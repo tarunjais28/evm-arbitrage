@@ -74,7 +74,7 @@ pub async fn show(
     Ok(())
 }
 
-fn get_output_fields(log: Log) -> Output {
+fn get_output_fields<'a>(log: Log) -> Result<Output, CustomError<'a>> {
     let mut output = Output::new();
     let mut dai = Int::max_value();
     let mut usdc = Int::max_value();
@@ -85,59 +85,43 @@ fn get_output_fields(log: Log) -> Output {
                 output.sender = param
                     .value
                     .into_address()
-                    .expect("Error while getting sender!")
+                    .ok_or(CustomError::NotFound("recipient address"))?
             }
             "recipient" => {
                 output.recipient = param
                     .value
                     .into_address()
-                    .expect("Error while getting recipient!")
+                    .ok_or(CustomError::NotFound("recipient address"))?
             }
-            "amount0" => {
-                dai = param
-                    .value
-                    .into_int()
-                    .expect("Error while getting amount0!")
-            }
-            "amount1" => {
-                usdc = param
-                    .value
-                    .into_int()
-                    .expect("Error while getting amount1!")
-            }
+            "amount0" => dai = param.value.into_int().unwrap_or_default(),
+            "amount1" => usdc = param.value.into_int().unwrap_or_default(),
             _ => (),
         }
     }
 
     if dai > usdc {
-        output.dai = twos_complement(&dai)
-            .to_f64()
-            .expect("Error while converting dai to floating point number!")
-            / 1_000000_000000_000000.0f64;
+        output.dai =
+            twos_complement(dai)?.to_f64().unwrap_or_default() / 1_000000_000000_000000.0f64;
         output.usdc = (usdc.as_u128() as f64) / 1_000000.0f64;
         output.direction = String::from("USDC -> DAI");
     } else {
-        output.usdc = twos_complement(&usdc)
-            .to_f64()
-            .expect("Error while converting usdc to floating point number!")
-            / 1_000000.0f64;
+        output.usdc = twos_complement(usdc)?.to_f64().unwrap_or_default() / 1_000000.0f64;
         output.dai = (dai.as_u128() as f64) / 1_000000_000000_000000.0f64;
         output.direction = String::from("DAI -> USDC");
     }
 
-    output
+    Ok(output)
 }
 
-fn twos_complement(value: &Int) -> BigInt {
+fn twos_complement<'a>(value: Int) -> Result<BigInt, CustomError<'a>> {
     // Convert web3::ethabi::Int to num_bigint::BigInt
-    let big_int_value =
-        BigInt::from_str(&value.to_string()).expect("Error while converting value to Bigint!");
+    let big_int_value = BigInt::from_str(&value.to_string())?;
 
     // Calculate 2^bit_size
     let two_power = BigInt::one() << 256;
 
     // Calculate two's complement
-    &two_power - big_int_value
+    Ok(&two_power - big_int_value)
 }
 
 pub async fn check_for_reorganization(
