@@ -1,7 +1,7 @@
 use super::*;
 
 async fn read_logs(
-    web3: Web3<WebSocket>,
+    web3: Arc<Web3<WebSocket>>,
     block_hash: H256,
     contract_address: H160,
     event_signatures: Vec<H256>,
@@ -21,19 +21,19 @@ async fn read_logs(
 }
 
 pub async fn show(
-    web3: Web3<WebSocket>,
+    web3: Arc<Web3<WebSocket>>,
     contract_address: H160,
     events: &[Event],
     event_signatures: Vec<H256>,
     block_hash: H256,
 ) -> Result<(), anyhow::Error> {
-    let mut output = Output::new();
-
     let logs = read_logs(web3, block_hash, contract_address, event_signatures).await?;
 
     if logs.is_empty() {
         return Ok(());
     }
+
+    let mut output = Output::new(contract_address);
 
     for log in logs {
         if let Ok(parsed_log) = events[0].parse_log(web3::ethabi::RawLog {

@@ -2,6 +2,7 @@ use super::*;
 
 #[derive(Default, Debug)]
 pub struct Output {
+    pub contract_address: Address,
     pub sender: Address,
     pub recipient: Address,
     pub amount0_in: u128,
@@ -13,8 +14,11 @@ pub struct Output {
 }
 
 impl Output {
-    pub fn new() -> Self {
-        Self::default()
+    pub fn new(contract_address: Address) -> Self {
+        Self {
+            contract_address,
+            ..Default::default()
+        }
     }
 
     pub fn update<'a>(&mut self, log: Log) -> Result<(), CustomError<'a>> {
@@ -63,7 +67,8 @@ impl Display for Output {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(
             f,
-            "Found:\nsender: 0x{:x}\nrecipient: 0x{:x}\namount0_in: {:018}\namount1_in: {:018}\namount0_out: {:018}\namount0_out: {:018}\nreserve0: {:018}\nreserve1: {:018}",
+            "Found:\ncontract_address: 0x{:x}\nsender: 0x{:x}\nrecipient: 0x{:x}\namount0_in: {:018}\namount1_in: {:018}\namount0_out: {:018}\namount0_out: {:018}\nreserve0: {:018}\nreserve1: {:018}",
+            self.contract_address,
             self.sender,
             self.recipient,
             format_with_decimals(self.amount0_in),

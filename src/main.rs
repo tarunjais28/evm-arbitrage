@@ -1,18 +1,20 @@
 use crate::{errors::*, parser::*, process::*, structs::*, util::*};
 use colored::Colorize;
 use dotenv::dotenv;
+use futures::future::join_all;
 use futures::StreamExt;
 use hex::FromHexError;
 use num_bigint::ParseBigIntError;
-use num_traits::{One, ToPrimitive};
-use std::env::{self, VarError};
-use std::fmt::Display;
-use std::{collections::HashMap, str::FromStr};
+use std::{
+    env::{self, VarError},
+    fmt::Display,
+    sync::Arc,
+};
 use thiserror::Error;
 use web3::{
-    ethabi::{Address, Event, Int, Log},
+    ethabi::{Address, Event, Log},
     transports::WebSocket,
-    types::{H160, H256, U64},
+    types::{H160, H256},
     Web3,
 };
 
@@ -31,28 +33,12 @@ async fn main() -> Result<(), anyhow::Error> {
 
     let env_parser = EnvParser::new()?;
 
-    let web3 = web3::Web3::new(web3::transports::ws::WebSocket::new(&env_parser.ws_address).await?);
-    let contract_address =
-        web3::types::H160::from_slice(&hex::decode(env_parser.contract_address)?[..]);
-    let contract = web3::contract::Contract::from_json(
-        web3.eth(),
-        contract_address,
-        include_bytes!("contracts/uniswap_pool_abi.json"),
-    )?;
-    let swap_event = contract
-        .abi()
-        .events_by_name("Swap")?
-        .first()
-        .ok_or(CustomError::EventNameError("Swap"))?;
-    let swap_event_signature = swap_event.signature();
+    // Shared WebSocket connection
+    let web3 = Arc::new(web3::Web3::new(
+        web3::transports::ws::WebSocket::new(&env_parser.ws_address).await?,
+    ));
 
-    let sync_event = contract
-        .abi()
-        .events_by_name("Sync")?
-        .first()
-        .ok_or(CustomError::EventNameError("Sync"))?;
-    let sync_event_signature = sync_event.signature();
-
+    // Shared block stream
     let mut block_stream = web3.eth_subscribe().subscribe_new_heads().await?;
 
     while let Some(Ok(block)) = block_stream.next().await {
@@ -61,14 +47,53 @@ async fn main() -> Result<(), anyhow::Error> {
 
         println!("{}", format!("current block: {}", block_number).blue());
 
-        show(
-            web3.clone(),
-            contract_address,
-            &[swap_event.clone(), sync_event.clone()],
-            vec![swap_event_signature, sync_event_signature],
-            block_hash,
-        )
-        .await?;
+        // Spawn a task for each contract address
+        let mut tasks = vec![];
+        for address in &env_parser.contract_addresses {
+            let web3 = web3.clone();
+            let address = *address;
+
+            let task = tokio::spawn(async move {
+                let contract = web3::contract::Contract::from_json(
+                    web3.eth(),
+                    address,
+                    include_bytes!("contracts/uniswap_pool_abi.json"),
+                )?;
+
+                let swap_event = contract
+                    .abi()
+                    .events_by_name("Swap")?
+                    .first()
+                    .ok_or(CustomError::EventNameError("Swap"))?;
+                let swap_event_signature = swap_event.signature();
+
+                let sync_event = contract
+                    .abi()
+                    .events_by_name("Sync")?
+                    .first()
+                    .ok_or(CustomError::EventNameError("Sync"))?;
+                let sync_event_signature = sync_event.signature();
+
+                show(
+                    web3.clone(),
+                    address,
+                    &[swap_event.clone(), sync_event.clone()],
+                    vec![swap_event_signature, sync_event_signature],
+                    block_hash,
+                )
+                .await
+            });
+
+            tasks.push(task);
+        }
+
+        // Wait for all tasks to complete
+        let results = join_all(tasks).await;
+        for res in results {
+            if let Err(e) = res {
+                eprintln!("{}", format!("Error in contract task: {:?}", e).red());
+            }
+        }
     }
 
     Ok(())
