@@ -6,6 +6,7 @@ use futures::StreamExt;
 use hex::FromHexError;
 use num_bigint::ParseBigIntError;
 use std::{
+    collections::HashMap,
     env::{self, VarError},
     fmt::Display,
     fs::File,
@@ -15,7 +16,7 @@ use std::{
 use thiserror::Error;
 use web3::{
     contract::Contract,
-    ethabi::{Address, Event, Log},
+    ethabi::{Address, Event, Log, RawLog},
     transports::WebSocket,
     types::{H160, H256},
     Web3,
