@@ -28,49 +28,52 @@ pub async fn scan(
     block_hash: H256,
 ) -> Result<(), anyhow::Error> {
     let logs = read_logs(web3, block_hash, contract_address, event_signatures).await?;
-
     if logs.is_empty() {
         return Ok(());
     }
 
     let mut output = Output::new(contract_address);
 
+    // topic_hash => (event_index, tx_type, should_show)
+    let event_map: HashMap<H256, (usize, Option<TxType>, bool)> = vec![
+        (events[0].signature(), (0, Some(TxType::Swap), true)),
+        (events[1].signature(), (1, None, false)),
+        (events[2].signature(), (2, Some(TxType::Add), true)),
+        (events[3].signature(), (3, Some(TxType::Remove), true)),
+    ]
+    .into_iter()
+    .collect();
+
     for log in logs {
-        if let Ok(parsed_log) = events[0].parse_log(web3::ethabi::RawLog {
+        let raw_log = RawLog {
             topics: log.topics.clone(),
             data: log.data.0.clone(),
-        }) {
-            output.update_tx_type(TxType::Swap);
-            output.update(parsed_log)?;
-            output.show();
-            output.clear();
-        } else if let Ok(parsed_log) = events[1].parse_log(web3::ethabi::RawLog {
-            topics: log.topics.clone(),
-            data: log.data.0.clone(),
-        }) {
-            output.update(parsed_log)?;
-        } else if let Ok(parsed_log) = events[2].parse_log(web3::ethabi::RawLog {
-            topics: log.topics.clone(),
-            data: log.data.0.clone(),
-        }) {
-            output.update_tx_type(TxType::Add);
-            output.update(parsed_log)?;
-            output.show();
-            output.clear();
-        } else if let Ok(parsed_log) = events[3].parse_log(web3::ethabi::RawLog {
-            topics: log.topics.clone(),
-            data: log.data.0.clone(),
-        }) {
-            output.update_tx_type(TxType::Remove);
-            output.update(parsed_log)?;
-            output.show();
-            output.clear();
-        } else {
+        };
+
+        let Some(topic0) = log.topics.first() else {
             println!("{}", format!("{log:#?}").red());
+            continue;
+        };
+
+        match event_map.get(topic0) {
+            Some((idx, tx_type, show)) => {
+                match events[*idx].parse_log(raw_log) {
+                    Ok(parsed_log) => {
+                        if let Some(t) = tx_type {
+                            output.update_tx_type(*t);
+                        }
+                        output.update(parsed_log)?;
+                        if *show {
+                            output.show();
+                            output.clear();
+                        }
+                    }
+                    Err(_) => println!("{}", format!("{log:#?}").red()),
+                }
+            }
+            None => println!("{}", format!("{log:#?}").red()),
         }
     }
-
-    output.show();
 
     Ok(())
 }
