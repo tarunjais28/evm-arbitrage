@@ -35,35 +35,42 @@ pub async fn scan(
 
     let mut output = Output::new(contract_address);
 
-    // Map event signature to index + TxType
-    let event_map: HashMap<H256, (usize, Option<TxType>)> = vec![
-        (events[0].signature(), (0, Some(TxType::Swap))),
-        (events[1].signature(), (1, None)),
-        (events[2].signature(), (2, Some(TxType::Add))),
-        (events[3].signature(), (3, Some(TxType::Remove))),
-    ]
-    .into_iter()
-    .collect();
-
     for log in logs {
-        let raw = RawLog {
+        if let Ok(parsed_log) = events[0].parse_log(web3::ethabi::RawLog {
             topics: log.topics.clone(),
             data: log.data.0.clone(),
-        };
-
-        if let Some(topic0) = log.topics.first() {
-            if let Some((idx, tx_type)) = event_map.get(topic0) {
-                if let Ok(parsed_log) = events[*idx].parse_log(raw) {
-                    output.update(parsed_log, *tx_type)?;
-                    continue;
-                }
-            }
+        }) {
+            output.update_tx_type(TxType::Swap);
+            output.update(parsed_log)?;
+            output.show();
+            output.clear();
+        } else if let Ok(parsed_log) = events[1].parse_log(web3::ethabi::RawLog {
+            topics: log.topics.clone(),
+            data: log.data.0.clone(),
+        }) {
+            output.update(parsed_log)?;
+        } else if let Ok(parsed_log) = events[2].parse_log(web3::ethabi::RawLog {
+            topics: log.topics.clone(),
+            data: log.data.0.clone(),
+        }) {
+            output.update_tx_type(TxType::Add);
+            output.update(parsed_log)?;
+            output.show();
+            output.clear();
+        } else if let Ok(parsed_log) = events[3].parse_log(web3::ethabi::RawLog {
+            topics: log.topics.clone(),
+            data: log.data.0.clone(),
+        }) {
+            output.update_tx_type(TxType::Remove);
+            output.update(parsed_log)?;
+            output.show();
+            output.clear();
+        } else {
+            println!("{}", format!("{log:#?}").red());
         }
-
-        // Fallback if no match or parse fails
-        println!("{}", format!("{log:#?}").red());
     }
 
     output.show();
+
     Ok(())
 }
