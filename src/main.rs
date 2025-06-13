@@ -76,7 +76,7 @@ async fn main() -> Result<(), anyhow::Error> {
                     .ok_or(CustomError::EventNameError("Sync"))?;
                 let sync_event_signature = sync_event.signature();
 
-                show(
+                scan(
                     web3.clone(),
                     address,
                     &[swap_event.clone(), sync_event.clone()],

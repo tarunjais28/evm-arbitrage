@@ -20,7 +20,7 @@ async fn read_logs(
     Ok(logs)
 }
 
-pub async fn show(
+pub async fn scan(
     web3: Arc<Web3<WebSocket>>,
     contract_address: H160,
     events: &[Event],
