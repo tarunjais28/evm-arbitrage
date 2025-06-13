@@ -1,4 +1,4 @@
-use crate::{errors::*, helper::*, parser::*, process::*, structs::*, util::*};
+use crate::{enums::*, errors::*, helper::*, parser::*, process::*, structs::*, util::*};
 use colored::Colorize;
 use dotenv::dotenv;
 use futures::future::join_all;
@@ -21,6 +21,7 @@ use web3::{
     Web3,
 };
 
+mod enums;
 mod errors;
 mod helper;
 mod parser;
@@ -64,8 +65,8 @@ async fn main() -> Result<(), anyhow::Error> {
                     include_bytes!("contracts/uniswap_pool_abi.json"),
                 )?;
 
-                // let (events, signatures) = get_events(&contract, &["Swap", "Sync"])?;
-                let (events, signatures) = get_events(&contract, &["Burn", "Mint"])?;
+                let (events, signatures) =
+                    get_events(&contract, &["Swap", "Sync", "Mint", "Burn"])?;
 
                 scan(web3.clone(), address, &events, signatures, block_hash).await
             });

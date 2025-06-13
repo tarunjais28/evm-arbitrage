@@ -3,7 +3,7 @@ use super::*;
 #[derive(Default, Debug)]
 pub struct Output {
     contract_address: Address,
-    tx_type: String,
+    tx_type: TxType,
     sender: Address,
     recipient: Address,
     amount0_in: u128,
@@ -22,11 +22,11 @@ impl Output {
         }
     }
 
-    pub fn add_tx_type(&mut self, tx_type: String) {
-        self.tx_type = tx_type;
-    }
+    pub fn update<'a>(&mut self, log: Log, tx_type: Option<TxType>) -> Result<(), CustomError<'a>> {
+        if let Some(typ) = tx_type {
+            self.tx_type = typ;
+        }
 
-    pub fn update<'a>(&mut self, log: Log) -> Result<(), CustomError<'a>> {
         for param in log.params {
             match param.name.as_str() {
                 "sender" => {
@@ -72,8 +72,9 @@ impl Display for Output {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(
             f,
-            "Found:\ncontract_address: 0x{:x}\nsender: 0x{:x}\nrecipient: 0x{:x}\namount0_in: {:018}\namount1_in: {:018}\namount0_out: {:018}\namount0_out: {:018}\nreserve0: {:018}\nreserve1: {:018}",
+            "Found:\ncontract_address: 0x{:x}\ntx_type: {:?}\nsender: 0x{:x}\nrecipient: 0x{:x}\namount0_in: {:018}\namount1_in: {:018}\namount0_out: {:018}\namount0_out: {:018}\nreserve0: {:018}\nreserve1: {:018}",
             self.contract_address,
+            self.tx_type,
             self.sender,
             self.recipient,
             format_with_decimals(self.amount0_in),

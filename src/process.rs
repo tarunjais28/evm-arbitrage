@@ -40,12 +40,24 @@ pub async fn scan(
             topics: log.topics.clone(),
             data: log.data.0.clone(),
         }) {
-            output.update(parsed_log)?;
+            output.update(parsed_log, Some(TxType::Swap))?;
         } else if let Ok(parsed_log) = events[1].parse_log(web3::ethabi::RawLog {
-            topics: log.topics,
-            data: log.data.0,
+            topics: log.topics.clone(),
+            data: log.data.0.clone(),
         }) {
-            output.update(parsed_log)?;
+            output.update(parsed_log, None)?;
+        } else if let Ok(parsed_log) = events[2].parse_log(web3::ethabi::RawLog {
+            topics: log.topics.clone(),
+            data: log.data.0.clone(),
+        }) {
+            output.update(parsed_log, Some(TxType::Add))?;
+        } else if let Ok(parsed_log) = events[3].parse_log(web3::ethabi::RawLog {
+            topics: log.topics.clone(),
+            data: log.data.0.clone(),
+        }) {
+            output.update(parsed_log, Some(TxType::Remove))?;
+        } else {
+            println!("{}", format!("{log:#?}").red());
         }
     }
 
