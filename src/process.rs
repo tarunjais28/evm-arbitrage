@@ -56,22 +56,20 @@ pub async fn scan(
         };
 
         match event_map.get(topic0) {
-            Some((idx, tx_type, show)) => {
-                match events[*idx].parse_log(raw_log) {
-                    Ok(parsed_log) => {
-                        if let Some(t) = tx_type {
-                            output.update_tx_type(*t);
-                        }
-                        output.update(parsed_log)?;
-                        if *show {
-                            output.show();
-                            output.clear();
-                        }
+            Some((idx, tx_type, show)) => match events[*idx].parse_log(raw_log) {
+                Ok(parsed_log) => {
+                    if let Some(t) = tx_type {
+                        output.update_tx_type(*t);
                     }
-                    Err(_) => println!("{}", format!("{log:#?}").red()),
+                    output.update(parsed_log)?;
+                    if *show {
+                        output.show();
+                        output.clear();
+                    }
                 }
-            }
-            None => println!("{}", format!("{log:#?}").red()),
+                Err(_) => println!("{}", format!("{log:#?}").red().bold()),
+            },
+            None => println!("{}", format!("{log:#?}").red().bold()),
         }
     }
 
