@@ -1,4 +1,4 @@
-use crate::{errors::*, parser::*, process::*, structs::*, util::*};
+use crate::{errors::*, helper::*, parser::*, process::*, structs::*, util::*};
 use colored::Colorize;
 use dotenv::dotenv;
 use futures::future::join_all;
@@ -14,6 +14,7 @@ use std::{
 };
 use thiserror::Error;
 use web3::{
+    contract::Contract,
     ethabi::{Address, Event, Log},
     transports::WebSocket,
     types::{H160, H256},
@@ -21,6 +22,7 @@ use web3::{
 };
 
 mod errors;
+mod helper;
 mod parser;
 mod process;
 mod structs;
@@ -62,28 +64,10 @@ async fn main() -> Result<(), anyhow::Error> {
                     include_bytes!("contracts/uniswap_pool_abi.json"),
                 )?;
 
-                let swap_event = contract
-                    .abi()
-                    .events_by_name("Swap")?
-                    .first()
-                    .ok_or(CustomError::EventNameError("Swap"))?;
-                let swap_event_signature = swap_event.signature();
+                // let (events, signatures) = get_events(&contract, &["Swap", "Sync"])?;
+                let (events, signatures) = get_events(&contract, &["Burn", "Mint"])?;
 
-                let sync_event = contract
-                    .abi()
-                    .events_by_name("Sync")?
-                    .first()
-                    .ok_or(CustomError::EventNameError("Sync"))?;
-                let sync_event_signature = sync_event.signature();
-
-                scan(
-                    web3.clone(),
-                    address,
-                    &[swap_event.clone(), sync_event.clone()],
-                    vec![swap_event_signature, sync_event_signature],
-                    block_hash,
-                )
-                .await
+                scan(web3.clone(), address, &events, signatures, block_hash).await
             });
 
             tasks.push(task);

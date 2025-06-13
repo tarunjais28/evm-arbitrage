@@ -2,15 +2,16 @@ use super::*;
 
 #[derive(Default, Debug)]
 pub struct Output {
-    pub contract_address: Address,
-    pub sender: Address,
-    pub recipient: Address,
-    pub amount0_in: u128,
-    pub amount1_in: u128,
-    pub amount0_out: u128,
-    pub amount1_out: u128,
-    pub reserve0: u128,
-    pub reserve1: u128,
+    contract_address: Address,
+    tx_type: String,
+    sender: Address,
+    recipient: Address,
+    amount0_in: u128,
+    amount1_in: u128,
+    amount0_out: u128,
+    amount1_out: u128,
+    reserve0: u128,
+    reserve1: u128,
 }
 
 impl Output {
@@ -19,6 +20,10 @@ impl Output {
             contract_address,
             ..Default::default()
         }
+    }
+
+    pub fn add_tx_type(&mut self, tx_type: String) {
+        self.tx_type = tx_type;
     }
 
     pub fn update<'a>(&mut self, log: Log) -> Result<(), CustomError<'a>> {

@@ -11,9 +11,6 @@ pub enum CustomError<'a> {
     #[error("IO error: `{0}`!")]
     IoError(#[from] io::Error),
 
-    #[error("Error while getting event by name: `{0}`!")]
-    EventNameError(&'a str),
-
     #[error("Error while getting `{0}`!")]
     NotFound(&'a str),
 
