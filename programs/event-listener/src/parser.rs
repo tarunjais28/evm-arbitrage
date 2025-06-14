@@ -8,7 +8,7 @@ pub struct EnvParser {
 impl<'a> EnvParser {
     pub fn new() -> Result<Self, CustomError<'a>> {
         // Open the file with contract addresses
-        let file = File::open("src/contracts/contracts.txt")?;
+        let file = File::open("programs/event-listener/src/contracts/contracts.txt")?;
         let reader = BufReader::new(file);
 
         // Parse and decode addresses

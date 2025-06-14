@@ -23,3 +23,4 @@ target/
 Cargo.lock
 
 .env
+.DS_Store
