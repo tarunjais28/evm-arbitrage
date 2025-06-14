@@ -2,11 +2,8 @@ use crate::{enums::*, helper::*, process::*, structs::*, util::*};
 use colored::Colorize;
 use futures::future::join_all;
 use futures::StreamExt;
-use std::{
-    collections::HashMap,
-    fmt::Display,
-    sync::Arc,
-};
+use std::{collections::HashMap, fmt::Display, sync::Arc};
+use utils::{CustomError, EnvParser};
 use web3::{
     contract::Contract,
     ethabi::{Address, Event, Log, RawLog},
@@ -14,7 +11,6 @@ use web3::{
     types::{H160, H256},
     Web3,
 };
-use utils::{CustomError, EnvParser};
 
 mod enums;
 mod helper;
@@ -23,7 +19,7 @@ mod structs;
 mod util;
 
 #[tokio::main]
-async fn main() -> Result<(), anyhow::Error> {    
+async fn main() -> Result<(), anyhow::Error> {
     let env_parser = EnvParser::new()?;
 
     // Shared WebSocket connection
@@ -47,7 +43,7 @@ async fn main() -> Result<(), anyhow::Error> {
             let address = *address;
 
             let task = tokio::spawn(async move {
-                let contract = web3::contract::Contract::from_json(
+                let contract = Contract::from_json(
                     web3.eth(),
                     address,
                     include_bytes!("contracts/uniswap_pool_abi.json"),
