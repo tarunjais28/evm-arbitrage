@@ -1,4 +1,5 @@
 pub use crate::{errors::*, parser::*, util::*};
+use dotenv::dotenv;
 use hex::FromHexError;
 use num_bigint::ParseBigIntError;
 use std::{
@@ -8,7 +9,6 @@ use std::{
 };
 use thiserror::Error;
 use web3::types::H160;
-use dotenv::dotenv;
 
 mod errors;
 mod parser;

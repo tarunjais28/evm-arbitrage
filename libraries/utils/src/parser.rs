@@ -2,7 +2,6 @@ use super::*;
 
 pub struct EnvParser {
     pub ws_address: String,
-    pub ws_infura_address: String,
     pub contract_addresses: Vec<H160>,
 }
 
@@ -28,8 +27,7 @@ impl<'a> EnvParser {
         }
 
         Ok(Self {
-            ws_address: env::var("WEBSOCKET_ANCHOR_ENDPOINT")?,
-            ws_infura_address: env::var("WEBSOCKET_INFURA_ENDPOINT")?,
+            ws_address: env::var("WEBSOCKET_ENDPOINT")?,
             contract_addresses,
         })
     }
