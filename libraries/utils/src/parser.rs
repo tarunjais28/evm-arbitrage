@@ -2,11 +2,14 @@ use super::*;
 
 pub struct EnvParser {
     pub ws_address: String,
+    pub ws_infura_address: String,
     pub contract_addresses: Vec<H160>,
 }
 
 impl<'a> EnvParser {
     pub fn new() -> Result<Self, CustomError<'a>> {
+        dotenv().ok();
+
         // Open the file with contract addresses
         let file = File::open("programs/event-listener/src/contracts/contracts.txt")?;
         let reader = BufReader::new(file);
@@ -25,7 +28,8 @@ impl<'a> EnvParser {
         }
 
         Ok(Self {
-            ws_address: env::var("WEBSOCKET_INFURA_ENDPOINT")?,
+            ws_address: env::var("WEBSOCKET_ANCHOR_ENDPOINT")?,
+            ws_infura_address: env::var("WEBSOCKET_INFURA_ENDPOINT")?,
             contract_addresses,
         })
     }

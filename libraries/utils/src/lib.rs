@@ -8,6 +8,7 @@ use std::{
 };
 use thiserror::Error;
 use web3::types::H160;
+use dotenv::dotenv;
 
 mod errors;
 mod parser;

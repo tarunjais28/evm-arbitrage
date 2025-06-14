@@ -1,19 +1,12 @@
-use crate::{enums::*, errors::*, helper::*, parser::*, process::*, structs::*, util::*};
+use crate::{enums::*, helper::*, process::*, structs::*, util::*};
 use colored::Colorize;
-use dotenv::dotenv;
 use futures::future::join_all;
 use futures::StreamExt;
-use hex::FromHexError;
-use num_bigint::ParseBigIntError;
 use std::{
     collections::HashMap,
-    env::{self, VarError},
     fmt::Display,
-    fs::File,
-    io::{self, BufRead, BufReader},
     sync::Arc,
 };
-use thiserror::Error;
 use web3::{
     contract::Contract,
     ethabi::{Address, Event, Log, RawLog},
@@ -21,19 +14,16 @@ use web3::{
     types::{H160, H256},
     Web3,
 };
+use utils::{CustomError, EnvParser};
 
 mod enums;
-mod errors;
 mod helper;
-mod parser;
 mod process;
 mod structs;
 mod util;
 
 #[tokio::main]
-async fn main() -> Result<(), anyhow::Error> {
-    dotenv().ok();
-
+async fn main() -> Result<(), anyhow::Error> {    
     let env_parser = EnvParser::new()?;
 
     // Shared WebSocket connection
