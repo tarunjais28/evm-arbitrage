@@ -7,15 +7,15 @@
         {
             "type": "lldb",
             "request": "launch",
-            "name": "Debug executable 'evm-arbitrage'",
+            "name": "event-listener",
             "cargo": {
                 "args": [
                     "build",
-                    "--bin=evm-arbitrage",
-                    "--package=evm-arbitrage"
+                    "--bin=event-listener",
+                    "--package=event-listener"
                 ],
                 "filter": {
-                    "name": "evm-arbitrage",
+                    "name": "event-listener",
                     "kind": "bin"
                 }
             },
@@ -25,21 +25,14 @@
         {
             "type": "lldb",
             "request": "launch",
-            "name": "Debug unit tests in executable 'evm-arbitrage'",
-            "cargo": {
-                "args": [
-                    "test",
-                    "--no-run",
-                    "--bin=evm-arbitrage",
-                    "--package=evm-arbitrage"
-                ],
-                "filter": {
-                    "name": "evm-arbitrage",
-                    "kind": "bin"
-                }
-            },
+            "name": "mem-pool-listener",
+            "program": "${workspaceFolder}/target/debug/mem-pool-listener",
             "args": [],
-            "cwd": "${workspaceFolder}"
+            "cwd": "${workspaceFolder}",
+            "sourceMap": {
+                "/rustc/${env:RUSTC_VERSION}": "${env:USERPROFILE}/.rustup/toolchains/stable-x86_64-apple-darwin/lib/rustlib/src/rust/library"
+            },
+            "preLaunchTask": "cargo build --bin mem-pool-listener"
         }
     ]
 }
