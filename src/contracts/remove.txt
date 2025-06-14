@@ -1,0 +1,25 @@
+current block: 22694697
+Found:
+contract_address: 0x795065dcc9f64b5614c407a6efdc400da6221fb0
+tx_type: Remove
+sender: 0xd9e1ce17f2641f24ae83637ab66a2cca9c378b9f
+recipient: 0xd9e1ce17f2641f24ae83637ab66a2cca9c378b9f
+amount0: 6.026118044403031621
+amount1: 0.001473698121825660
+amount0_in: 0.000000000000000000
+amount1_in: 0.000000000000000000
+amount0_out: 0.000000000000000000
+amount0_out: 0.000000000000000000
+reserve0: 2141337.920915593966881895
+reserve1: 523.668081009187880827
+======================================================================
+current block: 22697494
+contract_address: 0x6a091a3406e0073c3cd6340122143009adac0eda
+tx_type: Remove
+reserve0: 251948.922068391683163334
+reserve1: 1182.916811572267690833
+sender: 0xd9e1ce17f2641f24ae83637ab66a2cca9c378b9f
+to: 0xd9e1ce17f2641f24ae83637ab66a2cca9c378b9f
+amount0: 31.372120843652133443
+amount1: 0.147294177152935648
+======================================================================
