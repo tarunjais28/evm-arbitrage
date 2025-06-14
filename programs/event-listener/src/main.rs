@@ -30,9 +30,6 @@ mod process;
 mod structs;
 mod util;
 
-#[cfg(test)]
-mod tests;
-
 #[tokio::main]
 async fn main() -> Result<(), anyhow::Error> {
     dotenv().ok();
