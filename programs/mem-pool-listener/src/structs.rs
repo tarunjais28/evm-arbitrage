@@ -21,12 +21,7 @@ impl Output {
         if names.len() == 1 {
             println!(
                 "name: {}\n{}: {}\npath: {:?}\nto: {:?}\ndeadline: {}",
-                self.name,
-                names[0],
-                self.amount_0,
-                self.path,
-                self.to,
-                self.deadline,
+                self.name, names[0], self.amount_0, self.path, self.to, self.deadline,
             );
         } else {
             println!(

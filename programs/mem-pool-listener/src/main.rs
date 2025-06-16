@@ -1,13 +1,12 @@
 use crate::{helper::*, structs::*};
 use futures::StreamExt;
-use hex::FromHex;
 use std::{collections::HashMap, fs::File, io::BufReader};
 use utils::{CustomError, EnvParser};
 use web3::{
     ethabi::{Address, Contract, Function},
     signing::keccak256,
     transports::WebSocket,
-    types::{Transaction, H160, H256},
+    types::H160,
     Web3,
 };
 
@@ -39,20 +38,21 @@ async fn main() -> Result<(), anyhow::Error> {
         match tx_hash {
             Ok(hash) => {
                 // Fetch full transaction details using the hash
-                match web3
-                    .eth()
-                    .transaction(web3::types::TransactionId::Hash(hash))
-                    .await
                 {
-                    Ok(Some(tx)) => {
+                    if let Ok(Some(tx)) = web3
+                        .eth()
+                        .transaction(web3::types::TransactionId::Hash(hash))
+                        .await
+                    {
                         if tx.block_hash.is_none()
                             && tx.block_number.is_none()
                             && tx.transaction_index.is_none()
-                            && tx.input.0.len() > 4
+                        // && tx.input.0.len() > 4
                         {
+                            println!("{:#?}", tx);
                             let selector = hex::encode(&tx.input.0[..4]);
                             let input_data = &tx.input.0[4..];
-                            
+
                             if let Some(idx) = identifiers.iter().position(|x| selector.eq(x)) {
                                 if let Some(swap_fn) = generator.get(&selector) {
                                     let names = names_map.get(&identifiers[idx]).unwrap();
@@ -64,12 +64,6 @@ async fn main() -> Result<(), anyhow::Error> {
                                 }
                             }
                         }
-                    }
-                    Ok(None) => {
-                        println!("Tx {:?} not yet available", hash);
-                    }
-                    Err(e) => {
-                        eprintln!("Error fetching tx {:?}: {:?}", hash, e);
                     }
                 }
             }

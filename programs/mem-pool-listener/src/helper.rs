@@ -17,8 +17,8 @@ pub fn swap_eth_for_exact_tokens<'a>(
         .unwrap_or_default()
         .iter()
         .for_each(|address| {
-            out.path
-                .push(address.clone().into_address().unwrap_or_default())
+            let addr = address.clone().into_address().unwrap_or_default();
+            out.path.push(addr);
         });
 
     out.to = decoded[2].clone().into_address().unwrap_or_default();
@@ -47,8 +47,8 @@ pub fn swap_exact_tokens_for_eth<'a>(
         .unwrap_or_default()
         .iter()
         .for_each(|address| {
-            out.path
-                .push(address.clone().into_address().unwrap_or_default())
+            let addr = address.clone().into_address().unwrap_or_default();
+            out.path.push(addr);
         });
 
     out.to = decoded[3].clone().into_address().unwrap_or_default();
@@ -65,7 +65,7 @@ pub fn generate_maps<'a>(
     Vec<String>,
     Vec<&'a Function>,
     HashMap<String, fn(&Function, &[u8], &[&str]) -> Result<(), anyhow::Error>>,
-    HashMap<String, &'a[&'a str]>,
+    HashMap<String, &'a [&'a str]>,
 )> {
     let func_names = [
         "swapETHForExactTokens",
@@ -139,7 +139,6 @@ fn identify_uniswap_v2_function<'a>(
 
     let input_data = &input.0[4..];
 
-    println!("{}", selector);
     if let Ok(data) = swap.decode_input(input_data) {
         let amount0_out = data[0].clone().into_uint().unwrap_or_default();
         let amount1_out = data[1].clone().into_uint().unwrap_or_default();
@@ -158,4 +157,3 @@ fn identify_uniswap_v2_function<'a>(
 
     Ok(())
 }
-
