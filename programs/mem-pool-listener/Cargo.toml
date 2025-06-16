@@ -1,0 +1,17 @@
+[package]
+name = "mem-pool-listener"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+anyhow = "1.0"
+futures = "0.3.14"
+web3 = "0.19.0"
+num-traits = "0.2"
+hex = "0.4.3"
+hex-literal = "1.0.0"
+colored = "3.0.0"
+tokio = "1.45.1"
+utils = { path = "../../libraries/utils" }
