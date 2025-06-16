@@ -11,6 +11,9 @@ pub enum CustomError<'a> {
     #[error("IO error: `{0}`!")]
     IoError(#[from] io::Error),
 
+    #[error("IO error: `{0}`!")]
+    EthAbiError(#[from] web3::ethabi::Error),
+
     #[error("Error while getting `{0}`!")]
     NotFound(&'a str),
 

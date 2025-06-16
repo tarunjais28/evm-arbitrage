@@ -45,6 +45,7 @@ pub async fn scan(
     .collect();
 
     for log in logs {
+        println!("{:?}", log.transaction_hash.unwrap());
         let raw_log = RawLog {
             topics: log.topics.clone(),
             data: log.data.0.clone(),
@@ -55,6 +56,7 @@ pub async fn scan(
             continue;
         };
 
+        // TODO: Tx_Hash can be use for sync match
         match event_map.get(topic0) {
             Some((idx, tx_type, show)) => match events[*idx].parse_log(raw_log) {
                 Ok(parsed_log) => {

@@ -1,8 +1,6 @@
 use hex::FromHex;
 use std::{collections::HashMap, fs::File, io::BufReader};
-use web3::{
-    ethabi::{Address, Contract, Function},
-};
+use web3::ethabi::{Address, Contract, Function};
 
 #[derive(Default, Debug)]
 pub struct Output {
@@ -25,7 +23,13 @@ impl Output {
         if names.len() == 1 {
             println!(
                 "name: {}\n{}: {}\npath: {:?}\nto: {:?}\ndeadline: {}\n{}",
-                self.name, names[0], self.amount_0, self.path, self.to, self.deadline, "=".repeat(70)
+                self.name,
+                names[0],
+                self.amount_0,
+                self.path,
+                self.to,
+                self.deadline,
+                "=".repeat(70)
             );
         } else {
             println!(
@@ -65,12 +69,12 @@ fn main() -> anyhow::Result<()> {
         "swapTokensForExactTokens",
     ];
 
-    let funcs: Vec<_> = func_names
+    let funcs: Vec<&Function> = func_names
         .iter()
         .map(|name| contract.function(name))
         .collect::<Result<_, _>>()?;
 
-    let identifiers: Vec<_> = funcs
+    let identifiers: Vec<String> = funcs
         .iter()
         .map(|func| hex::encode(&func.short_signature()))
         .collect();
@@ -83,11 +87,7 @@ fn main() -> anyhow::Result<()> {
     let payload = &data[4..];
     let selector = tx_input_hex.to_string()[2..10].to_string();
 
-    let mut fn_map: HashMap<String, &Function> = HashMap::new();
     let mut names_map: HashMap<String, &[&str]> = HashMap::new();
-    for idx in 0..8 {
-        fn_map.insert(identifiers[idx].clone(), funcs[idx]);
-    }
 
     names_map.insert(identifiers[0].clone(), &["amount_out"]);
     names_map.insert(identifiers[1].clone(), &["amount_out_min"]);
