@@ -50,20 +50,19 @@ async fn main() -> Result<(), anyhow::Error> {
         if let Ok(decoded) = log.log_decode() {
             let swap: Swap = decoded.inner.data;
             scanner.update_swap(swap, decoded.inner.address);
-            scanner.show();
         } else if let Ok(decoded) = log.log_decode() {
             let sync: Sync = decoded.inner.data;
             scanner.update_sync(sync, decoded.inner.address);
-            scanner.show();
         } else if let Ok(decoded) = log.log_decode() {
             let mint: Mint = decoded.inner.data;
             scanner.update_liquidity_events(mint, decoded.inner.address);
-            scanner.show();
         } else if let Ok(decoded) = log.log_decode() {
             let burn: Burn = decoded.inner.data;
             scanner.update_liquidity_events(burn, decoded.inner.address);
-            scanner.show();
+        } else {
+            continue;
         }
+        scanner.show();
     }
 
     Ok(())

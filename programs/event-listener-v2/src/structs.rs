@@ -117,7 +117,14 @@ impl ScanData {
                 println!("{}", output.to_string().yellow());
                 println!("{}", "=".repeat(70).yellow().bold());
             }
-            Sync => (),
+            Sync => {
+                output.push_str(&format!(
+                    "reserve0: {:018}\nreserve1: {:018}",
+                    self.reserve0, self.reserve1
+                ));
+                println!("{}", output.to_string().magenta());
+                println!("{}", "=".repeat(70).magenta().bold());
+            }
         };
     }
 }
@@ -126,8 +133,8 @@ impl Display for ScanData {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(
             f,
-            "txHash: {}\nblockNumber: {}\npool_address: {}\ntx_type: {:?}\nreserve0: {:018}\nreserve1: {:018}\n",
-            self.tx_hash, self.block_number,self.pool_address, self.tx_type, self.reserve0, self.reserve1
+            "txHash: {}\nblockNumber: {}\npool_address: {}\ntx_type: {:?}\n",
+            self.tx_hash, self.block_number, self.pool_address, self.tx_type
         )
     }
 }
