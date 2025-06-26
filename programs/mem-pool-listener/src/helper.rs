@@ -65,11 +65,11 @@ pub fn swap_exact_tokens_for_eth<'a>(
 
     out.to = decoded[3].clone().into_address().unwrap_or_default();
     out.deadline = decoded[4].clone().into_uint().unwrap_or_default().as_u128();
-    
+
     if contract_addresses.contains(&out.to) {
         println!("{}", format!("Found: {:?}", out.to).green());
     }
-    
+
     out.display(names);
 
     Ok(())

@@ -15,4 +15,5 @@ hex = "0.4.3"
 hex-literal = "1.0.0"
 colored = "3.0.0"
 tokio = "1.45.1"
+alloy = { version = "1.0.13", features = ["full"] }
 utils = { path = "libraries/utils" }

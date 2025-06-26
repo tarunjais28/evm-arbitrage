@@ -46,7 +46,7 @@ async fn main() -> Result<(), anyhow::Error> {
                 let contract = Contract::from_json(
                     web3.eth(),
                     address,
-                    include_bytes!("contracts/uniswap_pool_abi.json"),
+                    include_bytes!("../../../resources//uniswap_pool_abi.json"),
                 )?;
 
                 let (events, signatures) =

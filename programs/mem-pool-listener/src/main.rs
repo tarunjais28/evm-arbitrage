@@ -57,15 +57,15 @@ async fn main() -> Result<(), anyhow::Error> {
                                         funcs[idx],
                                         &input_data,
                                         names,
-                                        &env_parser.contract_addresses,
+                                        &env_parser.pools,
                                     )?;
                                     if let Some(from) = tx.from {
-                                        if env_parser.contract_addresses.contains(&from) {
+                                        if env_parser.pools.contains(&from) {
                                             println!("{}", format!("Found: {from:?}").green());
                                         }
                                     }
                                     if let Some(to) = tx.to {
-                                        if env_parser.contract_addresses.contains(&to) {
+                                        if env_parser.pools.contains(&to) {
                                             println!("{}", format!("Found: {to:?}").green());
                                         }
                                     }
