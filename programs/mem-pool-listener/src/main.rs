@@ -1,4 +1,5 @@
 use crate::{helper::*, structs::*};
+use colored::Colorize;
 use futures::StreamExt;
 use std::{collections::HashMap, fs::File, io::BufReader};
 use utils::{CustomError, EnvParser};
@@ -44,19 +45,30 @@ async fn main() -> Result<(), anyhow::Error> {
                         .transaction(web3::types::TransactionId::Hash(hash))
                         .await
                     {
-                        if tx.block_hash.is_none()
-                            && tx.block_number.is_none()
-                            && tx.transaction_index.is_none()
-                        // && tx.input.0.len() > 4
-                        {
-                            println!("{:#?}", tx);
+                        if tx.input.0.len() > 4 {
                             let selector = hex::encode(&tx.input.0[..4]);
                             let input_data = &tx.input.0[4..];
-
                             if let Some(idx) = identifiers.iter().position(|x| selector.eq(x)) {
                                 if let Some(swap_fn) = generator.get(&selector) {
                                     let names = names_map.get(&identifiers[idx]).unwrap();
-                                    swap_fn(funcs[idx], &input_data, names)?;
+                                    println!("{}", selector);
+                                    println!("{}", hex::encode(input_data));
+                                    swap_fn(
+                                        funcs[idx],
+                                        &input_data,
+                                        names,
+                                        &env_parser.contract_addresses,
+                                    )?;
+                                    if let Some(from) = tx.from {
+                                        if env_parser.contract_addresses.contains(&from) {
+                                            println!("{}", format!("Found: {from:?}").green());
+                                        }
+                                    }
+                                    if let Some(to) = tx.to {
+                                        if env_parser.contract_addresses.contains(&to) {
+                                            println!("{}", format!("Found: {to:?}").green());
+                                        }
+                                    }
                                     println!("hash: {:?}", tx.hash);
                                     println!("from: {:?}", tx.from);
                                     println!("to {:?}", tx.to);

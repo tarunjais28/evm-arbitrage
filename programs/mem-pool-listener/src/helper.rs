@@ -4,6 +4,7 @@ pub fn swap_eth_for_exact_tokens<'a>(
     func: &Function,
     input: &[u8],
     names: &[&str],
+    contract_addresses: &[H160],
 ) -> Result<(), anyhow::Error> {
     let mut out = Output::new();
 
@@ -19,10 +20,17 @@ pub fn swap_eth_for_exact_tokens<'a>(
         .for_each(|address| {
             let addr = address.clone().into_address().unwrap_or_default();
             out.path.push(addr);
+            if contract_addresses.contains(&addr) {
+                println!("{}", format!("Found: {addr:?}").green());
+            }
         });
 
     out.to = decoded[2].clone().into_address().unwrap_or_default();
     out.deadline = decoded[3].clone().into_uint().unwrap_or_default().as_u128();
+
+    if contract_addresses.contains(&out.to) {
+        println!("{}", format!("Found: {:?}", out.to).green());
+    }
 
     out.display(names);
 
@@ -33,6 +41,7 @@ pub fn swap_exact_tokens_for_eth<'a>(
     func: &Function,
     input: &[u8],
     names: &[&str],
+    contract_addresses: &[H160],
 ) -> Result<(), anyhow::Error> {
     let mut out = Output::new();
 
@@ -49,11 +58,18 @@ pub fn swap_exact_tokens_for_eth<'a>(
         .for_each(|address| {
             let addr = address.clone().into_address().unwrap_or_default();
             out.path.push(addr);
+            if contract_addresses.contains(&addr) {
+                println!("{}", format!("Found: {addr:?}").green());
+            }
         });
 
     out.to = decoded[3].clone().into_address().unwrap_or_default();
     out.deadline = decoded[4].clone().into_uint().unwrap_or_default().as_u128();
-
+    
+    if contract_addresses.contains(&out.to) {
+        println!("{}", format!("Found: {:?}", out.to).green());
+    }
+    
     out.display(names);
 
     Ok(())
@@ -64,7 +80,7 @@ pub fn generate_maps<'a>(
 ) -> anyhow::Result<(
     Vec<String>,
     Vec<&'a Function>,
-    HashMap<String, fn(&Function, &[u8], &[&str]) -> Result<(), anyhow::Error>>,
+    HashMap<String, fn(&Function, &[u8], &[&str], &[H160]) -> Result<(), anyhow::Error>>,
     HashMap<String, &'a [&'a str]>,
 )> {
     let func_names = [
@@ -101,8 +117,10 @@ pub fn generate_maps<'a>(
     names_map.insert(identifiers[7].clone(), &["amount_out", "amount_in_max"]);
     names_map.insert(identifiers[8].clone(), &["amount_out", "amount_in_max"]);
 
-    let mut generator: HashMap<String, fn(&Function, &[u8], &[&str]) -> Result<(), anyhow::Error>> =
-        HashMap::new();
+    let mut generator: HashMap<
+        String,
+        fn(&Function, &[u8], &[&str], &[H160]) -> Result<(), anyhow::Error>,
+    > = HashMap::new();
 
     generator.insert(identifiers[0].clone(), swap_eth_for_exact_tokens);
     generator.insert(identifiers[1].clone(), swap_eth_for_exact_tokens);
@@ -117,10 +135,10 @@ pub fn generate_maps<'a>(
     Ok((identifiers, funcs, generator, names_map))
 }
 
-fn identify_uniswap_v2_function<'a>(
+fn _identify_uniswap_v2_function<'a>(
     input: &web3::types::Bytes,
-    to: &Option<H160>,
-    addresses: &[H160],
+    _to: &Option<H160>,
+    _addresses: &[H160],
     contract: &Contract,
 ) -> Result<(), CustomError<'a>> {
     if input.0.len() < 4 {
