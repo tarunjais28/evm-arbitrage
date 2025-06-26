@@ -1,27 +1,30 @@
-// use alloy_network::Ethereum;
+use crate::{
+    enums::*,
+    structs::*,
+    IUniswapV2Pool::{Burn, Mint, Swap, Sync},
+};
 use alloy::{
+    primitives::{Address, TxHash, Uint, U256},
     providers::{Provider, ProviderBuilder, WsConnect},
     rpc::types::Filter,
+    rpc::types::Log,
     sol,
 };
+use colored::Colorize;
 use futures_util::stream::StreamExt;
+use std::fmt::Display;
 use utils::EnvParser;
+type U112 = Uint<112, 2>;
 
-sol! {
-    event Swap(
-        address indexed sender,
-        uint amount0In,
-        uint amount1In,
-        uint amount0Out,
-        uint amount1Out,
-        address indexed to
-    );
+mod enums;
+mod structs;
 
-    event Sync(
-        uint112 reserve0,
-        uint112 reserve1,
-    );
-}
+sol!(
+    #[sol(rpc)]
+    #[derive(Debug)]
+    IUniswapV2Pool,
+    "../../resources/uniswapv2_pool_abi.json"
+);
 
 #[tokio::main]
 async fn main() -> Result<(), anyhow::Error> {
@@ -42,28 +45,24 @@ async fn main() -> Result<(), anyhow::Error> {
 
     // Process events from the stream.
     while let Some(log) = stream.next().await {
+        let mut scanner = ScanData::new(&log);
+
         if let Ok(decoded) = log.log_decode() {
             let swap: Swap = decoded.inner.data;
-            println!("New Swap!");
-            println!("  TxHash: {:?}", log.transaction_hash);
-            println!("  BlockNumber: {}", log.block_number.unwrap_or_default());
-            println!("  PoolAddress: {}", decoded.inner.address);
-            println!("  Sender: {}", swap.sender);
-            println!("  To: {}", swap.to);
-            println!("  Amount 0 In: {}", swap.amount0In);
-            println!("  Amount 1 In: {}", swap.amount1In);
-            println!("  Amount 0 Out: {}", swap.amount0Out);
-            println!("  Amount 1 Out: {}", swap.amount1Out);
-            println!("---------------------------------");
+            scanner.update_swap(swap, decoded.inner.address);
+            scanner.show();
         } else if let Ok(decoded) = log.log_decode() {
             let sync: Sync = decoded.inner.data;
-            println!("New Sync!");
-            println!("  TxHash: {:?}", log.transaction_hash);
-            println!("  BlockNumber: {}", log.block_number.unwrap_or_default());
-            println!("  PoolAddress: {}", decoded.inner.address);
-            println!("  Reserve 0: {}", sync.reserve0);
-            println!("  Reserve 1: {}", sync.reserve1);
-            println!("---------------------------------");
+            scanner.update_sync(sync, decoded.inner.address);
+            scanner.show();
+        } else if let Ok(decoded) = log.log_decode() {
+            let mint: Mint = decoded.inner.data;
+            scanner.update_liquidity_events(mint, decoded.inner.address);
+            scanner.show();
+        } else if let Ok(decoded) = log.log_decode() {
+            let burn: Burn = decoded.inner.data;
+            scanner.update_liquidity_events(burn, decoded.inner.address);
+            scanner.show();
         }
     }
 

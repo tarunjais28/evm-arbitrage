@@ -6,7 +6,7 @@ use std::{
     env::{self, VarError},
     fs::File,
     io::{self, BufRead, BufReader},
-    str::FromStr
+    str::FromStr,
 };
 use thiserror::Error;
 use web3::types::H160;
