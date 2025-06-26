@@ -10,6 +10,7 @@ mod util;
 
 sol!(
     #[sol(rpc)]
+    #[derive(Debug)]
     IUniswapV2Pair,
     "../../resources/uniswapv2_pair.json"
 );
@@ -34,6 +35,7 @@ async fn main() -> Result<(), anyhow::Error> {
         reserves._reserve0, reserves._reserve1, reserves._blockTimestampLast
     );
 
+    println!("{:#?}", reserves);
     //     println!("{}", format!("current block: {}", block_number).blue());
 
     //     // Spawn a task for each contract address
