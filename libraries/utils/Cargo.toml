@@ -6,9 +6,10 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-anyhow = "1.0"
-hex = "0.4.3"
-web3 = "0.19.0"
-num-bigint = "0.4"
-thiserror = "2.0.12"
-dotenv = "0.15.0"
+anyhow.workspace = true
+web3.workspace = true
+hex.workspace = true
+num-bigint.workspace = true
+thiserror.workspace = true
+dotenv.workspace = true
+alloy.workspace = true

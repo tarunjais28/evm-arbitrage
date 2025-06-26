@@ -3,7 +3,10 @@ use super::*;
 #[derive(Debug, Error)]
 pub enum CustomError<'a> {
     #[error("Hex error: `{0}`!")]
-    HexError(#[from] FromHexError),
+    HexError(#[from] hex::FromHexError),
+
+    #[error("Hex error: `{0}`!")]
+    HexErrorAlloy(#[from] alloy::primitives::hex::FromHexError),
 
     #[error("Environment variable error: `{0}`!")]
     EnvVarError(#[from] VarError),

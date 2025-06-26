@@ -1,6 +1,5 @@
 // use alloy_network::Ethereum;
 use alloy::{
-    primitives::address,
     providers::{Provider, ProviderBuilder, WsConnect},
     rpc::types::Filter,
     sol,
@@ -33,15 +32,13 @@ async fn main() -> Result<(), anyhow::Error> {
     let ws = WsConnect::new(env_parser.ws_address);
     let provider = ProviderBuilder::new().connect_ws(ws).await?;
 
-    // Create a filter for the Swap event.
+    // Create a filter for the events.
     let filter = provider
-        .subscribe_logs(
-            &Filter::new().address(address!("0x0d4a11d5EEaaC28EC3F61d100daF4d40471f1852")),
-        )
+        .subscribe_logs(&Filter::new().address(env_parser.pools_addrs))
         .await?;
     let mut stream = filter.into_stream();
 
-    println!("Waiting for swap events...");
+    println!("Waiting for events...");
 
     // Process events from the stream.
     while let Some(log) = stream.next().await {

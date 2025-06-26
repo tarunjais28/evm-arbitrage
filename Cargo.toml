@@ -18,4 +18,7 @@ colored = "3.0.0"
 tokio = "1.45.1"
 alloy = { version = "1.0.13", features = ["full"] }
 serde_json = "1.0.140"
+dotenv = "0.15.0"
+num-bigint = "0.4"
+thiserror = "2.0.12"
 utils = { path = "libraries/utils" }
