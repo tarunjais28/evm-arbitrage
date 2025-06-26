@@ -1,71 +1,71 @@
-use crate::{enums::*, helper::*, process::*, structs::*, util::*};
-use colored::Colorize;
-use futures::future::join_all;
-use futures::StreamExt;
-use std::{collections::HashMap, fmt::Display, sync::Arc};
-use utils::{CustomError, EnvParser};
-use web3::{
-    contract::Contract,
-    ethabi::{Address, Event, Log, RawLog},
-    transports::WebSocket,
-    types::{H160, H256},
-    Web3,
+use alloy::{
+    primitives::address,
+    providers::{ProviderBuilder, WsConnect},
+    sol,
 };
+use std::sync::Arc;
+use utils::EnvParser;
 
-mod enums;
-mod helper;
-mod process;
-mod structs;
 mod util;
+
+sol!(
+    #[sol(rpc)]
+    IUniswapV2Pair,
+    "../../resources/uniswapv2_pair.json"
+);
 
 #[tokio::main]
 async fn main() -> Result<(), anyhow::Error> {
     let env_parser = EnvParser::new()?;
 
-    // Shared WebSocket connection
-    let web3 = Arc::new(web3::Web3::new(
-        web3::transports::ws::WebSocket::new(&env_parser.ws_address).await?,
-    ));
+    let provider = ProviderBuilder::new()
+        .connect_ws(WsConnect::new(&env_parser.ws_address))
+        .await?;
 
-    // Shared block stream
-    let mut block_stream = web3.eth_subscribe().subscribe_new_heads().await?;
+    let contract = IUniswapV2Pair::new(
+        address!("0x0d4a11d5EEaaC28EC3F61d100daF4d40471f1852"),
+        Arc::new(provider),
+    );
 
-    while let Some(Ok(block)) = block_stream.next().await {
-        let block_number = block.number.ok_or(CustomError::NotFound("block number"))?;
-        let block_hash = block.hash.ok_or(CustomError::NotFound("block hash"))?;
+    let reserves = contract.getReserves().call().await?;
 
-        println!("{}", format!("current block: {}", block_number).blue());
+    println!(
+        "Reserves: (reserve0: {}, reserve1: {}, blockTimestampLast: {})",
+        reserves._reserve0, reserves._reserve1, reserves._blockTimestampLast
+    );
 
-        // Spawn a task for each contract address
-        let mut tasks = vec![];
-        for address in &env_parser.pools {
-            let web3 = web3.clone();
-            let address = *address;
+    //     println!("{}", format!("current block: {}", block_number).blue());
 
-            let task = tokio::spawn(async move {
-                let contract = Contract::from_json(
-                    web3.eth(),
-                    address,
-                    include_bytes!("../../../resources//uniswap_pool_abi.json"),
-                )?;
+    //     // Spawn a task for each contract address
+    //     let mut tasks = vec![];
+    //     for address in &env_parser.pools {
+    //         let web3 = web3.clone();
+    //         let address = *address;
 
-                let (events, signatures) =
-                    get_events(&contract, &["Swap", "Sync", "Mint", "Burn"])?;
+    //         let task = tokio::spawn(async move {
+    //             let contract = Contract::from_json(
+    //                 web3.eth(),
+    //                 address,
+    //                 include_bytes!("../../../resources//uniswap_pool_abi.json"),
+    //             )?;
 
-                scan(web3.clone(), address, &events, signatures, block_hash).await
-            });
+    //             let (events, signatures) =
+    //                 get_events(&contract, &["Swap", "Sync", "Mint", "Burn"])?;
 
-            tasks.push(task);
-        }
+    //             scan(web3.clone(), address, &events, signatures, block_hash).await
+    //         });
 
-        // Wait for all tasks to complete
-        let results = join_all(tasks).await;
-        for res in results {
-            if let Err(e) = res {
-                eprintln!("{}", format!("Error in contract task: {:?}", e).red());
-            }
-        }
-    }
+    //         tasks.push(task);
+    //     }
+
+    //     // Wait for all tasks to complete
+    //     let results = join_all(tasks).await;
+    //     for res in results {
+    //         if let Err(e) = res {
+    //             eprintln!("{}", format!("Error in contract task: {:?}", e).red());
+    //         }
+    //     }
+    // }
 
     Ok(())
 }

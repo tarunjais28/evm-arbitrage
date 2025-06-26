@@ -53,12 +53,7 @@ async fn main() -> Result<(), anyhow::Error> {
                                     let names = names_map.get(&identifiers[idx]).unwrap();
                                     println!("{}", selector);
                                     println!("{}", hex::encode(input_data));
-                                    swap_fn(
-                                        funcs[idx],
-                                        &input_data,
-                                        names,
-                                        &env_parser.pools,
-                                    )?;
+                                    swap_fn(funcs[idx], &input_data, names, &env_parser.pools)?;
                                     if let Some(from) = tx.from {
                                         if env_parser.pools.contains(&from) {
                                             println!("{}", format!("Found: {from:?}").green());

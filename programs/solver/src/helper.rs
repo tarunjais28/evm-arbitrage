@@ -23,3 +23,5 @@ pub fn get_events(
 
     Ok((events, signatures))
 }
+
+pub fn get_reservers() {}
