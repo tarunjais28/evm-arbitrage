@@ -23,6 +23,7 @@ type U112 = Uint<112, 2>;
 
 mod enums;
 mod fetch;
+mod helper;
 mod scanner;
 mod structs;
 
