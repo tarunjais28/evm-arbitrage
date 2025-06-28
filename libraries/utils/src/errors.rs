@@ -8,6 +8,9 @@ pub enum CustomError<'a> {
     #[error("Hex error: `{0}`!")]
     HexErrorAlloy(#[from] alloy::primitives::hex::FromHexError),
 
+    #[error("Transport Error: `{0}`!")]
+    TransportError(#[from] RpcError<TransportErrorKind>),
+
     #[error("Environment variable error: `{0}`!")]
     EnvVarError(#[from] VarError),
 

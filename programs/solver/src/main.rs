@@ -1,73 +1,47 @@
+use crate::{
+    enums::*,
+    scanner::*,
+    structs::*,
+    IUniswapV2Pool::{Burn, Mint, Swap, Sync},
+};
 use alloy::{
-    primitives::address,
-    providers::{ProviderBuilder, WsConnect},
+    primitives::{Address, TxHash, Uint, U256},
+    providers::{
+        fillers::{BlobGasFiller, ChainIdFiller, FillProvider, GasFiller, JoinFill, NonceFiller},
+        Identity, Provider, ProviderBuilder, RootProvider, WsConnect,
+    },
+    rpc::types::Filter,
+    rpc::types::Log,
     sol,
 };
-use std::sync::Arc;
-use utils::EnvParser;
+use colored::Colorize;
+use futures_util::stream::StreamExt;
+use std::fmt::Display;
+use utils::{CustomError, EnvParser};
+type U112 = Uint<112, 2>;
 
-mod util;
+mod enums;
+mod scanner;
+mod structs;
 
 sol!(
     #[sol(rpc)]
     #[derive(Debug)]
-    IUniswapV2Pair,
-    "../../resources/uniswapv2_pair.json"
+    IUniswapV2Pool,
+    "../../resources/uniswapv2_pool_abi.json"
 );
 
 #[tokio::main]
 async fn main() -> Result<(), anyhow::Error> {
+    // Load environment variables from .env file
     let env_parser = EnvParser::new()?;
 
-    let provider = ProviderBuilder::new()
-        .connect_ws(WsConnect::new(&env_parser.ws_address))
-        .await?;
+    // Set up the WS transport and connect.
+    let ws = WsConnect::new(env_parser.ws_address);
+    let provider = ProviderBuilder::new().connect_ws(ws).await?;
 
-    let contract = IUniswapV2Pair::new(
-        address!("0x0d4a11d5EEaaC28EC3F61d100daF4d40471f1852"),
-        Arc::new(provider),
-    );
-
-    let reserves = contract.getReserves().call().await?;
-
-    println!(
-        "Reserves: (reserve0: {}, reserve1: {}, blockTimestampLast: {})",
-        reserves._reserve0, reserves._reserve1, reserves._blockTimestampLast
-    );
-
-    println!("{:#?}", reserves);
-    //     println!("{}", format!("current block: {}", block_number).blue());
-
-    //     // Spawn a task for each contract address
-    //     let mut tasks = vec![];
-    //     for address in &env_parser.pools {
-    //         let web3 = web3.clone();
-    //         let address = *address;
-
-    //         let task = tokio::spawn(async move {
-    //             let contract = Contract::from_json(
-    //                 web3.eth(),
-    //                 address,
-    //                 include_bytes!("../../../resources//uniswap_pool_abi.json"),
-    //             )?;
-
-    //             let (events, signatures) =
-    //                 get_events(&contract, &["Swap", "Sync", "Mint", "Burn"])?;
-
-    //             scan(web3.clone(), address, &events, signatures, block_hash).await
-    //         });
-
-    //         tasks.push(task);
-    //     }
-
-    //     // Wait for all tasks to complete
-    //     let results = join_all(tasks).await;
-    //     for res in results {
-    //         if let Err(e) = res {
-    //             eprintln!("{}", format!("Error in contract task: {:?}", e).red());
-    //         }
-    //     }
-    // }
-
+    // Scanning the ethereum blockchain for events
+    scan(provider, env_parser.pools_addrs).await?;
+    
     Ok(())
 }

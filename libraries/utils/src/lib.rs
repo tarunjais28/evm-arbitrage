@@ -1,5 +1,8 @@
 pub use crate::{errors::*, parser::*, util::*};
-use alloy::primitives::Address;
+use alloy::{
+    primitives::Address,
+    transports::{RpcError, TransportErrorKind},
+};
 use dotenv::dotenv;
 use num_bigint::ParseBigIntError;
 use std::{
