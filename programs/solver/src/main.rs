@@ -1,5 +1,6 @@
 use crate::{
     enums::*,
+    fetch::*,
     scanner::*,
     structs::*,
     IUniswapV2Pool::{Burn, Mint, Swap, Sync},
@@ -21,6 +22,7 @@ use utils::{CustomError, EnvParser};
 type U112 = Uint<112, 2>;
 
 mod enums;
+mod fetch;
 mod scanner;
 mod structs;
 
@@ -29,6 +31,13 @@ sol!(
     #[derive(Debug)]
     IUniswapV2Pool,
     "../../resources/uniswapv2_pool_abi.json"
+);
+
+sol!(
+    #[sol(rpc)]
+    #[derive(Debug)]
+    IUniswapV2Pair,
+    "../../resources/uniswapv2_pair.json"
 );
 
 #[tokio::main]
@@ -42,6 +51,6 @@ async fn main() -> Result<(), anyhow::Error> {
 
     // Scanning the ethereum blockchain for events
     scan(provider, env_parser.pools_addrs).await?;
-    
+
     Ok(())
 }

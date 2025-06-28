@@ -11,6 +11,9 @@ pub enum CustomError<'a> {
     #[error("Transport Error: `{0}`!")]
     TransportError(#[from] RpcError<TransportErrorKind>),
 
+    #[error("Contract Error: `{0}`!")]
+    ContractError(#[from] contract::Error),
+
     #[error("Environment variable error: `{0}`!")]
     EnvVarError(#[from] VarError),
 

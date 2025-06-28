@@ -12,6 +12,7 @@ pub async fn scan<'a>(
 ) -> Result<(), CustomError<'a>> {
     // Create a filter for the events.
     let filter = provider
+        .clone()
         .subscribe_logs(&Filter::new().address(pool_addresses))
         .await?;
 
@@ -38,6 +39,7 @@ pub async fn scan<'a>(
         } else {
             continue;
         }
+        scanner.update_reserves(provider.clone()).await?;
         scanner.show();
     }
 

@@ -1,5 +1,6 @@
 pub use crate::{errors::*, parser::*, util::*};
 use alloy::{
+    contract,
     primitives::Address,
     transports::{RpcError, TransportErrorKind},
 };
