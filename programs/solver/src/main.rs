@@ -70,10 +70,11 @@ async fn main() -> Result<(), anyhow::Error> {
     let pools: Vec<Pools> = from_reader(reader)?;
     let graph = calc_slippage(provider, pools).await?;
 
+    println!("{:#?}", graph);
     let best_path = best_path(
         &graph,
-        &address!("0xdbdb4d16eda451d0503b854cf79d55697f90c8df"),
         &address!("0x614f611300d8fb0108fa2a860dbca1ff8fc62624"),
+        &address!("0xdac17f958d2ee523a2206206994597c13d831ec7"),
     );
     println!("{:#?}", best_path);
 

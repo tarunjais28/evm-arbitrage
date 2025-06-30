@@ -3,12 +3,13 @@ use super::*;
 #[derive(Debug, Clone)]
 pub struct SwapEdge {
     pub to: Address,
+    pub pool: Address,
     pub slippage: U256,
 }
 
 impl SwapEdge {
-    pub fn new(to: Address, slippage: U256) -> Self {
-        Self { to, slippage }
+    pub fn new(to: Address, pool: Address, slippage: U256) -> Self {
+        Self { to, pool, slippage }
     }
 }
 
@@ -18,7 +19,8 @@ pub type SwapGraph = HashMap<Address, Vec<SwapEdge>>;
 pub struct State {
     pub token: Address,
     pub cost: U256,
-    pub path: Vec<Address>,
+    pub paths: Vec<Address>,
+    pub pools: Vec<Address>,
 }
 
 impl Ord for State {
@@ -43,26 +45,29 @@ impl PartialEq for State {
 #[derive(Debug, Default)]
 pub struct ShortestPath {
     pub paths: Vec<Address>,
+    pub pools: Vec<Address>,
     pub cost: U256,
 }
 
 impl ShortestPath {
-    pub fn new(paths: Vec<Address>, cost: U256) -> Self {
-        Self { paths, cost }
+    pub fn new(paths: Vec<Address>, pools: Vec<Address>, cost: U256) -> Self {
+        Self { paths, pools, cost }
     }
 }
 
-pub fn build_bidirectional_graph(edges: &[(Address, Address, U256)]) -> SwapGraph {
+pub fn build_bidirectional_graph(edges: &[(Address, Address, Address, U256)]) -> SwapGraph {
     let mut graph = SwapGraph::new();
-    for (from, to, slippage) in edges {
-        graph
-            .entry(from.clone())
-            .or_default()
-            .push(SwapEdge::new(to.clone(), *slippage));
-        graph
-            .entry(to.clone())
-            .or_default()
-            .push(SwapEdge::new(from.clone(), *slippage));
+    for (from, to, pool, slippage) in edges {
+        graph.entry(from.clone()).or_default().push(SwapEdge::new(
+            to.clone(),
+            pool.clone(),
+            *slippage,
+        ));
+        graph.entry(to.clone()).or_default().push(SwapEdge::new(
+            from.clone(),
+            pool.clone(),
+            *slippage,
+        ));
     }
     graph
 }
@@ -74,12 +79,19 @@ pub fn best_path(graph: &SwapGraph, start: &Address, end: &Address) -> ShortestP
     heap.push(State {
         token: start.clone(),
         cost: U256::ZERO,
-        path: vec![start.clone()],
+        paths: vec![start.clone()],
+        pools: vec![],
     });
 
-    while let Some(State { token, cost, path }) = heap.pop() {
+    while let Some(State {
+        token,
+        cost,
+        paths,
+        pools,
+    }) = heap.pop()
+    {
         if &token == end {
-            return ShortestPath::new(path, cost);
+            return ShortestPath::new(paths, pools, cost);
         }
 
         if cost > *best_cost.get(&token).unwrap_or(&U256::MAX) {
@@ -90,15 +102,19 @@ pub fn best_path(graph: &SwapGraph, start: &Address, end: &Address) -> ShortestP
             for edge in neighbors {
                 let new_cost = cost + edge.slippage;
                 if new_cost < *best_cost.get(&edge.to).unwrap_or(&U256::MAX) {
-                    let mut new_path = path.clone();
-                    new_path.push(edge.to.clone());
+                    let mut new_paths = paths.clone();
+                    new_paths.push(edge.to.clone());
+
+                    let mut new_pools = pools.clone();
+                    new_pools.push(edge.pool.clone());
 
                     best_cost.insert(edge.to.clone(), new_cost);
 
                     heap.push(State {
                         token: edge.to.clone(),
                         cost: new_cost,
-                        path: new_path,
+                        paths: new_paths,
+                        pools: new_pools,
                     });
                 }
             }
@@ -119,34 +135,20 @@ mod tests {
         let b = address!("000000000000000000000000000000000000000B");
         let c = address!("000000000000000000000000000000000000000C");
         let d = address!("000000000000000000000000000000000000000D");
+        let p_a_b = address!("00000000000000000000000000000000000000AB");
+        let p_a_c = address!("00000000000000000000000000000000000000AC");
+        let p_b_d = address!("00000000000000000000000000000000000000BD");
+        let p_c_d = address!("00000000000000000000000000000000000000CD");
 
         graph.insert(
             a,
             vec![
-                SwapEdge {
-                    to: b,
-                    slippage: U256::from(10),
-                },
-                SwapEdge {
-                    to: c,
-                    slippage: U256::from(20),
-                },
+                SwapEdge::new(b, p_a_b, U256::from(10)),
+                SwapEdge::new(c, p_a_c, U256::from(20)),
             ],
         );
-        graph.insert(
-            b,
-            vec![SwapEdge {
-                to: d,
-                slippage: U256::from(5),
-            }],
-        );
-        graph.insert(
-            c,
-            vec![SwapEdge {
-                to: d,
-                slippage: U256::from(10),
-            }],
-        );
+        graph.insert(b, vec![SwapEdge::new(d, p_b_d, U256::from(5))]);
+        graph.insert(c, vec![SwapEdge::new(d, p_c_d, U256::from(10))]);
         graph
     }
 
@@ -188,26 +190,17 @@ mod tests {
         let b = address!("000000000000000000000000000000000000000B");
         let c = address!("000000000000000000000000000000000000000C");
         let d = address!("000000000000000000000000000000000000000D");
+        let p_a_b = address!("00000000000000000000000000000000000000AB");
+        let p_a_c = address!("00000000000000000000000000000000000000AC");
+        let p_c_d = address!("00000000000000000000000000000000000000CD");
         graph.insert(
             a,
             vec![
-                SwapEdge {
-                    to: b,
-                    slippage: U256::from(10),
-                },
-                SwapEdge {
-                    to: c,
-                    slippage: U256::from(5),
-                },
+                SwapEdge::new(b, p_a_b, U256::from(10)),
+                SwapEdge::new(c, p_a_c, U256::from(5)),
             ],
         );
-        graph.insert(
-            c,
-            vec![SwapEdge {
-                to: d,
-                slippage: U256::from(5),
-            }],
-        );
+        graph.insert(c, vec![SwapEdge::new(d, p_c_d, U256::from(5))]);
         let path = best_path(&graph, &a, &d);
         assert_eq!(path.paths, vec![a, c, d]);
         assert_eq!(path.cost, U256::from(10));
@@ -219,11 +212,15 @@ mod tests {
         let b = address!("000000000000000000000000000000000000000B");
         let c = address!("000000000000000000000000000000000000000C");
         let d = address!("000000000000000000000000000000000000000D");
+        let p_a_b = address!("00000000000000000000000000000000000000AB");
+        let p_a_c = address!("00000000000000000000000000000000000000AC");
+        let p_b_d = address!("00000000000000000000000000000000000000BD");
+        let p_c_d = address!("00000000000000000000000000000000000000CD");
         let edges = vec![
-            (a, b, U256::from(10)),
-            (a, c, U256::from(20)),
-            (b, d, U256::from(5)),
-            (c, d, U256::from(10)),
+            (a, b, p_a_b, U256::from(10)),
+            (a, c, p_a_c, U256::from(20)),
+            (b, d, p_b_d, U256::from(5)),
+            (c, d, p_c_d, U256::from(10)),
         ];
         let graph = build_bidirectional_graph(&edges);
 
@@ -245,13 +242,19 @@ mod tests {
         let c = address!("000000000000000000000000000000000000000C");
         let d = address!("000000000000000000000000000000000000000D");
         let e = address!("000000000000000000000000000000000000000E");
+        let p_a_b = address!("00000000000000000000000000000000000000AB");
+        let p_a_c = address!("00000000000000000000000000000000000000AC");
+        let p_b_d = address!("00000000000000000000000000000000000000BD");
+        let p_c_d = address!("00000000000000000000000000000000000000CD");
+        let p_b_e = address!("00000000000000000000000000000000000000BE");
+        let p_d_e = address!("00000000000000000000000000000000000000DE");
         let edges = vec![
-            (a, b, U256::from(10)),
-            (a, c, U256::from(5)), // A-C is cheaper
-            (b, d, U256::from(5)),
-            (c, d, U256::from(5)), // C-D is cheaper
-            (b, e, U256::from(2)),
-            (d, e, U256::from(8)),
+            (a, b, p_a_b, U256::from(10)),
+            (a, c, p_a_c, U256::from(5)), // A-C is cheaper
+            (b, d, p_b_d, U256::from(5)),
+            (c, d, p_c_d, U256::from(5)), // C-D is cheaper
+            (b, e, p_b_e, U256::from(2)),
+            (d, e, p_d_e, U256::from(8)),
         ];
         let graph = build_bidirectional_graph(&edges);
 

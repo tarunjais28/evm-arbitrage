@@ -19,11 +19,11 @@ pub async fn calc_slippage<'a>(
     });
 
     for (pair, data) in pool_data.iter_mut() {
-        let reserves = get_reserves(provider.clone(), data.address).await?;
+        let reserves = get_reserves(provider.clone(), data.pool).await?;
         data.update_reserves(reserves);
         data.calc_slippage();
 
-        edges.push((pair.token_a, pair.token_b, data.slippage));
+        edges.push((pair.token_a, pair.token_b, data.pool, data.slippage));
     }
 
     let graph = build_bidirectional_graph(&edges);
