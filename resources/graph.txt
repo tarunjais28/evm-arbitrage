@@ -1,0 +1,140 @@
+{
+    0xdbdb4d16eda451d0503b854cf79d55697f90c8df: [
+        SwapEdge {
+            to: 0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2,
+            slippage: 0,
+        },
+    ],
+    0x419c4db4b9e25d6db2ad9691ccb832c8d9fda05e: [
+        SwapEdge {
+            to: 0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2,
+            slippage: 10000,
+        },
+        SwapEdge {
+            to: 0xdac17f958d2ee523a2206206994597c13d831ec7,
+            slippage: 10000,
+        },
+    ],
+    0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48: [
+        SwapEdge {
+            to: 0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2,
+            slippage: 0,
+        },
+        SwapEdge {
+            to: 0xdac17f958d2ee523a2206206994597c13d831ec7,
+            slippage: 0,
+        },
+        SwapEdge {
+            to: 0x2260fac5e5542a773aa44fbcfedf7c193bc2c599,
+            slippage: 0,
+        },
+    ],
+    0x514910771af9ca656af840dff83e8264ecf986ca: [
+        SwapEdge {
+            to: 0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48,
+            slippage: 10000,
+        },
+        SwapEdge {
+            to: 0xdac17f958d2ee523a2206206994597c13d831ec7,
+            slippage: 10000,
+        },
+        SwapEdge {
+            to: 0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2,
+            slippage: 10000,
+        },
+        SwapEdge {
+            to: 0x2260fac5e5542a773aa44fbcfedf7c193bc2c599,
+            slippage: 0,
+        },
+    ],
+    0x45804880de22913dafe09f4980848ece6ecbaf78: [
+        SwapEdge {
+            to: 0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2,
+            slippage: 0,
+        },
+        SwapEdge {
+            to: 0xdac17f958d2ee523a2206206994597c13d831ec7,
+            slippage: 10000,
+        },
+        SwapEdge {
+            to: 0x2260fac5e5542a773aa44fbcfedf7c193bc2c599,
+            slippage: 0,
+        },
+        SwapEdge {
+            to: 0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48,
+            slippage: 10000,
+        },
+    ],
+    0x767fe9edc9e0df98e07454847909b5e959d7ca0e: [
+        SwapEdge {
+            to: 0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2,
+            slippage: 10000,
+        },
+    ],
+    0xdac17f958d2ee523a2206206994597c13d831ec7: [
+        SwapEdge {
+            to: 0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2,
+            slippage: 10000,
+        },
+        SwapEdge {
+            to: 0x2260fac5e5542a773aa44fbcfedf7c193bc2c599,
+            slippage: 0,
+        },
+    ],
+    0x6b3595068778dd592e39a122f4f5a5cf09c90fe2: [
+        SwapEdge {
+            to: 0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2,
+            slippage: 10000,
+        },
+        SwapEdge {
+            to: 0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48,
+            slippage: 10000,
+        },
+        SwapEdge {
+            to: 0xdac17f958d2ee523a2206206994597c13d831ec7,
+            slippage: 10000,
+        },
+    ],
+    0x2e9d63788249371f1dfc918a52f8d799f4a38c94: [
+        SwapEdge {
+            to: 0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2,
+            slippage: 10000,
+        },
+    ],
+    0x2260fac5e5542a773aa44fbcfedf7c193bc2c599: [
+        SwapEdge {
+            to: 0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2,
+            slippage: 0,
+        },
+    ],
+    0x6b175474e89094c44da98b954eedeac495271d0f: [
+        SwapEdge {
+            to: 0x514910771af9ca656af840dff83e8264ecf986ca,
+            slippage: 0,
+        },
+        SwapEdge {
+            to: 0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2,
+            slippage: 10000,
+        },
+        SwapEdge {
+            to: 0x2260fac5e5542a773aa44fbcfedf7c193bc2c599,
+            slippage: 0,
+        },
+        SwapEdge {
+            to: 0x419c4db4b9e25d6db2ad9691ccb832c8d9fda05e,
+            slippage: 10000,
+        },
+        SwapEdge {
+            to: 0x45804880de22913dafe09f4980848ece6ecbaf78,
+            slippage: 0,
+        },
+        SwapEdge {
+            to: 0xdac17f958d2ee523a2206206994597c13d831ec7,
+            slippage: 10000,
+        },
+        SwapEdge {
+            to: 0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48,
+            slippage: 10000,
+        },
+    ],
+}

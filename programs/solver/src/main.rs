@@ -4,17 +4,17 @@ use crate::{
     fetch::*,
     pools::*,
     scanner::*,
+    slippage::*,
     structs::*,
     IUniswapV2Pool::{Burn, Mint, Swap, Sync},
 };
 use alloy::{
-    primitives::{Address, TxHash, Uint, U256},
+    primitives::{address, Address, TxHash, Uint, U256},
     providers::{
         fillers::{BlobGasFiller, ChainIdFiller, FillProvider, GasFiller, JoinFill, NonceFiller},
         Identity, Provider, ProviderBuilder, RootProvider, WsConnect,
     },
-    rpc::types::Filter,
-    rpc::types::Log,
+    rpc::types::{Filter, Log},
     sol,
 };
 use colored::Colorize;
@@ -36,6 +36,7 @@ mod enums;
 mod fetch;
 mod pools;
 mod scanner;
+mod slippage;
 mod structs;
 
 sol!(
@@ -67,22 +68,14 @@ async fn main() -> Result<(), anyhow::Error> {
     let file = File::open("resources/tokens_to_pool.json")?;
     let reader = BufReader::new(file);
     let pools: Vec<Pools> = from_reader(reader)?;
+    let graph = calc_slippage(provider, pools).await?;
 
-    let mut pool_data: HashMap<TokenPair, TokenData> = HashMap::with_capacity(pools.len());
-    // let mut graph: SwapGraph = HashMap::with_capacity(pools.len());
-
-    pools.iter().for_each(|pool| {
-        let (pair, data) = pool.to_key_value();
-        pool_data.insert(pair, data);
-    });
-
-    for (_pair, data) in pool_data.iter_mut() {
-        let reserves = get_reserves(provider.clone(), data.address).await?;
-        data.update_reserves(reserves);
-        data.calc_slippage();
-    }
-
-    println!("{:#?}", pool_data);
+    let best_path = best_path(
+        &graph,
+        &address!("0xdbdb4d16eda451d0503b854cf79d55697f90c8df"),
+        &address!("0x614f611300d8fb0108fa2a860dbca1ff8fc62624"),
+    );
+    println!("{:#?}", best_path);
 
     Ok(())
 }

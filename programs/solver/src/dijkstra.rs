@@ -1,18 +1,27 @@
 use super::*;
+use alloy::primitives::Address as UAddress;
+
+type Address = UAddress;
 
 #[derive(Debug, Clone)]
-struct SwapEdge {
-    to: String,
-    slippage: U256,
+pub struct SwapEdge {
+    pub to: Address,
+    pub slippage: U256,
 }
 
-type SwapGraph = HashMap<String, Vec<SwapEdge>>;
+impl SwapEdge {
+    pub fn new(to: Address, slippage: U256) -> Self {
+        Self { to, slippage }
+    }
+}
+
+pub type SwapGraph = HashMap<Address, Vec<SwapEdge>>;
 
 #[derive(Debug, Eq)]
-struct State {
-    token: String,
-    cost: U256,
-    path: Vec<String>,
+pub struct State {
+    pub token: Address,
+    pub cost: U256,
+    pub path: Vec<Address>,
 }
 
 impl Ord for State {
@@ -35,44 +44,44 @@ impl PartialEq for State {
 }
 
 #[derive(Debug, Default)]
-struct ShortestPath {
-    paths: Vec<String>,
-    cost: U256,
+pub struct ShortestPath {
+    pub paths: Vec<Address>,
+    pub cost: U256,
 }
 
 impl ShortestPath {
-    fn new(paths: Vec<String>, cost: U256) -> Self {
+    pub fn new(paths: Vec<Address>, cost: U256) -> Self {
         Self { paths, cost }
     }
 }
 
-fn build_bidirectional_graph(edges: &[(String, String, U256)]) -> SwapGraph {
+pub fn build_bidirectional_graph(edges: &[(Address, Address, U256)]) -> SwapGraph {
     let mut graph = SwapGraph::new();
     for (from, to, slippage) in edges {
-        graph.entry(from.clone()).or_default().push(SwapEdge {
-            to: to.clone(),
-            slippage: *slippage,
-        });
-        graph.entry(to.clone()).or_default().push(SwapEdge {
-            to: from.clone(),
-            slippage: *slippage,
-        });
+        graph
+            .entry(from.clone())
+            .or_default()
+            .push(SwapEdge::new(to.clone(), *slippage));
+        graph
+            .entry(to.clone())
+            .or_default()
+            .push(SwapEdge::new(from.clone(), *slippage));
     }
     graph
 }
 
-fn best_path(graph: &SwapGraph, start: &str, end: &str) -> ShortestPath {
+pub fn best_path(graph: &SwapGraph, start: &Address, end: &Address) -> ShortestPath {
     let mut heap = BinaryHeap::new();
     let mut best_cost = HashMap::new();
 
     heap.push(State {
-        token: start.to_string(),
+        token: start.clone(),
         cost: U256::ZERO,
-        path: vec![start.to_string()],
+        path: vec![start.clone()],
     });
 
     while let Some(State { token, cost, path }) = heap.pop() {
-        if token == end {
+        if &token == end {
             return ShortestPath::new(path, cost);
         }
 
@@ -105,33 +114,39 @@ fn best_path(graph: &SwapGraph, start: &str, end: &str) -> ShortestPath {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use alloy::primitives::address;
 
-    fn create_graph() -> SwapGraph {
+    pub fn create_graph() -> SwapGraph {
         let mut graph = HashMap::new();
+        let a = address!("000000000000000000000000000000000000000A");
+        let b = address!("000000000000000000000000000000000000000B");
+        let c = address!("000000000000000000000000000000000000000C");
+        let d = address!("000000000000000000000000000000000000000D");
+
         graph.insert(
-            "A".to_string(),
+            a,
             vec![
                 SwapEdge {
-                    to: "B".to_string(),
+                    to: b,
                     slippage: U256::from(10),
                 },
                 SwapEdge {
-                    to: "C".to_string(),
+                    to: c,
                     slippage: U256::from(20),
                 },
             ],
         );
         graph.insert(
-            "B".to_string(),
+            b,
             vec![SwapEdge {
-                to: "D".to_string(),
+                to: d,
                 slippage: U256::from(5),
             }],
         );
         graph.insert(
-            "C".to_string(),
+            c,
             vec![SwapEdge {
-                to: "D".to_string(),
+                to: d,
                 slippage: U256::from(10),
             }],
         );
@@ -139,99 +154,107 @@ mod tests {
     }
 
     #[test]
-    fn test_single_depth_path() {
+    pub fn test_single_depth_path() {
         let graph = create_graph();
-        let path = best_path(&graph, "A", "B");
-        assert_eq!(path.paths, vec!["A".to_string(), "B".to_string()]);
+        let a = address!("000000000000000000000000000000000000000A");
+        let b = address!("000000000000000000000000000000000000000B");
+        let path = best_path(&graph, &a, &b);
+        assert_eq!(path.paths, vec![a, b]);
         assert_eq!(path.cost, U256::from(10));
     }
 
     #[test]
-    fn test_multi_depth_path() {
+    pub fn test_multi_depth_path() {
         let graph = create_graph();
-        let path = best_path(&graph, "A", "D");
-        assert_eq!(
-            path.paths,
-            vec!["A".to_string(), "B".to_string(), "D".to_string()]
-        );
+        let a = address!("000000000000000000000000000000000000000A");
+        let b = address!("000000000000000000000000000000000000000B");
+        let d = address!("000000000000000000000000000000000000000D");
+        let path = best_path(&graph, &a, &d);
+        assert_eq!(path.paths, vec![a, b, d]);
         assert_eq!(path.cost, U256::from(15));
     }
 
     #[test]
-    fn test_no_path() {
+    pub fn test_no_path() {
         let graph = create_graph();
-        let path = best_path(&graph, "A", "E");
+        let a = address!("000000000000000000000000000000000000000A");
+        let e = address!("000000000000000000000000000000000000000E");
+        let path = best_path(&graph, &a, &e);
         assert!(path.paths.is_empty());
         assert_eq!(path.cost, U256::ZERO);
     }
 
     #[test]
-    fn test_complex_path() {
+    pub fn test_complex_path() {
         let mut graph = create_graph();
+        let a = address!("000000000000000000000000000000000000000A");
+        let b = address!("000000000000000000000000000000000000000B");
+        let c = address!("000000000000000000000000000000000000000C");
+        let d = address!("000000000000000000000000000000000000000D");
         graph.insert(
-            "A".to_string(),
+            a,
             vec![
                 SwapEdge {
-                    to: "B".to_string(),
+                    to: b,
                     slippage: U256::from(10),
                 },
                 SwapEdge {
-                    to: "C".to_string(),
+                    to: c,
                     slippage: U256::from(5),
                 },
             ],
         );
         graph.insert(
-            "C".to_string(),
+            c,
             vec![SwapEdge {
-                to: "D".to_string(),
+                to: d,
                 slippage: U256::from(5),
             }],
         );
-        let path = best_path(&graph, "A", "D");
-        assert_eq!(
-            path.paths,
-            vec!["A".to_string(), "C".to_string(), "D".to_string()]
-        );
+        let path = best_path(&graph, &a, &d);
+        assert_eq!(path.paths, vec![a, c, d]);
         assert_eq!(path.cost, U256::from(10));
     }
 
     #[test]
-    fn test_bidirectional_path() {
+    pub fn test_bidirectional_path() {
+        let a = address!("000000000000000000000000000000000000000A");
+        let b = address!("000000000000000000000000000000000000000B");
+        let c = address!("000000000000000000000000000000000000000C");
+        let d = address!("000000000000000000000000000000000000000D");
         let edges = vec![
-            ("A".to_string(), "B".to_string(), U256::from(10)),
-            ("A".to_string(), "C".to_string(), U256::from(20)),
-            ("B".to_string(), "D".to_string(), U256::from(5)),
-            ("C".to_string(), "D".to_string(), U256::from(10)),
+            (a, b, U256::from(10)),
+            (a, c, U256::from(20)),
+            (b, d, U256::from(5)),
+            (c, d, U256::from(10)),
         ];
         let graph = build_bidirectional_graph(&edges);
 
         // Test forward path
-        let path_forward = best_path(&graph, "A", "D");
-        assert_eq!(
-            path_forward.paths,
-            vec!["A".to_string(), "B".to_string(), "D".to_string()]
-        );
+        let path_forward = best_path(&graph, &a, &d);
+        assert_eq!(path_forward.paths, vec![a, b, d]);
         assert_eq!(path_forward.cost, U256::from(15));
 
         // Test reverse path
-        let path_reverse = best_path(&graph, "D", "A");
-        assert_eq!(
-            path_reverse.paths,
-            vec!["D".to_string(), "B".to_string(), "A".to_string()]
-        );
+        let path_reverse = best_path(&graph, &d, &a);
+        assert_eq!(path_reverse.paths, vec![d, b, a]);
         assert_eq!(path_reverse.cost, U256::from(15));
     }
 
     #[test]
-    fn test_bidirectional_complex_path() {
+    pub fn test_bidirectional_complex_path() {
+        let a = address!("000000000000000000000000000000000000000A");
+        let b = address!("000000000000000000000000000000000000000B");
+        let c = address!("000000000000000000000000000000000000000C");
+        let d = address!("000000000000000000000000000000000000000D");
+        let e = address!("000000000000000000000000000000000000000E");
         let edges = vec![
-            ("A".to_string(), "B".to_string(), U256::from(10)),
-            ("A".to_string(), "C".to_string(), U256::from(5)), // A-C is cheaper
-            ("B".to_string(), "D".to_string(), U256::from(5)),
-            ("C".to_string(), "D".to_string(), U256::from(5)), // C-D is cheaper
-            ("B".to_string(), "E".to_string(), U256::from(2)),
-            ("D".to_string(), "E".to_string(), U256::from(8)),
+            (a, b, U256::from(10)),
+            (a, c, U256::from(5)), // A-C is cheaper
+            (b, d, U256::from(5)),
+            (c, d, U256::from(5)), // C-D is cheaper
+            (b, e, U256::from(2)),
+            (d, e, U256::from(8)),
         ];
         let graph = build_bidirectional_graph(&edges);
 
@@ -239,21 +262,15 @@ mod tests {
         // A -> C -> D -> E : 5 + 5 + 8 = 18
         // A -> B -> E : 10 + 2 = 12
         // A -> B -> D -> E : 10 + 5 + 8 = 23
-        let path_forward = best_path(&graph, "A", "E");
-        assert_eq!(
-            path_forward.paths,
-            vec!["A".to_string(), "B".to_string(), "E".to_string()]
-        );
+        let path_forward = best_path(&graph, &a, &e);
+        assert_eq!(path_forward.paths, vec![a, b, e]);
         assert_eq!(path_forward.cost, U256::from(12));
 
         // Test reverse path E -> A
         // E -> B -> A : 2 + 10 = 12
         // E -> D -> C -> A : 8 + 5 + 5 = 18
-        let path_reverse = best_path(&graph, "E", "A");
-        assert_eq!(
-            path_reverse.paths,
-            vec!["E".to_string(), "B".to_string(), "A".to_string()]
-        );
+        let path_reverse = best_path(&graph, &e, &a);
+        assert_eq!(path_reverse.paths, vec![e, b, a]);
         assert_eq!(path_reverse.cost, U256::from(12));
     }
 }
