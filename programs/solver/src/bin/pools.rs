@@ -1,5 +1,5 @@
 use alloy::{
-    primitives::{Address, address},
+    primitives::{address, Address},
     providers::{
         fillers::{BlobGasFiller, ChainIdFiller, FillProvider, GasFiller, JoinFill, NonceFiller},
         Identity, ProviderBuilder, RootProvider, WsConnect,
