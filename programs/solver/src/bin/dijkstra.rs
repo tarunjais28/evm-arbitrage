@@ -1,6 +1,5 @@
 use std::cmp::Ordering;
 use std::collections::{BinaryHeap, HashMap};
-use std::fmt::Display;
 
 #[derive(Debug, Clone)]
 struct SwapEdge {
@@ -111,5 +110,5 @@ fn main() {
     );
 
     let best_output = best_path(&graph, "ETH", "WBTC");
-    println!("{:#?}", best_output);
+    println!("{:?} -> {}", best_output.paths, best_output.cost);
 }

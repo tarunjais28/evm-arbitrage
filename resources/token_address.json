@@ -58,5 +58,13 @@
     {
         "token": "WETH",
         "address": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2"
+    },
+    {
+        "token": "ZEUS",
+        "address": "0x4d4574f50dd8b9dbe623cf329dcc78d76935e610"
+    },
+    {
+        "token": "p e p e",
+        "address": "0x614f611300d8fb0108fa2a860dbca1ff8fc62624"
     }
 ]

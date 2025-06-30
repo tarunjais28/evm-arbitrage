@@ -11,25 +11,21 @@ impl<'a> EnvParser {
         dotenv().ok();
 
         // Open the file with contract addresses
-        let file = File::open("resources/pools.txt")?;
+        let file = File::open("resources/pools.json")?;
         let reader = BufReader::new(file);
 
         // Parse and decode addresses
-        let mut pools = Vec::new();
-        let mut pools_addrs = Vec::new();
-        for line in reader.lines() {
-            let line = line?;
-            let trimmed = line.trim();
-            if trimmed.is_empty() {
-                continue;
-            }
+        let addresses: Vec<String> = from_reader(reader)?;
 
-            let address = H160::from_slice(&hex::decode(trimmed)?);
-            pools.push(address);
+        let pools_addrs: Vec<Address> = addresses
+            .iter()
+            .map(|s| s.parse())
+            .collect::<Result<_, _>>()?;
 
-            let addr = Address::from_str(trimmed)?;
-            pools_addrs.push(addr);
-        }
+        let pools: Vec<H160> = pools_addrs
+            .iter()
+            .map(|addr| H160::from(addr.into_array()))
+            .collect();
 
         Ok(Self {
             ws_address: env::var("WEBSOCKET_ENDPOINT")?,

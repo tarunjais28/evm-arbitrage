@@ -6,11 +6,11 @@ use alloy::{
 };
 use dotenv::dotenv;
 use num_bigint::ParseBigIntError;
+use serde_json::from_reader;
 use std::{
     env::{self, VarError},
     fs::File,
-    io::{self, BufRead, BufReader},
-    str::FromStr,
+    io::{self, BufReader},
 };
 use thiserror::Error;
 use web3::types::H160;

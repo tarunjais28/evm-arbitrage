@@ -17,6 +17,9 @@ pub enum CustomError<'a> {
     #[error("Environment variable error: `{0}`!")]
     EnvVarError(#[from] VarError),
 
+    #[error("Json serialisation failed: `{0}`!")]
+    JsonParseError(#[from] serde_json::Error),
+
     #[error("IO error: `{0}`!")]
     IoError(#[from] io::Error),
 

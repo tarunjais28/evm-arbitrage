@@ -17,6 +17,7 @@ hex-literal = "1.0.0"
 colored = "3.0.0"
 tokio = "1.45.1"
 alloy = { version = "1.0.13", features = ["full"] }
+serde = { version = "1.0.219", features = ["derive"] }
 serde_json = "1.0.140"
 dotenv = "0.15.0"
 num-bigint = "0.4"
