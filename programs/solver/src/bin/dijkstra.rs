@@ -4,7 +4,7 @@ use std::collections::{BinaryHeap, HashMap};
 #[derive(Debug, Clone)]
 struct SwapEdge {
     to: String,
-    slippage: u64, // e.g., tokenA → tokenB exchange rate
+    slippage: u64,
 }
 
 type SwapGraph = HashMap<String, Vec<SwapEdge>>;
@@ -12,12 +12,14 @@ type SwapGraph = HashMap<String, Vec<SwapEdge>>;
 #[derive(Debug, Eq)]
 struct State {
     token: String,
-    amount: u64,
+    cost: u64,
+    path: Vec<String>,
 }
 
 impl Ord for State {
     fn cmp(&self, other: &Self) -> Ordering {
-        other.amount.partial_cmp(&self.amount).unwrap()
+        // Notice: Reverse comparison to make min-heap
+        other.cost.cmp(&self.cost)
     }
 }
 
@@ -29,7 +31,7 @@ impl PartialOrd for State {
 
 impl PartialEq for State {
     fn eq(&self, other: &Self) -> bool {
-        self.token == other.token && self.amount == other.amount
+        self.token == other.token && self.cost == other.cost
     }
 }
 
@@ -45,31 +47,53 @@ impl ShortestPath {
     }
 }
 
+fn build_bidirectional_graph(edges: &[(String, String, u64)]) -> SwapGraph {
+    let mut graph = SwapGraph::new();
+    for (from, to, slippage) in edges {
+        graph.entry(from.clone()).or_default().push(SwapEdge {
+            to: to.clone(),
+            slippage: *slippage,
+        });
+        graph.entry(to.clone()).or_default().push(SwapEdge {
+            to: from.clone(),
+            slippage: *slippage,
+        });
+    }
+    graph
+}
+
 fn best_path(graph: &SwapGraph, start: &str, end: &str) -> ShortestPath {
     let mut heap = BinaryHeap::new();
-    let mut best = HashMap::new();
-    let mut paths = Vec::with_capacity(graph.len());
+    let mut best_cost = HashMap::new();
 
     heap.push(State {
         token: start.to_string(),
-        amount: 0,
+        cost: 0,
+        path: vec![start.to_string()],
     });
 
-    while let Some(State { token, amount }) = heap.pop() {
-        paths.push(token.to_string());
-
+    while let Some(State { token, cost, path }) = heap.pop() {
         if token == end {
-            return ShortestPath::new(paths, amount);
+            return ShortestPath::new(path, cost);
+        }
+
+        if cost > *best_cost.get(&token).unwrap_or(&u64::MAX) {
+            continue;
         }
 
         if let Some(neighbors) = graph.get(&token) {
             for edge in neighbors {
-                let new_amount = amount + edge.slippage;
-                if new_amount > *best.get(&edge.to).unwrap_or(&0) {
-                    best.insert(edge.to.clone(), new_amount);
+                let new_cost = cost + edge.slippage;
+                if new_cost < *best_cost.get(&edge.to).unwrap_or(&u64::MAX) {
+                    let mut new_path = path.clone();
+                    new_path.push(edge.to.clone());
+
+                    best_cost.insert(edge.to.clone(), new_cost);
+
                     heap.push(State {
                         token: edge.to.clone(),
-                        amount: new_amount,
+                        cost: new_cost,
+                        path: new_path,
                     });
                 }
             }
@@ -80,35 +104,19 @@ fn best_path(graph: &SwapGraph, start: &str, end: &str) -> ShortestPath {
 }
 
 fn main() {
-    let mut graph = SwapGraph::new();
-    graph.insert(
-        "ETH".to_string(),
-        vec![
-            SwapEdge {
-                to: "USDC".to_string(),
-                slippage: 15,
-            },
-            SwapEdge {
-                to: "DAI".to_string(),
-                slippage: 2,
-            },
-        ],
-    );
-    graph.insert(
-        "USDC".to_string(),
-        vec![SwapEdge {
-            to: "WBTC".to_string(),
-            slippage: 3,
-        }],
-    );
-    graph.insert(
-        "DAI".to_string(),
-        vec![SwapEdge {
-            to: "WBTC".to_string(),
-            slippage: 6,
-        }],
-    );
+    // Define your edges as (from, to, slippage)
+    let edges = vec![
+        ("ETH".to_string(), "USDC".to_string(), 15),
+        ("ETH".to_string(), "DAI".to_string(), 2),
+        ("USDC".to_string(), "WBTC".to_string(), 3),
+        ("DAI".to_string(), "WBTC".to_string(), 6),
+    ];
+
+    let graph = build_bidirectional_graph(&edges);
 
     let best_output = best_path(&graph, "ETH", "WBTC");
-    println!("{:?} -> {}", best_output.paths, best_output.cost);
+    println!(
+        "Best path: {:?}, cost: {}",
+        best_output.paths, best_output.cost
+    );
 }

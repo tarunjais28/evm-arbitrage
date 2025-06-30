@@ -69,7 +69,7 @@ async fn main() -> Result<(), anyhow::Error> {
     let pools: Vec<Pools> = from_reader(reader)?;
 
     let mut pool_data: HashMap<TokenPair, TokenData> = HashMap::with_capacity(pools.len());
-    let mut graph: SwapGraph = HashMap::with_capacity(pools.len());
+    // let mut graph: SwapGraph = HashMap::with_capacity(pools.len());
 
     pools.iter().for_each(|pool| {
         let (pair, data) = pool.to_key_value();
