@@ -1,7 +1,4 @@
 use super::*;
-use alloy::primitives::Address as UAddress;
-
-type Address = UAddress;
 
 #[derive(Debug, Clone)]
 pub struct SwapEdge {
