@@ -1,6 +1,6 @@
 use super::*;
 
-pub type PoolData = HashMap<TokenPair, TokenData>;
+pub type PoolData = HashMap<Address, TokenData>;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Pools {
@@ -10,14 +10,13 @@ pub struct Pools {
 }
 
 impl Pools {
-    pub fn to_key_value(&self) -> (TokenPair, TokenData) {
+    pub fn to_key_value(&self) -> (Address, TokenData) {
         (
-            TokenPair {
+            self.address,
+            TokenData {
                 token_a: self.token_a,
                 token_b: self.token_b,
-            },
-            TokenData {
-                pool: self.address,
+
                 slippage: U256::ZERO,
                 reserve0: U112::ZERO,
                 reserve1: U112::ZERO,
@@ -26,15 +25,10 @@ impl Pools {
     }
 }
 
-#[derive(Debug, Eq, Hash, PartialEq)]
-pub struct TokenPair {
-    pub token_a: Address,
-    pub token_b: Address,
-}
-
 #[derive(Debug)]
 pub struct TokenData {
-    pub pool: Address,
+    pub token_a: Address,
+    pub token_b: Address,
     pub slippage: U256,
     pub reserve0: U112,
     pub reserve1: U112,
@@ -85,7 +79,8 @@ mod tests {
     #[test]
     fn test_calc_slippage_zero_reserves() {
         let mut token_data = TokenData {
-            pool: Address::ZERO,
+            token_a: Address::ZERO,
+            token_b: Address::ZERO,
             slippage: U256::ZERO,
             reserve0: U112::ZERO,
             reserve1: U112::ZERO,
@@ -98,7 +93,8 @@ mod tests {
     #[test]
     fn test_calc_slippage_equal_reserves() {
         let mut token_data = TokenData {
-            pool: Address::ZERO,
+            token_a: Address::ZERO,
+            token_b: Address::ZERO,
             slippage: U256::ZERO,
             reserve0: U112::from(1000),
             reserve1: U112::from(1000),
@@ -111,7 +107,8 @@ mod tests {
     #[test]
     fn test_calc_slippage_unequal_reserves() {
         let mut token_data = TokenData {
-            pool: Address::ZERO,
+            token_a: Address::ZERO,
+            token_b: Address::ZERO,
             slippage: U256::ZERO,
             reserve0: U112::from(1000),
             reserve1: U112::from(2000),
@@ -124,7 +121,8 @@ mod tests {
     #[test]
     fn test_calc_slippage_one_reserve_is_zero() {
         let mut token_data = TokenData {
-            pool: Address::ZERO,
+            token_a: Address::ZERO,
+            token_b: Address::ZERO,
             slippage: U256::ZERO,
             reserve0: U112::from(1000),
             reserve1: U112::ZERO,

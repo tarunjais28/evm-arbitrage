@@ -26,8 +26,8 @@ pub async fn update_reserves<'a>(
     });
 
     debug_time!("slippage::update_reserves::pool_data_abstraction()", {
-        for (_, data) in pool_data.iter_mut() {
-            if let Some(reserves) = reserves_map.get(&data.pool) {
+        for (pool, data) in pool_data.iter_mut() {
+            if let Some(reserves) = reserves_map.get(pool) {
                 data.update_reserves(*reserves);
             }
         }
@@ -37,7 +37,7 @@ pub async fn update_reserves<'a>(
 }
 
 pub async fn calc_slippage<'a>(
-    pair: TokenPair,
+    pool_address: Address,
     pool_data: &mut PoolData,
     reserves: Reserves,
     amount_in: U256,
@@ -46,14 +46,14 @@ pub async fn calc_slippage<'a>(
 
     debug_time!("slippage::calc_slippage::reserves_updation()", {
         pool_data
-            .entry(pair)
+            .entry(pool_address)
             .and_modify(|data| data.update_reserves(reserves))
     });
 
     debug_time!("slippage::calc_slippage::calc_slippage()", {
-        pool_data.iter_mut().for_each(|(pair, data)| {
+        pool_data.iter_mut().for_each(|(pool, data)| {
             data.calc_slippage(amount_in);
-            edges.push((pair.token_a, pair.token_b, data.pool, data.slippage));
+            edges.push((data.token_a, data.token_b, *pool, data.slippage));
         })
     });
 

@@ -72,20 +72,20 @@ async fn main() -> Result<(), anyhow::Error> {
         let ws = WsConnect::new(env_parser.ws_address);
         let provider = ProviderBuilder::new().connect_ws(ws).await?;
 
-        // // Scanning the ethereum blockchain for events
-        // debug_time!("Calling scanner()", {
-        //     scan(provider.clone(), env_parser.pools_addrs).await?
-        // });
-
         let file = debug_time!("file_open()", {
             File::open("resources/tokens_to_pool.json")?
         });
         let reader = debug_time!("reader()", { BufReader::new(file) });
         let pools: Vec<Pools> = debug_time!("pools_serialize()", { from_reader(reader)? });
-        let pool_data: PoolData = debug_time!("slippage::update_reserves", {
-            update_reserves(provider, pools).await?
+        let mut pool_data: PoolData = debug_time!("slippage::update_reserves", {
+            update_reserves(provider.clone(), pools).await?
+        });
+
+        // Scanning the ethereum blockchain for events
+        debug_time!("Calling scanner()", {
+            scan(provider.clone(), env_parser.pools_addrs, &mut pool_data).await?
         });
     });
-    
+
     Ok(())
 }

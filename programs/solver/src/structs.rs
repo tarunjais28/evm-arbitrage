@@ -29,7 +29,7 @@ impl From<Burn> for EventData {
     }
 }
 
-#[derive(Default, Debug)]
+#[derive(Default, Debug, Clone, Copy)]
 pub struct ScanData {
     tx_hash: TxHash,
     block_number: u64,
@@ -47,6 +47,15 @@ pub struct ScanData {
     reserve1: U112,
     reserve0_crnt: U112,
     reserve1_crnt: U112,
+}
+
+impl From<ScanData> for Reserves {
+    fn from(res: ScanData) -> Self {
+        Self {
+            reserve0: res.reserve0,
+            reserve1: res.reserve1,
+        }
+    }
 }
 
 impl ScanData {

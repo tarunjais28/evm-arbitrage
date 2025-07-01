@@ -9,6 +9,7 @@ pub async fn scan<'a>(
         RootProvider,
     >,
     pool_addresses: Vec<Address>,
+    pool_data: &mut PoolData,
 ) -> Result<(), CustomError<'a>> {
     // Create a filter for the events.
     let filter = provider
@@ -16,7 +17,7 @@ pub async fn scan<'a>(
         .subscribe_logs(&Filter::new().address(pool_addresses))
         .await?;
 
-    println!("Waiting for events...");
+    log::info!("Waiting for events...");
 
     let mut stream = filter.into_stream();
 
@@ -29,7 +30,26 @@ pub async fn scan<'a>(
             scanner.update_swap(swap, decoded.inner.address);
         } else if let Ok(decoded) = log.log_decode() {
             let sync: Sync = decoded.inner.data;
-            scanner.update_sync(sync, decoded.inner.address);
+            let pool_address = decoded.inner.address;
+            scanner.update_sync(sync, pool_address);
+
+            let graph = debug_time!("scanner::calc_slippage()", {
+                calc_slippage(
+                    pool_address,
+                    pool_data,
+                    Reserves::from(scanner),
+                    U256::from(1),
+                )
+                .await?
+            });
+            let path = debug_time!("scanner::best_path()", {
+                best_path(
+                    &graph,
+                    &address!("0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"),
+                    &address!("0x2260fac5e5542a773aa44fbcfedf7c193bc2c599"),
+                )
+            });
+            println!("{:#?}", path);
         } else if let Ok(decoded) = log.log_decode() {
             let mint: Mint = decoded.inner.data;
             scanner.update_liquidity_events(mint, decoded.inner.address);
