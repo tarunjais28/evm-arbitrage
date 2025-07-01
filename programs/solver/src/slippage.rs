@@ -36,19 +36,24 @@ pub async fn update_reserves<'a>(
     Ok(pool_data)
 }
 
-pub async fn calc_slippage<'a>(
-    pool_address: Address,
+pub fn update_reserve_abs<'a>(
+    scanner: ScanData,
     pool_data: &mut PoolData,
-    reserves: Reserves,
+) -> Result<(), CustomError<'a>> {
+    debug_time!("slippage::calc_slippage::update_reserve_abs()", {
+        pool_data
+            .entry(scanner.pool_address)
+            .and_modify(|data| data.update_reserves(Reserves::from(scanner)))
+    });
+
+    Ok(())
+}
+
+pub fn calc_slippage<'a>(
+    pool_data: &mut PoolData,
     amount_in: U256,
 ) -> Result<SwapGraph, CustomError<'a>> {
     let mut edges = Vec::with_capacity(pool_data.len());
-
-    debug_time!("slippage::calc_slippage::reserves_updation()", {
-        pool_data
-            .entry(pool_address)
-            .and_modify(|data| data.update_reserves(reserves))
-    });
 
     debug_time!("slippage::calc_slippage::calc_slippage()", {
         pool_data.iter_mut().for_each(|(pool, data)| {

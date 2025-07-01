@@ -78,13 +78,13 @@ async fn main() -> Result<(), anyhow::Error> {
         });
         let reader = debug_time!("reader()", { BufReader::new(file) });
         let pools: Vec<Pools> = debug_time!("pools_serialize()", { from_reader(reader)? });
-        let mut pool_data: PoolData = debug_time!("slippage::update_reserves", {
+        let pool_data: PoolData = debug_time!("slippage::update_reserves", {
             update_reserves(provider.clone(), pools).await?
         });
 
         // Scanning the ethereum blockchain for events
         debug_time!("Calling scanner()", {
-            scan(provider.clone(), env_parser.pools_addrs, &mut pool_data).await?
+            scan(provider.clone(), env_parser.pools_addrs, pool_data).await?
         });
     });
 

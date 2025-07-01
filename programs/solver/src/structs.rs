@@ -33,7 +33,7 @@ impl From<Burn> for EventData {
 pub struct ScanData {
     tx_hash: TxHash,
     block_number: u64,
-    pool_address: Address,
+    pub pool_address: Address,
     tx_type: TxType,
     sender: Address,
     to: Address,
@@ -43,8 +43,8 @@ pub struct ScanData {
     amount1_in: U256,
     amount0_out: U256,
     amount1_out: U256,
-    reserve0: U112,
-    reserve1: U112,
+    pub reserve0: U112,
+    pub reserve1: U112,
 }
 
 impl From<ScanData> for Reserves {

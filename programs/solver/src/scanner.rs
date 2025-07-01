@@ -1,14 +1,9 @@
 use super::*;
 use tokio::io::{AsyncBufReadExt, BufReader};
 
-async fn calculate_path<'a>(
-    pool_address: Address,
-    pool_data: &mut PoolData,
-    scanner: ScanData,
-    amount_in: U256,
-) -> Result<(), CustomError<'a>> {
+fn calculate_path<'a>(pool_data: &mut PoolData, amount_in: U256) -> Result<(), CustomError<'a>> {
     let graph = debug_time!("scanner::calculate_path::calc_slippage()", {
-        calc_slippage(pool_address, pool_data, Reserves::from(scanner), amount_in).await?
+        calc_slippage(pool_data, amount_in)?
     });
 
     let path = debug_time!("scanner::calculate_path::best_path()", {
@@ -36,7 +31,7 @@ pub async fn scan<'a>(
         RootProvider,
     >,
     pool_addresses: Vec<Address>,
-    pool_data: &mut PoolData,
+    pool_data: PoolData,
 ) -> Result<(), CustomError<'a>> {
     // Create a filter for the events.
     let filter = provider
@@ -51,10 +46,12 @@ pub async fn scan<'a>(
 
     // Create a shared state for the current amount
     let current_amount = Arc::new(Mutex::new(U256::from(1)));
+    let pool_data = Arc::new(Mutex::new(pool_data));
 
     // Spawn a task to handle user input
     let input_handle = {
         let current_amount = Arc::clone(&current_amount);
+        let pool_data_clone = Arc::clone(&pool_data);
         tokio::spawn(async move {
             let stdin = tokio::io::stdin();
             let mut reader = BufReader::new(stdin);
@@ -79,6 +76,11 @@ pub async fn scan<'a>(
                     *current_amount.lock().await = amount;
                     println!("New amount set to: {}", amount);
 
+                    // Calculate path immediately after receiving amount
+                    if let Err(e) = calculate_path(&mut *pool_data_clone.lock().await, amount) {
+                        log::error!("Error calculating path: {}", e);
+                    }
+
                     if let Err(e) = tx.send(amount).await {
                         log::error!("Error sending amount: {}", e);
                         break;
@@ -93,20 +95,16 @@ pub async fn scan<'a>(
     // Process events from the stream
     while let Some(log) = stream.next().await {
         let mut scanner = ScanData::new(&log);
-        let amount = *current_amount.lock().await;
 
         if let Ok(decoded) = log.log_decode() {
             let swap: Swap = decoded.inner.data;
             scanner.update_swap(swap, decoded.inner.address);
-
-            // Process the swap with current amount
-            if let Err(e) = calculate_path(decoded.inner.address, pool_data, scanner, amount).await
-            {
-                log::error!("Error calculating path: {}", e);
-            }
         } else if let Ok(decoded) = log.log_decode() {
             let sync: Sync = decoded.inner.data;
             scanner.update_sync(sync, decoded.inner.address);
+
+            // Update reserves based on the event
+            update_reserve_abs(scanner, &mut *pool_data.lock().await)?;
         } else if let Ok(decoded) = log.log_decode() {
             let mint: Mint = decoded.inner.data;
             scanner.update_liquidity_events(mint, decoded.inner.address);
