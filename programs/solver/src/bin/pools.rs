@@ -6,6 +6,7 @@ use alloy::{
     },
     sol,
 };
+use futures::future::join_all;
 use serde::{Deserialize, Serialize};
 use serde_json::from_reader;
 use std::{
@@ -74,30 +75,43 @@ async fn get_addresses_v2<'a>(
         RootProvider,
     >,
     tokens: Vec<Address>,
-    exchanges: Exchanges, 
+    exchanges: Exchanges,
 ) -> Result<(), CustomError<'a>> {
     let n = tokens.len();
     let mut pools = Vec::with_capacity(n);
 
     use Exchanges::*;
     let (factory, mut file) = match exchanges {
-        Uniswap => {
-            (address!("0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f"), File::create("resources/sushiv2_tokens_to_pool.json")?)
-        }
-        Sushi =>{
-            (address!("0xC0AEe478e3658e2610c5F7A4A2E1777cE9e4f2Ac"), File::create("resources/uniswapv2_tokens_to_pool.json")?)
-
-        }
+        Uniswap => (
+            address!("0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f"),
+            File::create("resources/uniswapv2_tokens_to_pool.json")?,
+        ),
+        Sushi => (
+            address!("0xC0AEe478e3658e2610c5F7A4A2E1777cE9e4f2Ac"),
+            File::create("resources/sushiv2_tokens_to_pool.json")?,
+        ),
     };
 
+    let mut handles = Vec::with_capacity((n * (n - 1)) / 2);
     for i in 0..n - 1 {
         for j in (i + 1)..n {
-            if let Some(pool) = get_pair_address(provider.clone(), factory, tokens[i], tokens[j]).await? {
-                pools.push(pool);
-            }
+            let provider_clone = provider.clone();
+            let factory_clone = factory;
+            let token_a = tokens[i];
+            let token_b = tokens[j];
+
+            handles.push(tokio::spawn(async move {
+                get_pair_address(provider_clone, factory_clone, token_a, token_b).await
+            }));
         }
     }
 
+    let results = join_all(handles).await;
+    for result in results {
+        if let Ok(Ok(Some(pool))) = result {
+            pools.push(pool);
+        }
+    }
     file.write_all(serde_json::to_string_pretty(&pools)?.as_bytes())?;
 
     Ok(())
