@@ -4,7 +4,7 @@ use super::*;
 pub struct Pools {
     token_a: Address,
     token_b: Address,
-    address: Address,
+    pub address: Address,
 }
 
 impl Pools {

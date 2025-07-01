@@ -18,6 +18,7 @@ use alloy::{
     sol,
 };
 use colored::Colorize;
+use futures::future::join_all;
 use futures_util::stream::StreamExt;
 use serde::{Deserialize, Serialize};
 use serde_json::from_reader;
@@ -29,6 +30,7 @@ use std::{
     io::BufReader,
 };
 use utils::{CustomError, EnvParser};
+
 type U112 = Uint<112, 2>;
 
 mod dijkstra;
@@ -63,33 +65,34 @@ async fn main() -> Result<(), anyhow::Error> {
 
     log::info!("Logger initialized");
 
-    // Load environment variables from .env file
-    let env_parser = debug_time!("env_parser", { EnvParser::new()? });
+    debug_time!("main()", {
+        // Load environment variables from .env file
+        let env_parser = debug_time!("env_parser", { EnvParser::new()? });
 
-    // Set up the WS transport and connect.
-    let ws = WsConnect::new(env_parser.ws_address);
-    let provider = ProviderBuilder::new().connect_ws(ws).await?;
+        // Set up the WS transport and connect.
+        let ws = WsConnect::new(env_parser.ws_address);
+        let provider = ProviderBuilder::new().connect_ws(ws).await?;
 
-    // // Scanning the ethereum blockchain for events
-    // debug_time!("Calling scanner()", {
-    //     scan(provider.clone(), env_parser.pools_addrs).await?
-    // });
+        // // Scanning the ethereum blockchain for events
+        // debug_time!("Calling scanner()", {
+        //     scan(provider.clone(), env_parser.pools_addrs).await?
+        // });
 
-    let file = File::open("resources/tokens_to_pool.json")?;
-    let reader = BufReader::new(file);
-    let pools: Vec<Pools> = from_reader(reader)?;
-    let graph = debug_time!("slippage::calc_slippage", {
-        calc_slippage(provider, pools).await?
+        let file = File::open("resources/tokens_to_pool.json")?;
+        let reader = BufReader::new(file);
+        let pools: Vec<Pools> = from_reader(reader)?;
+        let graph = debug_time!("slippage::calc_slippage", {
+            calc_slippage(provider, pools).await?
+        });
+
+        let best_path = debug_time!("best_path()", {
+            best_path(
+                &graph,
+                &address!("0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"),
+                &address!("0x2260fac5e5542a773aa44fbcfedf7c193bc2c599"),
+            )
+        });
+        println!("{:#?}", best_path);
     });
-
-    let best_path = debug_time!("best_path()", {
-        best_path(
-            &graph,
-            &address!("0x614f611300d8fb0108fa2a860dbca1ff8fc62624"),
-            &address!("0xdac17f958d2ee523a2206206994597c13d831ec7"),
-        )
-    });
-    println!("{:#?}", best_path);
-
     Ok(())
 }
