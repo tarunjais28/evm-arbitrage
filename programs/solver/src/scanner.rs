@@ -1,23 +1,29 @@
 use super::*;
 use tokio::io::{AsyncBufReadExt, BufReader};
 
-fn calculate_path<'a>(pool_data: &mut PoolData, amount_in: U256) -> Result<(), CustomError<'a>> {
+#[derive(Debug, Deserialize, Serialize, Clone, Copy)]
+pub struct InputData {
+    pub token_a: Address,
+    pub token_b: Address,
+    pub amount_in: U256,
+}
+
+fn calculate_path<'a>(
+    pool_data: &mut PoolData,
+    input_data: InputData,
+) -> Result<(), CustomError<'a>> {
     let graph = debug_time!("scanner::calculate_path::calc_slippage()", {
-        calc_slippage(pool_data, amount_in)?
+        calc_slippage(pool_data, input_data.amount_in)?
     });
 
     let path = debug_time!("scanner::calculate_path::best_path()", {
-        best_path(
-            &graph,
-            &address!("0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"),
-            &address!("0x2260fac5e5542a773aa44fbcfedf7c193bc2c599"),
-        )
+        best_path(&graph, &input_data.token_a, &input_data.token_b)
     });
 
     println!(
-        "Optimal path for amount {}:
+        "Optimal path for input {:#?}:
 {:#?}",
-        amount_in, path
+        input_data, path
     );
     Ok(())
 }
@@ -45,12 +51,10 @@ pub async fn scan<'a>(
     let (tx, rx) = mpsc::channel(32);
 
     // Create a shared state for the current amount
-    let current_amount = Arc::new(Mutex::new(U256::from(1)));
     let pool_data = Arc::new(Mutex::new(pool_data));
 
     // Spawn a task to handle user input
     let input_handle = {
-        let current_amount = Arc::clone(&current_amount);
         let pool_data_clone = Arc::clone(&pool_data);
         tokio::spawn(async move {
             let stdin = tokio::io::stdin();
@@ -71,21 +75,18 @@ pub async fn scan<'a>(
                     break;
                 }
 
-                if let Ok(amount) = input.parse::<u128>() {
-                    let amount = U256::from(amount);
-                    *current_amount.lock().await = amount;
-                    println!("New amount set to: {}", amount);
-
+                let buffer = input.trim();
+                if let Ok(input_data) = serde_json::from_str::<InputData>(buffer) {
                     // Calculate path immediately after receiving amount
-                    if let Err(e) = calculate_path(&mut *pool_data_clone.lock().await, amount) {
+                    if let Err(e) = calculate_path(&mut *pool_data_clone.lock().await, input_data) {
                         log::error!("Error calculating path: {}", e);
                     }
 
-                    if let Err(e) = tx.send(amount).await {
+                    if let Err(e) = tx.send(input_data.amount_in).await {
                         log::error!("Error sending amount: {}", e);
                         break;
                     }
-                } else if !input.is_empty() {
+                } else {
                     log::error!("Invalid input. Please enter a valid number or 'q' to quit.");
                 }
             }

@@ -9,7 +9,7 @@ use crate::{
     IUniswapV2Pool::{Burn, Mint, Swap, Sync},
 };
 use alloy::{
-    primitives::{address, Address, TxHash, Uint, U256},
+    primitives::{Address, TxHash, Uint, U256},
     providers::{
         fillers::{BlobGasFiller, ChainIdFiller, FillProvider, GasFiller, JoinFill, NonceFiller},
         Identity, Provider, ProviderBuilder, RootProvider, WsConnect,
