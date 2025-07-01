@@ -143,5 +143,55 @@
     "token_a": "0x2260fac5e5542a773aa44fbcfedf7c193bc2c599",
     "token_b": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
     "address": "0xbb2b8038a1640196fbe3e38816f3e67cba72d940"
+  },
+  {
+    "token_a": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+    "token_b": "0x4d4574f50dd8b9dbe623cf329dcc78d76935e610",
+    "address": "0x055fb841cce69000fbaff2691ad39fa6e23826a1"
+  },
+  {
+    "token_a": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+    "token_b": "0x614f611300d8fb0108fa2a860dbca1ff8fc62624",
+    "address": "0x74b00e5197525554eb463589d0e3d7da547b067d"
+  },
+  {
+    "token_a": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+    "token_b": "0x76e222b07c53d28b89b0bac18602810fc22b49a8",
+    "address": "0x704ad8d95c12d7fea531738faa94402725acb035"
+  },
+  {
+    "token_a": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+    "token_b": "0x2e44f3f609ff5aa4819b323fd74690f07c3607c4",
+    "address": "0x8d547a3e42828093e31a8c3f2a864036984b64ee"
+  },
+  {
+    "token_a": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+    "token_b": "0x969ce55826bb4b3a572ed4f17c795a3ebcb0079f",
+    "address": "0x0f417870fc97924337266c10102016a076729da9"
+  },
+  {
+    "token_a": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+    "token_b": "0x44709a920fccf795fbc57baa433cc3dd53c44dbe",
+    "address": "0x0fd3faf056382a25507de89022d8acf66b3d7410"
+  },
+  {
+    "token_a": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+    "token_b": "0x95ed629b028cf6aadd1408bb988c6d1daabe4767",
+    "address": "0xfa3551ee99a4ac691673a569d586c8cc7e78672f"
+  },
+  {
+    "token_a": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+    "token_b": "0xa9a660e7d49bbef606d07210ddd6568b70b93dd3",
+    "address": "0x6090341b15b7e9397f11e85e6afb944058bbfd9a"
+  },
+  {
+    "token_a": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+    "token_b": "0x7abc8a5768e6be61a6c693a6e4eacb5b60602c4d",
+    "address": "0xc783d210c483d76d158fd502af6b48439ffed9c5"
+  },
+  {
+    "token_a": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+    "token_b": "0x4e9623b7e5b6438542458f5ee828d65c24d3af8c",
+    "address": "0x2623edc6008d057786a6bf9dd34185dcddebbf2f"
   }
 ]

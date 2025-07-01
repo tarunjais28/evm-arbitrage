@@ -8,7 +8,7 @@ use alloy::{
 };
 use serde::{Deserialize, Serialize};
 use serde_json::from_reader;
-use std::{fs::File, io::BufReader};
+use std::{fs::File, io::{BufReader, Write}};
 use utils::{CustomError, EnvParser};
 
 sol!(
@@ -95,7 +95,9 @@ async fn main() -> Result<(), anyhow::Error> {
     // Parse and decode addresses
     let tokens: Vec<Address> = from_reader(reader)?;
     let pools = get_addresses_v2(provider, tokens).await?;
-    println!("{}", serde_json::to_string_pretty(&pools)?);
+
+    let mut file = File::create("resources/tokens_to_pool.json")?;
+    file.write_all(serde_json::to_string_pretty(&pools)?.as_bytes())?;
 
     Ok(())
 }
