@@ -59,7 +59,6 @@ pub async fn scan<'a>(
         } else {
             continue;
         }
-        scanner.update_reserves(provider.clone()).await?;
         scanner.show();
     }
 

@@ -18,7 +18,6 @@ use alloy::{
     sol,
 };
 use colored::Colorize;
-use futures::future::join_all;
 use futures_util::stream::StreamExt;
 use serde::{Deserialize, Serialize};
 use serde_json::from_reader;

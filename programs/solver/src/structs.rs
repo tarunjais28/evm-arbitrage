@@ -45,8 +45,6 @@ pub struct ScanData {
     amount1_out: U256,
     reserve0: U112,
     reserve1: U112,
-    reserve0_crnt: U112,
-    reserve1_crnt: U112,
 }
 
 impl From<ScanData> for Reserves {
@@ -92,23 +90,6 @@ impl ScanData {
         self.amount1 = e.amount1;
 
         self.pool_address = pool_address;
-    }
-
-    pub async fn update_reserves<'a>(
-        &mut self,
-        provider: FillProvider<
-            JoinFill<
-                Identity,
-                JoinFill<GasFiller, JoinFill<BlobGasFiller, JoinFill<NonceFiller, ChainIdFiller>>>,
-            >,
-            RootProvider,
-        >,
-    ) -> Result<(), CustomError<'a>> {
-        let reserves = get_reserves(provider, self.pool_address).await?;
-        self.reserve0_crnt = reserves.reserve0;
-        self.reserve1_crnt = reserves.reserve1;
-
-        Ok(())
     }
 
     pub fn show(&self) {
@@ -161,8 +142,8 @@ impl Display for ScanData {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(
             f,
-            "txHash: {}\nblockNumber: {}\npool_address: {}\ntx_type: {:?}\ncurrent_reserve0: {:018}\ncurrent_reserve1: {:018}\n",
-            self.tx_hash, self.block_number, self.pool_address, self.tx_type,self.reserve0_crnt, self.reserve1_crnt
+            "txHash: {}\nblockNumber: {}\npool_address: {}\ntx_type: {:?}\n",
+            self.tx_hash, self.block_number, self.pool_address, self.tx_type,
         )
     }
 }
