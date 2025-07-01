@@ -8,7 +8,10 @@ use alloy::{
 };
 use serde::{Deserialize, Serialize};
 use serde_json::from_reader;
-use std::{fs::File, io::{BufReader, Write}};
+use std::{
+    fs::File,
+    io::{BufReader, Write},
+};
 use utils::{CustomError, EnvParser};
 
 sol!(
@@ -26,10 +29,10 @@ pub async fn get_pair_address<'a>(
         >,
         RootProvider,
     >,
+    factory_address: Address,
     token_a: Address,
     token_b: Address,
 ) -> Result<Option<Pools>, CustomError<'a>> {
-    let factory_address = address!("0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f");
     let contract = IUniswapV2Factory::new(factory_address, provider);
     let pair: Address = contract.getPair(token_a, token_b).call().await?;
 
@@ -57,6 +60,11 @@ impl Pools {
     }
 }
 
+enum Exchanges {
+    Sushi,
+    Uniswap,
+}
+
 async fn get_addresses_v2<'a>(
     provider: FillProvider<
         JoinFill<
@@ -66,18 +74,33 @@ async fn get_addresses_v2<'a>(
         RootProvider,
     >,
     tokens: Vec<Address>,
-) -> Result<Vec<Pools>, CustomError<'a>> {
+    exchanges: Exchanges, 
+) -> Result<(), CustomError<'a>> {
     let n = tokens.len();
     let mut pools = Vec::with_capacity(n);
+
+    use Exchanges::*;
+    let (factory, mut file) = match exchanges {
+        Uniswap => {
+            (address!("0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f"), File::create("resources/sushiv2_tokens_to_pool.json")?)
+        }
+        Sushi =>{
+            (address!("0xC0AEe478e3658e2610c5F7A4A2E1777cE9e4f2Ac"), File::create("resources/uniswapv2_tokens_to_pool.json")?)
+
+        }
+    };
+
     for i in 0..n - 1 {
         for j in (i + 1)..n {
-            if let Some(pool) = get_pair_address(provider.clone(), tokens[i], tokens[j]).await? {
+            if let Some(pool) = get_pair_address(provider.clone(), factory, tokens[i], tokens[j]).await? {
                 pools.push(pool);
             }
         }
     }
 
-    Ok(pools)
+    file.write_all(serde_json::to_string_pretty(&pools)?.as_bytes())?;
+
+    Ok(())
 }
 
 #[tokio::main]
@@ -94,10 +117,8 @@ async fn main() -> Result<(), anyhow::Error> {
 
     // Parse and decode addresses
     let tokens: Vec<Address> = from_reader(reader)?;
-    let pools = get_addresses_v2(provider, tokens).await?;
-
-    let mut file = File::create("resources/tokens_to_pool.json")?;
-    file.write_all(serde_json::to_string_pretty(&pools)?.as_bytes())?;
+    get_addresses_v2(provider.clone(), tokens.clone(), Exchanges::Uniswap).await?;
+    get_addresses_v2(provider, tokens, Exchanges::Sushi).await?;
 
     Ok(())
 }
