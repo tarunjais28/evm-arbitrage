@@ -29,12 +29,10 @@ pub async fn calc_slippage<'a>(
     debug_time!("pool_data_abstraction()", {
         for (pair, data) in pool_data.iter_mut() {
             if let Some(reserves) = reserves_map.get(&data.pool) {
-                debug_time!("update_reserves()", { data.update_reserves(*reserves) });
-                debug_time!("calc_slippage()", { data.calc_slippage() });
+                data.update_reserves(*reserves);
+                data.calc_slippage();
 
-                debug_time!("edges()", {
-                    edges.push((pair.token_a, pair.token_b, data.pool, data.slippage))
-                });
+                edges.push((pair.token_a, pair.token_b, data.pool, data.slippage));
             }
         }
     });

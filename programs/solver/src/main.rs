@@ -60,14 +60,13 @@ sol!(
 #[tokio::main]
 async fn main() -> Result<(), anyhow::Error> {
     // Initialize the logger
-    // env_logger::Builder::from_env(env_logger::Env::default().default_filter_or("debug")).init();
-    env_logger::init();
+    env_logger::Builder::from_env(env_logger::Env::default().default_filter_or("info")).init();
 
     log::info!("Logger initialized");
 
-    debug_time!("main()", {
+    info_time!("main()", {
         // Load environment variables from .env file
-        let env_parser = debug_time!("env_parser", { EnvParser::new()? });
+        let env_parser = info_time!("env_parser", { EnvParser::new()? });
 
         // Set up the WS transport and connect.
         let ws = WsConnect::new(env_parser.ws_address);
