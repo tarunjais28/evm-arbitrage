@@ -74,7 +74,7 @@ async fn main() -> Result<(), anyhow::Error> {
         let provider = ProviderBuilder::new().connect_ws(ws).await?;
 
         let file = debug_time!("file_open()", {
-            File::open("resources/tokens_to_pool.json")?
+            File::open("resources/uniswapv2_tokens_to_pool.json")?
         });
         let reader = debug_time!("reader()", { BufReader::new(file) });
         let pools: Vec<Pools> = debug_time!("pools_serialize()", { from_reader(reader)? });

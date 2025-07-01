@@ -75,21 +75,15 @@ async fn get_addresses_v2<'a>(
         RootProvider,
     >,
     tokens: Vec<Address>,
+    pools: &mut Vec<Pools>,
     exchanges: Exchanges,
 ) -> Result<(), CustomError<'a>> {
     let n = tokens.len();
-    let mut pools = Vec::with_capacity(n);
 
     use Exchanges::*;
-    let (factory, mut file) = match exchanges {
-        Uniswap => (
-            address!("0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f"),
-            File::create("resources/uniswapv2_tokens_to_pool.json")?,
-        ),
-        Sushi => (
-            address!("0xC0AEe478e3658e2610c5F7A4A2E1777cE9e4f2Ac"),
-            File::create("resources/sushiv2_tokens_to_pool.json")?,
-        ),
+    let factory = match exchanges {
+        Uniswap => address!("0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f"),
+        Sushi => address!("0xC0AEe478e3658e2610c5F7A4A2E1777cE9e4f2Ac"),
     };
 
     let mut handles = Vec::with_capacity((n * (n - 1)) / 2);
@@ -112,7 +106,6 @@ async fn get_addresses_v2<'a>(
             pools.push(pool);
         }
     }
-    file.write_all(serde_json::to_string_pretty(&pools)?.as_bytes())?;
 
     Ok(())
 }
@@ -131,8 +124,24 @@ async fn main() -> Result<(), anyhow::Error> {
 
     // Parse and decode addresses
     let tokens: Vec<Address> = from_reader(reader)?;
-    get_addresses_v2(provider.clone(), tokens.clone(), Exchanges::Uniswap).await?;
-    get_addresses_v2(provider, tokens, Exchanges::Sushi).await?;
+    let mut pools: Vec<Pools> = Vec::with_capacity(tokens.len() * 2);
+    get_addresses_v2(
+        provider.clone(),
+        tokens.clone(),
+        &mut pools,
+        Exchanges::Uniswap,
+    )
+    .await?;
+    get_addresses_v2(provider, tokens, &mut pools, Exchanges::Sushi).await?;
+
+    let mut pool_addresses = Vec::with_capacity(pools.len());
+    pools.iter().for_each(|p| pool_addresses.push(p.address));
+
+    let mut file = File::create("resources/uniswapv2_tokens_to_pool.json")?;
+    file.write_all(serde_json::to_string_pretty(&pools)?.as_bytes())?;
+
+    let mut file = File::create("resources/pools.json")?;
+    file.write_all(serde_json::to_string_pretty(&pool_addresses)?.as_bytes())?;
 
     Ok(())
 }
