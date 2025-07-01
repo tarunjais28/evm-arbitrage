@@ -34,7 +34,7 @@ pub struct ScanData {
     tx_hash: TxHash,
     block_number: u64,
     pub pool_address: Address,
-    tx_type: TxType,
+    pub tx_type: TxType,
     sender: Address,
     to: Address,
     amount0: U256,

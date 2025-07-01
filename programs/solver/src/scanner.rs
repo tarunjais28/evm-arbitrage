@@ -114,7 +114,8 @@ pub async fn scan<'a>(
             scanner.update_liquidity_events(burn, decoded.inner.address);
         }
 
-        scanner.show();
+        log::info!("{:?}", scanner.tx_type);
+        // scanner.show();
     }
 
     // Clean up
