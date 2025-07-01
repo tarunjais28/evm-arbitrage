@@ -1,5 +1,7 @@
 use super::*;
 
+pub type PoolData = HashMap<TokenPair, TokenData>;
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Pools {
     token_a: Address,
@@ -44,8 +46,7 @@ impl TokenData {
         self.reserve1 = reserves.reserve1;
     }
 
-    pub fn calc_slippage(&mut self) {
-        let amount_in = U256::from(1);
+    pub fn calc_slippage(&mut self, amount_in: U256) {
         let fee = U256::from(3);
         let net_percent = U256::from(1000);
         let reserve0 = U256::from(self.reserve0);
@@ -89,7 +90,8 @@ mod tests {
             reserve0: U112::ZERO,
             reserve1: U112::ZERO,
         };
-        token_data.calc_slippage();
+        let amount_in = U256::from(1);
+        token_data.calc_slippage(amount_in);
         assert_eq!(token_data.slippage, U256::from(1000));
     }
 
@@ -101,7 +103,8 @@ mod tests {
             reserve0: U112::from(1000),
             reserve1: U112::from(1000),
         };
-        token_data.calc_slippage();
+        let amount_in = U256::from(1);
+        token_data.calc_slippage(amount_in);
         assert_eq!(token_data.slippage, U256::from(1000));
     }
 
@@ -113,7 +116,8 @@ mod tests {
             reserve0: U112::from(1000),
             reserve1: U112::from(2000),
         };
-        token_data.calc_slippage();
+        let amount_in = U256::from(1);
+        token_data.calc_slippage(amount_in);
         assert_eq!(token_data.slippage, U256::from(1000));
     }
 
@@ -125,7 +129,8 @@ mod tests {
             reserve0: U112::from(1000),
             reserve1: U112::ZERO,
         };
-        token_data.calc_slippage();
+        let amount_in = U256::from(1);
+        token_data.calc_slippage(amount_in);
         assert_eq!(token_data.slippage, U256::from(1000));
     }
 }

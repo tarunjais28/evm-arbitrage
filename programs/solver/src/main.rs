@@ -77,21 +77,15 @@ async fn main() -> Result<(), anyhow::Error> {
         //     scan(provider.clone(), env_parser.pools_addrs).await?
         // });
 
-        let file = File::open("resources/tokens_to_pool.json")?;
-        let reader = BufReader::new(file);
-        let pools: Vec<Pools> = from_reader(reader)?;
-        let graph = debug_time!("slippage::calc_slippage", {
-            calc_slippage(provider, pools).await?
+        let file = debug_time!("file_open()", {
+            File::open("resources/tokens_to_pool.json")?
         });
-
-        let best_path = debug_time!("best_path()", {
-            best_path(
-                &graph,
-                &address!("0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"),
-                &address!("0x2260fac5e5542a773aa44fbcfedf7c193bc2c599"),
-            )
+        let reader = debug_time!("reader()", { BufReader::new(file) });
+        let pools: Vec<Pools> = debug_time!("pools_serialize()", { from_reader(reader)? });
+        let pool_data: PoolData = debug_time!("slippage::update_reserves", {
+            update_reserves(provider, pools).await?
         });
-        println!("{:#?}", best_path);
     });
+    
     Ok(())
 }
