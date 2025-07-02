@@ -78,7 +78,7 @@ async fn main() -> Result<(), anyhow::Error> {
         });
         let reader = debug_time!("reader()", { BufReader::new(file) });
         let pools: Vec<Pools> = debug_time!("pools_serialize()", { from_reader(reader)? });
-        let pool_data: PoolData = debug_time!("slippage::update_reserves", {
+        let pool_data: PoolData = debug_time!("update_reserves", {
             update_reserves(provider.clone(), pools).await?
         });
 

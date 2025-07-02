@@ -62,11 +62,11 @@ pub async fn scan<'a>(
             let mut input = String::new();
 
             loop {
-                println!("\nEnter amount to calculate path (or 'q' to quit): ");
+                println!("\nEnter input data to calculate path (or 'q' to quit): ");
                 input.clear();
 
                 if let Err(e) = reader.read_line(&mut input).await {
-                    eprintln!("Error reading input: {}", e);
+                    log::error!("Error reading input: {}", e);
                     break;
                 }
 
