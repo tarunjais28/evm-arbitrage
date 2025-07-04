@@ -1,0 +1,18 @@
+[package]
+name = "price-compare"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+alloy.workspace = true
+tokio.workspace = true
+futures-util.workspace = true
+futures.workspace = true
+utils.workspace = true
+anyhow.workspace = true
+colored.workspace = true
+serde_json.workspace = true
+serde.workspace = true
+log.workspace = true
+env_logger.workspace = true
+dotenv.workspace = true
