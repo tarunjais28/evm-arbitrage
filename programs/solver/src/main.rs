@@ -2,6 +2,7 @@ use crate::{
     dijkstra::*,
     enums::*,
     fetch::*,
+    parser::*,
     pools::*,
     scanner::*,
     slippage::*,
@@ -18,25 +19,29 @@ use alloy::{
     sol,
 };
 use colored::Colorize;
+use dotenv::dotenv;
 use futures_util::stream::StreamExt;
 use serde::{Deserialize, Serialize};
 use serde_json::from_reader;
 use std::{
     cmp::Ordering,
     collections::{BinaryHeap, HashMap},
+    env,
     fmt::Display,
     fs::File,
     io::BufReader,
     sync::Arc,
 };
+
 use tokio::sync::{mpsc, Mutex};
-use utils::{CustomError, EnvParser};
+use utils::CustomError;
 
 type U112 = Uint<112, 2>;
 
 mod dijkstra;
 mod enums;
 mod fetch;
+mod parser;
 #[macro_use]
 mod logger;
 mod pools;

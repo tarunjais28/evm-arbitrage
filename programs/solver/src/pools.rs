@@ -16,7 +16,6 @@ impl Pools {
             TokenData {
                 token_a: self.token_a,
                 token_b: self.token_b,
-
                 slippage: U256::ZERO,
                 reserve0: U112::ZERO,
                 reserve1: U112::ZERO,
