@@ -20,38 +20,9 @@ use utils::{CustomError, EnvParser};
 sol!(
     #[sol(rpc)]
     #[derive(Debug)]
-    IUniswapV2Factory,
-    "../../resources/uniswapv2_factory.json"
-);
-
-sol!(
-    #[sol(rpc)]
-    #[derive(Debug)]
     IUniswapV3Factory,
-    "../../resources/uniswapv3_factory.json"
+    "../../resources/contracts/uniswapv3_factory.json"
 );
-
-pub async fn get_pair_address<'a>(
-    provider: FillProvider<
-        JoinFill<
-            Identity,
-            JoinFill<GasFiller, JoinFill<BlobGasFiller, JoinFill<NonceFiller, ChainIdFiller>>>,
-        >,
-        RootProvider,
-    >,
-    factory_address: Address,
-    token_a: Address,
-    token_b: Address,
-) -> Result<Option<Pools>, CustomError<'a>> {
-    let contract = IUniswapV2Factory::new(factory_address, provider);
-    let pair: Address = contract.getPair(token_a, token_b).call().await?;
-
-    if pair.is_zero() {
-        Ok(None)
-    } else {
-        Ok(Some(Pools::new(token_a, token_b, pair)))
-    }
-}
 
 pub async fn get_pair_address_v3<'a>(
     provider: FillProvider<
@@ -96,23 +67,6 @@ impl PoolV3 {
             token_a,
             token_b,
             fee,
-            address,
-        }
-    }
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct Pools {
-    token_a: Address,
-    token_b: Address,
-    address: Address,
-}
-
-impl Pools {
-    fn new(token_a: Address, token_b: Address, address: Address) -> Self {
-        Self {
-            token_a,
-            token_b,
             address,
         }
     }

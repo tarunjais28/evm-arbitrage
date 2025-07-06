@@ -19,7 +19,7 @@ sol!(
     #[sol(rpc)]
     #[derive(Debug)]
     IUniswapV2Factory,
-    "../../resources/uniswapv2_factory.json"
+    "../../resources/contracts/uniswapv2_factory.json"
 );
 
 pub async fn get_pair_address<'a>(
