@@ -3,7 +3,7 @@ use crate::{
     slippage::*, structs::*,
 };
 use alloy::{
-    primitives::{Address, TxHash, Uint, U256},
+    primitives::{Address, TxHash, U256},
     providers::{
         fillers::{BlobGasFiller, ChainIdFiller, FillProvider, GasFiller, JoinFill, NonceFiller},
         Identity, Provider, ProviderBuilder, RootProvider, WsConnect,
@@ -28,8 +28,6 @@ use std::{
 
 use tokio::sync::{mpsc, Mutex};
 use utils::CustomError;
-
-type U112 = Uint<112, 2>;
 
 mod dijkstra;
 mod enums;

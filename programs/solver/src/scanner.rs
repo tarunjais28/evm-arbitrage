@@ -13,7 +13,7 @@ fn calculate_path<'a>(
     input_data: InputData,
 ) -> Result<(), CustomError<'a>> {
     let graph = debug_time!("scanner::calculate_path::calc_slippage()", {
-        calc_slippage(pool_data, input_data.amount_in)?
+        calc_slippage(pool_data)?
     });
 
     let path = debug_time!("scanner::calculate_path::best_path()", {

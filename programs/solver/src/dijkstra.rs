@@ -68,19 +68,21 @@ impl ShortestPath {
     }
 }
 
-pub fn build_bidirectional_graph(edges: &[(Address, Address, Address, U256, u16)]) -> SwapGraph {
-    let mut graph = SwapGraph::new();
-    for (from, to, pool, slippage, fee) in edges {
+pub fn build_bidirectional_graph(
+    edges: &[(Address, Address, Address, U256, U256, u16)],
+) -> SwapGraph {
+    let mut graph = SwapGraph::with_capacity(edges.len() * 2);
+    for (from, to, pool, slippage0, slippage1, fee) in edges {
         graph.entry(from.clone()).or_default().push(SwapEdge::new(
             to.clone(),
             pool.clone(),
-            *slippage,
+            *slippage0,
             *fee,
         ));
         graph.entry(to.clone()).or_default().push(SwapEdge::new(
             from.clone(),
             pool.clone(),
-            *slippage,
+            *slippage1,
             *fee,
         ));
     }
@@ -238,10 +240,10 @@ mod tests {
         let p_b_d = address!("00000000000000000000000000000000000000BD");
         let p_c_d = address!("00000000000000000000000000000000000000CD");
         let edges = vec![
-            (a, b, p_a_b, U256::from(10), 0),
-            (a, c, p_a_c, U256::from(20), 0),
-            (b, d, p_b_d, U256::from(5), 0),
-            (c, d, p_c_d, U256::from(10), 0),
+            (a, b, p_a_b, U256::from(10), U256::from(10), 0),
+            (a, c, p_a_c, U256::from(20), U256::from(20), 0),
+            (b, d, p_b_d, U256::from(5), U256::from(5), 0),
+            (c, d, p_c_d, U256::from(10), U256::from(10), 0),
         ];
         let graph = build_bidirectional_graph(&edges);
 
@@ -270,12 +272,12 @@ mod tests {
         let p_b_e = address!("00000000000000000000000000000000000000BE");
         let p_d_e = address!("00000000000000000000000000000000000000DE");
         let edges = vec![
-            (a, b, p_a_b, U256::from(10), 0),
-            (a, c, p_a_c, U256::from(5), 0), // A-C is cheaper
-            (b, d, p_b_d, U256::from(5), 0),
-            (c, d, p_c_d, U256::from(5), 0), // C-D is cheaper
-            (b, e, p_b_e, U256::from(2), 0),
-            (d, e, p_d_e, U256::from(8), 0),
+            (a, b, p_a_b, U256::from(10), U256::from(10), 0),
+            (a, c, p_a_c, U256::from(5), U256::from(5), 0), // A-C is cheaper
+            (b, d, p_b_d, U256::from(5), U256::from(5), 0),
+            (c, d, p_c_d, U256::from(5), U256::from(5), 0), // C-D is cheaper
+            (b, e, p_b_e, U256::from(2), U256::from(2), 0),
+            (d, e, p_d_e, U256::from(8), U256::from(8), 0),
         ];
         let graph = build_bidirectional_graph(&edges);
 

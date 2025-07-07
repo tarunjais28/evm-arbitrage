@@ -90,7 +90,10 @@ async fn get_pair_address_v3<'a>(
 
     for fee in [100, 500, 3000, 10000] {
         let fee_u24 = U24::from(fee);
-        let pool: Address = contract.getPool(token_a.address, token_b.address, fee_u24).call().await?;
+        let pool: Address = contract
+            .getPool(token_a.address, token_b.address, fee_u24)
+            .call()
+            .await?;
         if !pool.is_zero() {
             pools
                 .lock()

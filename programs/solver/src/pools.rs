@@ -6,6 +6,8 @@ pub type PoolData = HashMap<Address, TokenData>;
 pub struct Pools {
     pub token_a: Address,
     pub token_b: Address,
+    pub decimals0: u8,
+    pub decimals1: u8,
     pub fee: u16,
     pub address: Address,
 }
@@ -17,9 +19,12 @@ impl Pools {
             TokenData {
                 token_a: self.token_a,
                 token_b: self.token_b,
-                slippage: U256::ZERO,
+                slippage0: U256::ZERO,
+                slippage1: U256::ZERO,
                 reserve0: U256::ZERO,
                 reserve1: U256::ZERO,
+                decimals0: self.decimals0,
+                decimals1: self.decimals1,
                 fee: self.fee,
             },
         )
@@ -30,9 +35,12 @@ impl Pools {
 pub struct TokenData {
     pub token_a: Address,
     pub token_b: Address,
-    pub slippage: U256,
+    pub slippage0: U256,
+    pub slippage1: U256,
     pub reserve0: U256,
     pub reserve1: U256,
+    pub decimals0: u8,
+    pub decimals1: u8,
     pub fee: u16,
 }
 
@@ -42,35 +50,20 @@ impl TokenData {
         self.reserve1 = reserves.reserve1;
     }
 
-    pub fn calc_slippage(&mut self, amount_in: U256) {
-        let fee = U256::from(3);
-        let net_percent = U256::from(1000);
+    pub fn calc_slippages(&mut self) {
         let reserve0 = U256::from(self.reserve0);
         let reserve1 = U256::from(self.reserve1);
+        let precision0 = U256::from(10u128.pow(self.decimals0 as u32));
+        let precision1 = U256::from(10u128.pow(self.decimals1 as u32));
 
-        let expected_price = reserve1.checked_div(reserve0).unwrap_or_default();
+        let fee = if self.fee == 0 {
+            U256::from(3000)
+        } else {
+            U256::from(self.fee)
+        };
 
-        let amount_in_net = amount_in
-            .checked_mul(net_percent.checked_sub(fee).unwrap_or_default())
-            .unwrap_or_default();
-
-        let reserve0_net = reserve0.checked_mul(net_percent).unwrap_or_default();
-
-        let amount_out = (reserve1.checked_mul(amount_in_net).unwrap_or_default())
-            .checked_div(reserve0_net.checked_add(amount_in_net).unwrap_or_default())
-            .unwrap_or_default();
-
-        let executed_price = amount_out.checked_div(amount_in).unwrap_or_default();
-
-        let slippage = U256::from(1)
-            .checked_sub(
-                executed_price
-                    .checked_div(expected_price)
-                    .unwrap_or_default(),
-            )
-            .unwrap_or_default();
-
-        self.slippage = slippage.checked_mul(net_percent).unwrap_or_default();
+        self.slippage0 = calc_individual_slippage(reserve0, precision0, reserve1, precision1, fee);
+        self.slippage1 = calc_individual_slippage(reserve1, precision1, reserve0, precision0, fee);
     }
 }
 
@@ -83,14 +76,17 @@ mod tests {
         let mut token_data = TokenData {
             token_a: Address::ZERO,
             token_b: Address::ZERO,
-            slippage: U256::ZERO,
+            slippage0: U256::ZERO,
+            slippage1: U256::ZERO,
             reserve0: U256::ZERO,
             reserve1: U256::ZERO,
+            decimals0: 0,
+            decimals1: 0,
             fee: 0,
         };
-        let amount_in = U256::from(1);
-        token_data.calc_slippage(amount_in);
-        assert_eq!(token_data.slippage, U256::from(1000));
+        token_data.calc_slippages();
+        assert_eq!(token_data.slippage0, U256::from(1000000000));
+        assert_eq!(token_data.slippage1, U256::from(1000000000));
     }
 
     #[test]
@@ -98,14 +94,17 @@ mod tests {
         let mut token_data = TokenData {
             token_a: Address::ZERO,
             token_b: Address::ZERO,
-            slippage: U256::ZERO,
+            slippage0: U256::ZERO,
+            slippage1: U256::ZERO,
             reserve0: U256::from(1000),
             reserve1: U256::from(1000),
+            decimals0: 0,
+            decimals1: 0,
             fee: 0,
         };
-        let amount_in = U256::from(1);
-        token_data.calc_slippage(amount_in);
-        assert_eq!(token_data.slippage, U256::from(1000));
+        token_data.calc_slippages();
+        assert_eq!(token_data.slippage0, U256::from(999999001));
+        assert_eq!(token_data.slippage1, U256::from(999999001));
     }
 
     #[test]
@@ -113,14 +112,17 @@ mod tests {
         let mut token_data = TokenData {
             token_a: Address::ZERO,
             token_b: Address::ZERO,
-            slippage: U256::ZERO,
+            slippage0: U256::ZERO,
+            slippage1: U256::ZERO,
             reserve0: U256::from(1000),
             reserve1: U256::from(2000),
+            decimals0: 0,
+            decimals1: 0,
             fee: 0,
         };
-        let amount_in = U256::from(1);
-        token_data.calc_slippage(amount_in);
-        assert_eq!(token_data.slippage, U256::from(1000));
+        token_data.calc_slippages();
+        assert_eq!(token_data.slippage0, U256::from(999999001));
+        assert_eq!(token_data.slippage1, U256::from(999998002));
     }
 
     #[test]
@@ -128,13 +130,34 @@ mod tests {
         let mut token_data = TokenData {
             token_a: Address::ZERO,
             token_b: Address::ZERO,
-            slippage: U256::ZERO,
+            slippage0: U256::ZERO,
+            slippage1: U256::ZERO,
             reserve0: U256::from(1000),
             reserve1: U256::ZERO,
+            decimals0: 0,
+            decimals1: 0,
             fee: 0,
         };
-        let amount_in = U256::from(1);
-        token_data.calc_slippage(amount_in);
-        assert_eq!(token_data.slippage, U256::from(1000));
+        token_data.calc_slippages();
+        assert_eq!(token_data.slippage0, U256::from(1000000000));
+        assert_eq!(token_data.slippage1, U256::from(1000000000));
+    }
+
+    #[test]
+    fn test_calc_slippage() {
+        let mut token_data = TokenData {
+            token_a: Address::ZERO,
+            token_b: Address::ZERO,
+            slippage0: U256::ZERO,
+            slippage1: U256::ZERO,
+            reserve0: U256::from(1551650201200975628814u128),
+            reserve1: U256::from(1178164302654065252u128),
+            fee: 0,
+            decimals0: 18,
+            decimals1: 18,
+        };
+        token_data.calc_slippages();
+        assert_eq!(token_data.slippage0, U256::from(3000144));
+        assert_eq!(token_data.slippage1, U256::from(3000001));
     }
 }

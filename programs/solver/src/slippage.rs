@@ -79,16 +79,20 @@ pub async fn update_reserve_v3<'a>(
     Ok(())
 }
 
-pub fn calc_slippage<'a>(
-    pool_data: &mut PoolData,
-    amount_in: U256,
-) -> Result<SwapGraph, CustomError<'a>> {
+pub fn calc_slippage<'a>(pool_data: &mut PoolData) -> Result<SwapGraph, CustomError<'a>> {
     let mut edges = Vec::with_capacity(pool_data.len());
 
     debug_time!("calc_slippage::calc_slippage()", {
         pool_data.iter_mut().for_each(|(pool, data)| {
-            data.calc_slippage(amount_in);
-            edges.push((data.token_a, data.token_b, *pool, data.slippage, data.fee));
+            data.calc_slippages();
+            edges.push((
+                data.token_a,
+                data.token_b,
+                *pool,
+                data.slippage0,
+                data.slippage1,
+                data.fee,
+            ));
         })
     });
 
