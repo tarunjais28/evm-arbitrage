@@ -1,8 +1,20 @@
 use super::*;
 
+#[derive(Debug, Serialize, Deserialize)]
+pub struct PoolAddress {
+    pub v2: Vec<Address>,
+    pub v3: Vec<Address>,
+}
+
+impl PoolAddress {
+    pub fn single(&self) -> Vec<Address> {
+        self.v2.iter().chain(self.v3.iter()).cloned().collect()
+    }
+}
+
 pub struct EnvParser {
     pub ws_address: String,
-    pub pools_addrs: Vec<Address>,
+    pub pool_address: PoolAddress,
 }
 
 impl<'a> EnvParser {
@@ -10,20 +22,12 @@ impl<'a> EnvParser {
         dotenv().ok();
 
         // Open the file with contract addresses
-        let file = File::open("resources/pools.json")?;
+        let file = File::open("resources/pools_combined.json")?;
         let reader = BufReader::new(file);
-
-        // Parse and decode addresses
-        let addresses: Vec<String> = from_reader(reader)?;
-
-        let pools_addrs: Vec<Address> = addresses
-            .iter()
-            .map(|s| s.parse())
-            .collect::<Result<_, _>>()?;
 
         Ok(Self {
             ws_address: env::var("WEBSOCKET_ENDPOINT")?,
-            pools_addrs,
+            pool_address: from_reader(reader)?,
         })
     }
 }

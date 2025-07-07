@@ -5,11 +5,17 @@ pub struct SwapEdge {
     pub to: Address,
     pub pool: Address,
     pub slippage: U256,
+    pub fee: u16,
 }
 
 impl SwapEdge {
-    pub fn new(to: Address, pool: Address, slippage: U256) -> Self {
-        Self { to, pool, slippage }
+    pub fn new(to: Address, pool: Address, slippage: U256, fee: u16) -> Self {
+        Self {
+            to,
+            pool,
+            slippage,
+            fee,
+        }
     }
 }
 
@@ -21,6 +27,7 @@ pub struct State {
     pub cost: U256,
     pub paths: Vec<Address>,
     pub pools: Vec<Address>,
+    pub fees: Vec<u16>,
 }
 
 impl Ord for State {
@@ -46,27 +53,35 @@ impl PartialEq for State {
 pub struct ShortestPath {
     pub paths: Vec<Address>,
     pub pools: Vec<Address>,
+    pub fees: Vec<u16>,
     pub cost: U256,
 }
 
 impl ShortestPath {
-    pub fn new(paths: Vec<Address>, pools: Vec<Address>, cost: U256) -> Self {
-        Self { paths, pools, cost }
+    pub fn new(paths: Vec<Address>, pools: Vec<Address>, fees: Vec<u16>, cost: U256) -> Self {
+        Self {
+            paths,
+            pools,
+            fees,
+            cost,
+        }
     }
 }
 
-pub fn build_bidirectional_graph(edges: &[(Address, Address, Address, U256)]) -> SwapGraph {
+pub fn build_bidirectional_graph(edges: &[(Address, Address, Address, U256, u16)]) -> SwapGraph {
     let mut graph = SwapGraph::new();
-    for (from, to, pool, slippage) in edges {
+    for (from, to, pool, slippage, fee) in edges {
         graph.entry(from.clone()).or_default().push(SwapEdge::new(
             to.clone(),
             pool.clone(),
             *slippage,
+            *fee,
         ));
         graph.entry(to.clone()).or_default().push(SwapEdge::new(
             from.clone(),
             pool.clone(),
             *slippage,
+            *fee,
         ));
     }
     graph
@@ -81,6 +96,7 @@ pub fn best_path(graph: &SwapGraph, start: &Address, end: &Address) -> ShortestP
         cost: U256::ZERO,
         paths: vec![start.clone()],
         pools: vec![],
+        fees: vec![],
     });
 
     while let Some(State {
@@ -88,10 +104,11 @@ pub fn best_path(graph: &SwapGraph, start: &Address, end: &Address) -> ShortestP
         cost,
         paths,
         pools,
+        fees,
     }) = heap.pop()
     {
         if &token == end {
-            return ShortestPath::new(paths, pools, cost);
+            return ShortestPath::new(paths, pools, fees, cost);
         }
 
         if cost > *best_cost.get(&token).unwrap_or(&U256::MAX) {
@@ -108,6 +125,9 @@ pub fn best_path(graph: &SwapGraph, start: &Address, end: &Address) -> ShortestP
                     let mut new_pools = pools.clone();
                     new_pools.push(edge.pool.clone());
 
+                    let mut new_fees = fees.clone();
+                    new_fees.push(edge.fee.clone());
+
                     best_cost.insert(edge.to.clone(), new_cost);
 
                     heap.push(State {
@@ -115,6 +135,7 @@ pub fn best_path(graph: &SwapGraph, start: &Address, end: &Address) -> ShortestP
                         cost: new_cost,
                         paths: new_paths,
                         pools: new_pools,
+                        fees: new_fees,
                     });
                 }
             }
@@ -143,12 +164,12 @@ mod tests {
         graph.insert(
             a,
             vec![
-                SwapEdge::new(b, p_a_b, U256::from(10)),
-                SwapEdge::new(c, p_a_c, U256::from(20)),
+                SwapEdge::new(b, p_a_b, U256::from(10), 0),
+                SwapEdge::new(c, p_a_c, U256::from(20), 0),
             ],
         );
-        graph.insert(b, vec![SwapEdge::new(d, p_b_d, U256::from(5))]);
-        graph.insert(c, vec![SwapEdge::new(d, p_c_d, U256::from(10))]);
+        graph.insert(b, vec![SwapEdge::new(d, p_b_d, U256::from(5), 0)]);
+        graph.insert(c, vec![SwapEdge::new(d, p_c_d, U256::from(10), 0)]);
         graph
     }
 
@@ -196,11 +217,11 @@ mod tests {
         graph.insert(
             a,
             vec![
-                SwapEdge::new(b, p_a_b, U256::from(10)),
-                SwapEdge::new(c, p_a_c, U256::from(5)),
+                SwapEdge::new(b, p_a_b, U256::from(10), 0),
+                SwapEdge::new(c, p_a_c, U256::from(5), 0),
             ],
         );
-        graph.insert(c, vec![SwapEdge::new(d, p_c_d, U256::from(5))]);
+        graph.insert(c, vec![SwapEdge::new(d, p_c_d, U256::from(5), 0)]);
         let path = best_path(&graph, &a, &d);
         assert_eq!(path.paths, vec![a, c, d]);
         assert_eq!(path.cost, U256::from(10));
@@ -217,10 +238,10 @@ mod tests {
         let p_b_d = address!("00000000000000000000000000000000000000BD");
         let p_c_d = address!("00000000000000000000000000000000000000CD");
         let edges = vec![
-            (a, b, p_a_b, U256::from(10)),
-            (a, c, p_a_c, U256::from(20)),
-            (b, d, p_b_d, U256::from(5)),
-            (c, d, p_c_d, U256::from(10)),
+            (a, b, p_a_b, U256::from(10), 0),
+            (a, c, p_a_c, U256::from(20), 0),
+            (b, d, p_b_d, U256::from(5), 0),
+            (c, d, p_c_d, U256::from(10), 0),
         ];
         let graph = build_bidirectional_graph(&edges);
 
@@ -249,12 +270,12 @@ mod tests {
         let p_b_e = address!("00000000000000000000000000000000000000BE");
         let p_d_e = address!("00000000000000000000000000000000000000DE");
         let edges = vec![
-            (a, b, p_a_b, U256::from(10)),
-            (a, c, p_a_c, U256::from(5)), // A-C is cheaper
-            (b, d, p_b_d, U256::from(5)),
-            (c, d, p_c_d, U256::from(5)), // C-D is cheaper
-            (b, e, p_b_e, U256::from(2)),
-            (d, e, p_d_e, U256::from(8)),
+            (a, b, p_a_b, U256::from(10), 0),
+            (a, c, p_a_c, U256::from(5), 0), // A-C is cheaper
+            (b, d, p_b_d, U256::from(5), 0),
+            (c, d, p_c_d, U256::from(5), 0), // C-D is cheaper
+            (b, e, p_b_e, U256::from(2), 0),
+            (d, e, p_d_e, U256::from(8), 0),
         ];
         let graph = build_bidirectional_graph(&edges);
 

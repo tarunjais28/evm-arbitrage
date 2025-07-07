@@ -1,13 +1,6 @@
 use crate::{
-    dijkstra::*,
-    enums::*,
-    fetch::*,
-    parser::*,
-    pools::*,
-    scanner::*,
-    slippage::*,
-    structs::*,
-    IUniswapV2Pool::{Burn, Mint, Swap, Sync},
+    contracts::*, dijkstra::*, enums::*, fetch::*, helper::*, parser::*, pools::*, scanner::*,
+    slippage::*, structs::*,
 };
 use alloy::{
     primitives::{Address, TxHash, Uint, U256},
@@ -44,24 +37,12 @@ mod fetch;
 mod parser;
 #[macro_use]
 mod logger;
+mod contracts;
+mod helper;
 mod pools;
 mod scanner;
 mod slippage;
 mod structs;
-
-sol!(
-    #[sol(rpc)]
-    #[derive(Debug)]
-    IUniswapV2Pool,
-    "../../resources/uniswapv2_pool_abi.json"
-);
-
-sol!(
-    #[sol(rpc)]
-    #[derive(Debug)]
-    IUniswapV2Pair,
-    "../../resources/uniswapv2_pair.json"
-);
 
 #[tokio::main]
 async fn main() -> Result<(), anyhow::Error> {
@@ -79,17 +60,22 @@ async fn main() -> Result<(), anyhow::Error> {
         let provider = ProviderBuilder::new().connect_ws(ws).await?;
 
         let file = debug_time!("file_open()", {
-            File::open("resources/uniswapv2_tokens_to_pool.json")?
+            File::open("resources/tokens_to_pool.json")?
         });
         let reader = debug_time!("reader()", { BufReader::new(file) });
         let pools: Vec<Pools> = debug_time!("pools_serialize()", { from_reader(reader)? });
         let pool_data: PoolData = debug_time!("update_reserves", {
-            update_reserves(provider.clone(), pools).await?
+            update_reserves(provider.clone(), pools, &env_parser.pool_address).await?
         });
 
         // Scanning the ethereum blockchain for events
         debug_time!("Calling scanner()", {
-            scan(provider.clone(), env_parser.pools_addrs, pool_data).await?
+            scan(
+                provider.clone(),
+                env_parser.pool_address.single(),
+                pool_data,
+            )
+            .await?
         });
     });
 

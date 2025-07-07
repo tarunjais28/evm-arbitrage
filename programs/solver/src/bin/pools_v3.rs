@@ -120,6 +120,11 @@ async fn get_addresses_v3<'a>(
 
 #[tokio::main]
 async fn main() -> Result<(), anyhow::Error> {
+    // Initialize the logger
+    env_logger::Builder::from_env(env_logger::Env::default().default_filter_or("info")).init();
+
+    log::info!("Logger initialized");
+
     // Load environment variables from .env file
     let env_parser = EnvParser::new()?;
 
@@ -140,6 +145,9 @@ async fn main() -> Result<(), anyhow::Error> {
         Exchanges::Uniswap,
     )
     .await?;
+
+    let uniswap_pools = pools.lock().await.len();
+    log::info!("UniswapV3 Pools: {uniswap_pools}");
 
     let pools_guard = pools.lock().await;
     let pool_addresses: Vec<_> = pools_guard.iter().map(|p| p.address).collect();

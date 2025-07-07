@@ -98,24 +98,22 @@ pub async fn scan<'a>(
         let mut scanner = ScanData::new(&log);
 
         if let Ok(decoded) = log.log_decode() {
-            let swap: Swap = decoded.inner.data;
-            scanner.update_swap(swap, decoded.inner.address);
-        } else if let Ok(decoded) = log.log_decode() {
-            let sync: Sync = decoded.inner.data;
+            let sync: IUniswapV2Pool::Sync = decoded.inner.data;
             scanner.update_sync(sync, decoded.inner.address);
 
             // Update reserves based on the event
             update_reserve_abs(scanner, &mut *pool_data.lock().await)?;
         } else if let Ok(decoded) = log.log_decode() {
-            let mint: Mint = decoded.inner.data;
-            scanner.update_liquidity_events(mint, decoded.inner.address);
-        } else if let Ok(decoded) = log.log_decode() {
-            let burn: Burn = decoded.inner.data;
-            scanner.update_liquidity_events(burn, decoded.inner.address);
-        }
+            let _: IUniswapV3Pool::Swap = decoded.inner.data;
 
-        log::info!("{:?}", scanner.tx_type);
-        // scanner.show();
+            // Update reserves based on the event
+            update_reserve_v3(
+                &provider,
+                decoded.inner.address,
+                &mut *pool_data.lock().await,
+            )
+            .await?;
+        }
     }
 
     // Clean up

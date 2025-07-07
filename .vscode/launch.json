@@ -33,6 +33,18 @@
                 "/rustc/${env:RUSTC_VERSION}": "${env:USERPROFILE}/.rustup/toolchains/stable-x86_64-apple-darwin/lib/rustlib/src/rust/library"
             },
             "preLaunchTask": "cargo build --bin mem-pool-listener"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "solver",
+            "program": "${workspaceFolder}/target/debug/solver",
+            "args": [],
+            "cwd": "${workspaceFolder}",
+            "sourceMap": {
+                "/rustc/${env:RUSTC_VERSION}": "${env:USERPROFILE}/.rustup/toolchains/stable-x86_64-apple-darwin/lib/rustlib/src/rust/library"
+            },
+            "preLaunchTask": "cargo build --bin solver"
         }
     ]
 }

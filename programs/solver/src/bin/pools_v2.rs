@@ -48,6 +48,7 @@ pub async fn get_pair_address<'a>(
 pub struct Pools {
     token_a: Address,
     token_b: Address,
+    fee: u16,
     address: Address,
 }
 
@@ -56,6 +57,7 @@ impl Pools {
         Self {
             token_a,
             token_b,
+            fee: 0,
             address,
         }
     }
@@ -112,6 +114,11 @@ async fn get_addresses_v2<'a>(
 
 #[tokio::main]
 async fn main() -> Result<(), anyhow::Error> {
+    // Initialize the logger
+    env_logger::Builder::from_env(env_logger::Env::default().default_filter_or("info")).init();
+
+    log::info!("Logger initialized");
+
     // Load environment variables from .env file
     let env_parser = EnvParser::new()?;
 
@@ -132,7 +139,12 @@ async fn main() -> Result<(), anyhow::Error> {
         Exchanges::Uniswap,
     )
     .await?;
+    let uniswap_pools = pools.len();
+    log::info!("UniswapV2 Pools: {uniswap_pools}");
+
     get_addresses_v2(provider, tokens, &mut pools, Exchanges::Sushi).await?;
+    let sushiswap_pools = pools.len() - uniswap_pools;
+    log::info!("SushiswapV2 Pools: {sushiswap_pools}");
 
     let mut pool_addresses = Vec::with_capacity(pools.len());
     pools.iter().for_each(|p| pool_addresses.push(p.address));
@@ -140,7 +152,7 @@ async fn main() -> Result<(), anyhow::Error> {
     let mut file = File::create("resources/uniswapv2_tokens_to_pool.json")?;
     file.write_all(serde_json::to_string_pretty(&pools)?.as_bytes())?;
 
-    let mut file = File::create("resources/pools.json")?;
+    let mut file = File::create("resources/pools_v2.json")?;
     file.write_all(serde_json::to_string_pretty(&pool_addresses)?.as_bytes())?;
 
     Ok(())

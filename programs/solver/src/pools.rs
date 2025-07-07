@@ -4,8 +4,9 @@ pub type PoolData = HashMap<Address, TokenData>;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Pools {
-    token_a: Address,
-    token_b: Address,
+    pub token_a: Address,
+    pub token_b: Address,
+    pub fee: u16,
     pub address: Address,
 }
 
@@ -17,20 +18,22 @@ impl Pools {
                 token_a: self.token_a,
                 token_b: self.token_b,
                 slippage: U256::ZERO,
-                reserve0: U112::ZERO,
-                reserve1: U112::ZERO,
+                reserve0: U256::ZERO,
+                reserve1: U256::ZERO,
+                fee: self.fee,
             },
         )
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy)]
 pub struct TokenData {
     pub token_a: Address,
     pub token_b: Address,
     pub slippage: U256,
-    pub reserve0: U112,
-    pub reserve1: U112,
+    pub reserve0: U256,
+    pub reserve1: U256,
+    pub fee: u16,
 }
 
 impl TokenData {
@@ -81,8 +84,9 @@ mod tests {
             token_a: Address::ZERO,
             token_b: Address::ZERO,
             slippage: U256::ZERO,
-            reserve0: U112::ZERO,
-            reserve1: U112::ZERO,
+            reserve0: U256::ZERO,
+            reserve1: U256::ZERO,
+            fee: 0,
         };
         let amount_in = U256::from(1);
         token_data.calc_slippage(amount_in);
@@ -95,8 +99,9 @@ mod tests {
             token_a: Address::ZERO,
             token_b: Address::ZERO,
             slippage: U256::ZERO,
-            reserve0: U112::from(1000),
-            reserve1: U112::from(1000),
+            reserve0: U256::from(1000),
+            reserve1: U256::from(1000),
+            fee: 0,
         };
         let amount_in = U256::from(1);
         token_data.calc_slippage(amount_in);
@@ -109,8 +114,9 @@ mod tests {
             token_a: Address::ZERO,
             token_b: Address::ZERO,
             slippage: U256::ZERO,
-            reserve0: U112::from(1000),
-            reserve1: U112::from(2000),
+            reserve0: U256::from(1000),
+            reserve1: U256::from(2000),
+            fee: 0,
         };
         let amount_in = U256::from(1);
         token_data.calc_slippage(amount_in);
@@ -123,8 +129,9 @@ mod tests {
             token_a: Address::ZERO,
             token_b: Address::ZERO,
             slippage: U256::ZERO,
-            reserve0: U112::from(1000),
-            reserve1: U112::ZERO,
+            reserve0: U256::from(1000),
+            reserve1: U256::ZERO,
+            fee: 0,
         };
         let amount_in = U256::from(1);
         token_data.calc_slippage(amount_in);
