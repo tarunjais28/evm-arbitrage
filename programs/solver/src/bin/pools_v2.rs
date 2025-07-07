@@ -6,7 +6,7 @@ use alloy::{
     },
     sol,
 };
-use futures::future::join_all;
+use futures::{future::join_all, StreamExt};
 use serde::{Deserialize, Serialize};
 use serde_json::from_reader;
 use std::{
@@ -22,7 +22,56 @@ sol!(
     "../../resources/contracts/uniswapv2_factory.json"
 );
 
-pub async fn get_pair_address<'a>(
+sol!(
+    #[sol(rpc)]
+    #[derive(Debug)]
+    ERC20,
+    "../../resources/contracts/erc20_abi.json"
+);
+
+#[derive(Debug, Clone, Copy)]
+struct TokenData {
+    address: Address,
+    decimals: u8,
+}
+
+async fn get_decimal<'a>(
+    provider: &FillProvider<
+        JoinFill<
+            Identity,
+            JoinFill<GasFiller, JoinFill<BlobGasFiller, JoinFill<NonceFiller, ChainIdFiller>>>,
+        >,
+        RootProvider,
+    >,
+    tokens: &[Address],
+) -> Result<Vec<TokenData>, CustomError<'a>> {
+    let mut futures = Vec::with_capacity(tokens.len());
+    for &address in tokens {
+        let provider_clone = provider.clone();
+        let fut = async move {
+            let contract = ERC20::new(address, provider_clone);
+            let decimals = contract.decimals().call().await?;
+            Ok(TokenData { address, decimals })
+        };
+        futures.push(fut);
+    }
+
+    let results: Vec<Result<TokenData, CustomError<'a>>> = futures::stream::iter(futures)
+        .buffer_unordered(10)
+        .collect::<Vec<_>>()
+        .await;
+
+    let mut token_data = Vec::with_capacity(tokens.len());
+    results.iter().for_each(|res| {
+        if let Ok(token) = res {
+            token_data.push(*token);
+        }
+    });
+
+    Ok(token_data)
+}
+
+async fn get_pair_address<'a>(
     provider: FillProvider<
         JoinFill<
             Identity,
@@ -31,11 +80,14 @@ pub async fn get_pair_address<'a>(
         RootProvider,
     >,
     factory_address: Address,
-    token_a: Address,
-    token_b: Address,
+    token_a: TokenData,
+    token_b: TokenData,
 ) -> Result<Option<Pools>, CustomError<'a>> {
     let contract = IUniswapV2Factory::new(factory_address, provider);
-    let pair: Address = contract.getPair(token_a, token_b).call().await?;
+    let pair: Address = contract
+        .getPair(token_a.address, token_b.address)
+        .call()
+        .await?;
 
     if pair.is_zero() {
         Ok(None)
@@ -48,17 +100,21 @@ pub async fn get_pair_address<'a>(
 pub struct Pools {
     token_a: Address,
     token_b: Address,
+    decimals0: u8,
+    decimals1: u8,
     fee: u16,
     address: Address,
 }
 
 impl Pools {
-    fn new(token_a: Address, token_b: Address, address: Address) -> Self {
+    fn new(token_a: TokenData, token_b: TokenData, address: Address) -> Self {
         Self {
-            token_a,
-            token_b,
+            token_a: token_a.address,
+            token_b: token_b.address,
             fee: 0,
             address,
+            decimals1: token_a.decimals,
+            decimals0: token_b.decimals,
         }
     }
 }
@@ -76,7 +132,7 @@ async fn get_addresses_v2<'a>(
         >,
         RootProvider,
     >,
-    tokens: Vec<Address>,
+    tokens: Vec<TokenData>,
     pools: &mut Vec<Pools>,
     exchanges: Exchanges,
 ) -> Result<(), CustomError<'a>> {
@@ -131,10 +187,13 @@ async fn main() -> Result<(), anyhow::Error> {
 
     // Parse and decode addresses
     let tokens: Vec<Address> = from_reader(reader)?;
+    let token_data = get_decimal(&provider, &tokens).await?;
+
     let mut pools: Vec<Pools> = Vec::with_capacity(tokens.len() * 2);
+
     get_addresses_v2(
         provider.clone(),
-        tokens.clone(),
+        token_data.clone(),
         &mut pools,
         Exchanges::Uniswap,
     )
@@ -142,7 +201,7 @@ async fn main() -> Result<(), anyhow::Error> {
     let uniswap_pools = pools.len();
     log::info!("UniswapV2 Pools: {uniswap_pools}");
 
-    get_addresses_v2(provider, tokens, &mut pools, Exchanges::Sushi).await?;
+    get_addresses_v2(provider, token_data, &mut pools, Exchanges::Sushi).await?;
     let sushiswap_pools = pools.len() - uniswap_pools;
     log::info!("SushiswapV2 Pools: {sushiswap_pools}");
 

@@ -6,7 +6,7 @@ use alloy::{
     },
     sol,
 };
-use futures::future::join_all;
+use futures::{future::join_all, StreamExt};
 use serde::{Deserialize, Serialize};
 use serde_json::from_reader;
 use std::{
@@ -24,7 +24,56 @@ sol!(
     "../../resources/contracts/uniswapv3_factory.json"
 );
 
-pub async fn get_pair_address_v3<'a>(
+sol!(
+    #[sol(rpc)]
+    #[derive(Debug)]
+    ERC20,
+    "../../resources/contracts/erc20_abi.json"
+);
+
+#[derive(Debug, Clone, Copy)]
+struct TokenData {
+    address: Address,
+    decimals: u8,
+}
+
+async fn get_decimal<'a>(
+    provider: &FillProvider<
+        JoinFill<
+            Identity,
+            JoinFill<GasFiller, JoinFill<BlobGasFiller, JoinFill<NonceFiller, ChainIdFiller>>>,
+        >,
+        RootProvider,
+    >,
+    tokens: &[Address],
+) -> Result<Vec<TokenData>, CustomError<'a>> {
+    let mut futures = Vec::with_capacity(tokens.len());
+    for &address in tokens {
+        let provider_clone = provider.clone();
+        let fut = async move {
+            let contract = ERC20::new(address, provider_clone);
+            let decimals = contract.decimals().call().await?;
+            Ok(TokenData { address, decimals })
+        };
+        futures.push(fut);
+    }
+
+    let results: Vec<Result<TokenData, CustomError<'a>>> = futures::stream::iter(futures)
+        .buffer_unordered(10)
+        .collect::<Vec<_>>()
+        .await;
+
+    let mut token_data = Vec::with_capacity(tokens.len());
+    results.iter().for_each(|res| {
+        if let Ok(token) = res {
+            token_data.push(*token);
+        }
+    });
+
+    Ok(token_data)
+}
+
+async fn get_pair_address_v3<'a>(
     provider: FillProvider<
         JoinFill<
             Identity,
@@ -32,21 +81,21 @@ pub async fn get_pair_address_v3<'a>(
         >,
         RootProvider,
     >,
-    pools: Arc<Mutex<Vec<PoolV3>>>,
+    pools: Arc<Mutex<Vec<Pools>>>,
     factory_address: Address,
-    token_a: Address,
-    token_b: Address,
+    token_a: TokenData,
+    token_b: TokenData,
 ) -> Result<(), CustomError<'a>> {
     let contract = IUniswapV3Factory::new(factory_address, provider);
 
     for fee in [100, 500, 3000, 10000] {
         let fee_u24 = U24::from(fee);
-        let pool: Address = contract.getPool(token_a, token_b, fee_u24).call().await?;
+        let pool: Address = contract.getPool(token_a.address, token_b.address, fee_u24).call().await?;
         if !pool.is_zero() {
             pools
                 .lock()
                 .await
-                .push(PoolV3::new(token_a, token_b, fee, pool));
+                .push(Pools::new(token_a, token_b, fee, pool));
         }
     }
 
@@ -54,24 +103,27 @@ pub async fn get_pair_address_v3<'a>(
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct PoolV3 {
+pub struct Pools {
     token_a: Address,
     token_b: Address,
+    decimals0: u8,
+    decimals1: u8,
     fee: u16,
     address: Address,
 }
 
-impl PoolV3 {
-    fn new(token_a: Address, token_b: Address, fee: u16, address: Address) -> Self {
+impl Pools {
+    fn new(token_a: TokenData, token_b: TokenData, fee: u16, address: Address) -> Self {
         Self {
-            token_a,
-            token_b,
+            token_a: token_a.address,
+            token_b: token_b.address,
             fee,
             address,
+            decimals1: token_a.decimals,
+            decimals0: token_b.decimals,
         }
     }
 }
-
 enum Exchanges {
     Sushi,
     Uniswap,
@@ -85,8 +137,8 @@ async fn get_addresses_v3<'a>(
         >,
         RootProvider,
     >,
-    tokens: Vec<Address>,
-    pools: Arc<Mutex<Vec<PoolV3>>>,
+    tokens: Vec<TokenData>,
+    pools: Arc<Mutex<Vec<Pools>>>,
     exchanges: Exchanges,
 ) -> Result<(), CustomError<'a>> {
     let n = tokens.len();
@@ -137,10 +189,11 @@ async fn main() -> Result<(), anyhow::Error> {
 
     // Parse and decode addresses
     let tokens: Vec<Address> = from_reader(reader)?;
+    let token_data = get_decimal(&provider, &tokens).await?;
     let pools = Arc::new(Mutex::new(Vec::with_capacity(tokens.len() * 2)));
     get_addresses_v3(
         provider.clone(),
-        tokens.clone(),
+        token_data.clone(),
         Arc::clone(&pools),
         Exchanges::Uniswap,
     )
