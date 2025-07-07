@@ -8,7 +8,7 @@ pub fn calc_individual_slippage(
     precision_out: U256,
     fee: U256,
 ) -> U256 {
-    let amount_in = U256::from(1);
+    let amount_in = U256::from(1) * precision_in;
     let precision = U256::from(10u128.pow(9));
     let net_percent = U256::from(1000000);
 

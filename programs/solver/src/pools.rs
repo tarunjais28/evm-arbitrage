@@ -157,7 +157,25 @@ mod tests {
             decimals1: 18,
         };
         token_data.calc_slippages();
-        assert_eq!(token_data.slippage0, U256::from(3000144));
-        assert_eq!(token_data.slippage1, U256::from(3000001));
+        assert_eq!(token_data.slippage0, U256::from(999998449));
+        assert_eq!(token_data.slippage1, U256::from(999999999));
+    }
+
+    #[test]
+    fn test_calc_slippage_with_different_decimals() {
+        let mut token_data = TokenData {
+            token_a: Address::ZERO,
+            token_b: Address::ZERO,
+            slippage0: U256::ZERO,
+            slippage1: U256::ZERO,
+            reserve0: U256::from(1551650201200975628814u128),
+            reserve1: U256::from(1178164302654065252u128),
+            fee: 0,
+            decimals0: 18,
+            decimals1: 6,
+        };
+        token_data.calc_slippages();
+        assert_eq!(token_data.slippage0, U256::from(999998449));
+        assert_eq!(token_data.slippage1, U256::ZERO);
     }
 }
