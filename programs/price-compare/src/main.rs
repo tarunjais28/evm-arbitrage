@@ -50,14 +50,14 @@ sol!(
     #[sol(rpc)]
     #[derive(Debug)]
     IUniswapV2Pool,
-    "../../resources/uniswapv2_pool_abi.json"
+    "../../resources/contracts/uniswapv2_pool_abi.json"
 );
 
 sol!(
     #[sol(rpc)]
     #[derive(Debug)]
     IUniswapV2Pair,
-    "../../resources/uniswapv2_pair.json"
+    "../../resources/contracts/uniswapv2_pair.json"
 );
 
 #[tokio::main]

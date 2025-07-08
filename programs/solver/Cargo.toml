@@ -5,6 +5,7 @@ edition = "2021"
 
 [dependencies]
 alloy.workspace = true
+alloy-primitives.workspace = true
 tokio.workspace = true
 futures-util.workspace = true
 futures.workspace = true
@@ -16,3 +17,5 @@ serde.workspace = true
 log.workspace = true
 env_logger.workspace = true
 dotenv.workspace = true
+uniswap-v3-sdk.workspace = true
+uniswap-sdk-core.workspace = true

@@ -23,7 +23,7 @@ sol!(
     #[sol(rpc)]
     #[derive(Debug)]
     IUniswapV2Pool,
-    "../../resources/uniswapv2_pool_abi.json"
+    "../../resources/contracts/uniswapv2_pool_abi.json"
 );
 
 #[tokio::main]
