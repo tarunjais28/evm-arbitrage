@@ -8,7 +8,6 @@
 //! This example uses mainnet block 17000000 for consistent results
 
 use alloy::{
-    eips::BlockId,
     primitives::U256,
     providers::{Provider, ProviderBuilder, WsConnect},
     rpc::types::TransactionRequest,
@@ -28,7 +27,6 @@ async fn main() {
     let ws = WsConnect::new(env_parser.ws_address);
     let provider = ProviderBuilder::new().connect_ws(ws).await.unwrap();
 
-    let block_id = BlockId::from(17000000);
     const CHAIN_ID: u64 = 1;
     let usdc = token!(
         CHAIN_ID,
@@ -47,14 +45,15 @@ async fn main() {
         weth.address(),
         FeeAmount::LOW,
         provider.clone(),
-        Some(block_id),
+        None,
     )
     .await
     .unwrap();
 
     // Get the output amount from the pool
     let amount_in = CurrencyAmount::from_raw_amount(usdc.clone(), 100000000).unwrap();
-    let amount_in_b = CurrencyAmount::from_raw_amount(weth.clone(), 100000000000000000u128).unwrap();
+    let amount_in_b =
+        CurrencyAmount::from_raw_amount(weth.clone(), 100000000000000000u128).unwrap();
     let local_amount_out = pool.get_output_amount(&amount_in, None).await.unwrap();
     let local_amount_out_b = pool.get_input_amount(&amount_in_b, None).await.unwrap();
     let local_amount_out = local_amount_out.quotient();
@@ -67,7 +66,7 @@ async fn main() {
     let tx = TransactionRequest::default()
         .to(*QUOTER_ADDRESSES.get(&CHAIN_ID).unwrap())
         .input(params.calldata.into());
-    let res = provider.call(tx).block(block_id).await.unwrap();
+    let res = provider.call(tx).await.unwrap();
     let amount_out =
         IQuoter::quoteExactInputSingleCall::abi_decode_returns_validate(res.as_ref()).unwrap();
     println!("Quoter amount out: {}", amount_out);

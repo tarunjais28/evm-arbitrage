@@ -1,0 +1,152 @@
+[
+  {
+    "address": "0xdbdb4d16eda451d0503b854cf79d55697f90c8df",
+    "name": "Alchemix",
+    "symbol": "ALCX",
+    "decimals": 18
+  },
+  {
+    "address": "0x6b175474e89094c44da98b954eedeac495271d0f",
+    "name": "Dai Stablecoin",
+    "symbol": "DAI",
+    "decimals": 18
+  },
+  {
+    "address": "0x419c4db4b9e25d6db2ad9691ccb832c8d9fda05e",
+    "name": "Dragon",
+    "symbol": "DRGN",
+    "decimals": 18
+  },
+  {
+    "address": "0x9ab7bb7fdc60f4357ecfef43986818a2a3569c62",
+    "name": "Guild of Guardians",
+    "symbol": "GOG",
+    "decimals": 18
+  },
+  {
+    "address": "0x767fe9edc9e0df98e07454847909b5e959d7ca0e",
+    "name": "Illuvium",
+    "symbol": "ILV",
+    "decimals": 18
+  },
+  {
+    "address": "0x514910771af9ca656af840dff83e8264ecf986ca",
+    "name": "ChainLink Token",
+    "symbol": "LINK",
+    "decimals": 18
+  },
+  {
+    "address": "0x3131ae663eef833e77dfa1d618536b07e191b31d",
+    "name": "NFD",
+    "symbol": "NFD",
+    "decimals": 18
+  },
+  {
+    "address": "0x45804880de22913dafe09f4980848ece6ecbaf78",
+    "name": "Paxos Gold",
+    "symbol": "PAXG",
+    "decimals": 18
+  },
+  {
+    "address": "0xee7527841a932d2912224e20a405e1a1ff747084",
+    "name": "Stronghold SHx",
+    "symbol": "SHX",
+    "decimals": 7
+  },
+  {
+    "address": "0x6b3595068778dd592e39a122f4f5a5cf09c90fe2",
+    "name": "SushiToken",
+    "symbol": "SUSHI",
+    "decimals": 18
+  },
+  {
+    "address": "0x2e9d63788249371f1dfc918a52f8d799f4a38c94",
+    "name": "Tokemak",
+    "symbol": "TOKE",
+    "decimals": 18
+  },
+  {
+    "address": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+    "name": "USD Coin",
+    "symbol": "USDC",
+    "decimals": 6
+  },
+  {
+    "address": "0xdac17f958d2ee523a2206206994597c13d831ec7",
+    "name": "Tether USD",
+    "symbol": "USDT",
+    "decimals": 6
+  },
+  {
+    "address": "0x2260fac5e5542a773aa44fbcfedf7c193bc2c599",
+    "name": "Wrapped BTC",
+    "symbol": "WBTC",
+    "decimals": 8
+  },
+  {
+    "address": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+    "name": "Wrapped Ether",
+    "symbol": "WETH",
+    "decimals": 18
+  },
+  {
+    "address": "0x4d4574f50dd8b9dbe623cf329dcc78d76935e610",
+    "name": "Zeus",
+    "symbol": "ZEUS",
+    "decimals": 9
+  },
+  {
+    "address": "0x614f611300d8fb0108fa2a860dbca1ff8fc62624",
+    "name": "Long P E P E",
+    "symbol": "p e p e",
+    "decimals": 9
+  },
+  {
+    "address": "0x76e222b07c53d28b89b0bac18602810fc22b49a8",
+    "name": "Joe Coin",
+    "symbol": "JOE",
+    "decimals": 18
+  },
+  {
+    "address": "0x2e44f3f609ff5aa4819b323fd74690f07c3607c4",
+    "name": "PinLink",
+    "symbol": "Pin",
+    "decimals": 18
+  },
+  {
+    "address": "0x969ce55826bb4b3a572ed4f17c795a3ebcb0079f",
+    "name": "Humpy Squigg",
+    "symbol": "SQUIGG",
+    "decimals": 18
+  },
+  {
+    "address": "0x44709a920fccf795fbc57baa433cc3dd53c44dbe",
+    "name": "DappRadar",
+    "symbol": "RADAR",
+    "decimals": 18
+  },
+  {
+    "address": "0x95ed629b028cf6aadd1408bb988c6d1daabe4767",
+    "name": "Dork Lord",
+    "symbol": "DORKY",
+    "decimals": 9
+  },
+  {
+    "address": "0xa9a660e7d49bbef606d07210ddd6568b70b93dd3",
+    "name": "Gnome Child",
+    "symbol": "GNOME",
+    "decimals": 18
+  },
+  {
+    "address": "0x7abc8a5768e6be61a6c693a6e4eacb5b60602c4d",
+    "name": "Covalent X Token",
+    "symbol": "CXT",
+    "decimals": 18
+  },
+  {
+    "address": "0x4e9623b7e5b6438542458f5ee828d65c24d3af8c",
+    "name": "Jerry The Turtle By Matt Furie",
+    "symbol": "JYAI",
+    "decimals": 18
+  }
+]
