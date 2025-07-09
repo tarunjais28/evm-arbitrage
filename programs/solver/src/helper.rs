@@ -38,3 +38,13 @@ pub fn calc_individual_slippage(
         .checked_div(expected_price.quotient())
         .unwrap_or_default()
 }
+
+pub fn calc_slippage<'a>(
+    start_price: PriceData,
+    end_price: PriceData,
+) -> Result<BigInt, CustomError<'a>> {
+    let base_currency = WETH9::on_chain(1).ok_or_else(|| CustomError::NotFound("weth"))?;
+    let percent = Price::new(base_currency.clone(), base_currency, 1, 1000000);
+
+    Ok((((end_price - start_price.clone()) * percent) / start_price).quotient())
+}

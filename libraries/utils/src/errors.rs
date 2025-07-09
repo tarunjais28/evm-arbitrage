@@ -17,6 +17,9 @@ pub enum CustomError<'a> {
     #[error("Environment variable error: `{0}`!")]
     EnvVarError(#[from] VarError),
 
+    #[error("Uniswap v2 sdk error: `{0}`!")]
+    UniswapV2SdkError(#[from] uniswap_v2_sdk::error::Error),
+
     #[error("Uniswap v3 sdk error: `{0}`!")]
     UniswapV3SdkError(#[from] uniswap_v3_sdk::error::Error),
 

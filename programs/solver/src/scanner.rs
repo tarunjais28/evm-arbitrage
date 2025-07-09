@@ -22,8 +22,12 @@ async fn calculate_path<'a>(
 ) -> Result<(), CustomError<'a>> {
     let amount_in = input_data.amount_in.to_big_int();
 
+    debug_time!("scanner::calculate_path::calc_effective_price()", {
+        pool_data_v2.calc_effective_price(amount_in)?;
+    });
+
     debug_time!("scanner::calculate_path::calc_slippage_v2()", {
-        pool_data_v2.calc_slippage(amount_in)?;
+        pool_data_v2.calc_slippage()?;
     });
 
     debug_time!("scanner::calculate_path::calc_effective_price_v3()", {

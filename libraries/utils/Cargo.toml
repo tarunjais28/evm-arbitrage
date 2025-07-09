@@ -14,5 +14,6 @@ thiserror.workspace = true
 dotenv.workspace = true
 alloy.workspace = true
 serde_json.workspace = true
+uniswap-v2-sdk.workspace = true
 uniswap-v3-sdk.workspace = true
 uniswap-sdk-core.workspace = true

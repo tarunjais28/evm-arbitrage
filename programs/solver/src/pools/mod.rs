@@ -5,6 +5,8 @@ pub mod v2;
 pub mod v3;
 
 pub type TokenMap = HashMap<Address, Token>;
+pub type PriceData =
+    FractionLike<PriceMeta<CurrencyLike<false, TokenMeta>, CurrencyLike<false, TokenMeta>>>;
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct TokenMetadata {
@@ -38,17 +40,19 @@ pub struct SerialisedV3Pools {
 pub struct TokenDetails {
     pub token: Token,
     pub slippage: BigInt,
-    pub price_start: BigInt,
-    pub price_effective: BigInt,
+    pub price_start: PriceData,
+    pub price_effective: PriceData,
 }
 
 impl Default for TokenDetails {
     fn default() -> Self {
+        let def_token = token!(1, address!(), 0);
+        let def_price = Price::new(def_token.clone(), def_token.clone(), 1, 0);
         Self {
-            token: token!(1, address!(), 0),
+            token: def_token.clone(),
             slippage: BigInt::ZERO,
-            price_start: BigInt::ZERO,
-            price_effective: BigInt::ZERO,
+            price_start: def_price.clone(),
+            price_effective: def_price,
         }
     }
 }

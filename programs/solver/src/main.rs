@@ -72,11 +72,15 @@ async fn main() -> Result<(), anyhow::Error> {
                 .await?
         });
 
+        debug_time!("calulate_start_price_v2()", {
+            pool_data_v2.calc_start_price()?
+        });
+
         let mut pool_data_v3: v3::PoolData = debug_time!("pool_data_v3()", {
             v3::PoolData::new(&env_parser.serialised_v3_pool, &token_map)?
         });
 
-        debug_time!("calulate_start_price()", {
+        debug_time!("calulate_start_price_v3()", {
             pool_data_v3.calc_start_price(&provider).await?
         });
 

@@ -53,8 +53,8 @@ impl PoolData {
             )
             .await?;
 
-            token_data.token_a.price_start = pool.token0_price().quotient();
-            token_data.token_b.price_start = pool.token1_price().quotient();
+            token_data.token_a.price_start = pool.token0_price();
+            token_data.token_b.price_start = pool.token1_price();
         }
 
         Ok(())
@@ -77,11 +77,14 @@ impl PoolData {
                 .get_mut(pool_address)
                 .ok_or_else(|| CustomError::AddressNotFound(*pool_address))?;
 
-            token_data.token_a.price_start = numerator.checked_div(denominator).unwrap_or_default();
-            token_data.token_b.price_start =
-                BigInt::from(token_data.token_a.precision() * token_data.token_b.precision())
-                    .checked_div(token_data.token_a.price_start)
-                    .unwrap_or_default();
+            let price = Price::new(
+                token_data.token_a.token.clone(),
+                token_data.token_a.token.clone(),
+                denominator,
+                numerator,
+            );
+            token_data.token_a.price_start = price.clone();
+            token_data.token_b.price_start = price.invert();
         });
 
         Ok(())
@@ -118,30 +121,26 @@ impl PoolData {
                 CurrencyAmount::from_raw_amount(token_data.token_b.token.clone(), amount)?;
             let amount1_in = pool.get_input_amount(&amount1_out, None).await?;
 
-            token_data.token_a.price_effective = amount0_out.divide(&amount0_in)?.quotient();
-            token_data.token_b.price_effective = amount1_in.divide(&amount1_out)?.quotient();
+            token_data.token_a.price_effective =
+                Price::from_currency_amounts(amount0_in, amount0_out);
+            token_data.token_b.price_effective =
+                Price::from_currency_amounts(amount1_out, amount1_in);
         }
 
         Ok(())
     }
 
     pub fn calc_slippage<'a>(&mut self) -> Result<(), CustomError<'a>> {
-        let precision = BigInt::from(10u128.pow(9));
-
         for token_data in self.data.values_mut() {
-            token_data.token_a.slippage = ((token_data.token_a.price_effective
-                - token_data.token_a.price_start)
-                * precision
-                * BigInt::from(100))
-            .checked_div(token_data.token_a.price_start)
-            .unwrap_or_default();
+            token_data.token_a.slippage = calc_slippage(
+                token_data.token_a.price_start.clone(),
+                token_data.token_a.price_effective.clone(),
+            )?;
 
-            token_data.token_b.slippage = ((token_data.token_b.price_effective
-                - token_data.token_b.price_start)
-                * precision
-                * BigInt::from(100))
-            .checked_div(token_data.token_b.price_start)
-            .unwrap_or_default();
+            token_data.token_b.slippage = calc_slippage(
+                token_data.token_b.price_start.clone(),
+                token_data.token_b.price_effective.clone(),
+            )?;
         }
 
         Ok(())
