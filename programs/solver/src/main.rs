@@ -58,13 +58,13 @@ async fn main() -> Result<(), anyhow::Error> {
         let ws = WsConnect::new(env_parser.ws_address);
         let provider = ProviderBuilder::new().connect_ws(ws).await?;
 
-        let file = debug_time!("file_open()", {
-            File::open("resources/tokens_to_pool.json")?
-        });
-        let reader = debug_time!("reader()", { BufReader::new(file) });
-        let pools_v2: Vec<v2::Pools> = debug_time!("pools_serialize()", { from_reader(reader)? });
         let pool_data_v2: v2::PoolData = debug_time!("update_reserves", {
-            update_reserves(provider.clone(), pools_v2, &env_parser.pool_address).await?
+            update_reserves(
+                provider.clone(),
+                env_parser.pools_v2,
+                &env_parser.pool_address,
+            )
+            .await?
         });
 
         let token_map: TokenMap = debug_time!("token_map creation()", {

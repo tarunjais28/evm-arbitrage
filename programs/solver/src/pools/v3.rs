@@ -187,7 +187,7 @@ pub struct TokenDetails {
 impl Default for TokenDetails {
     fn default() -> Self {
         Self {
-            token: token!(0, address!(), 0),
+            token: token!(1, address!(), 0),
             slippage: BigInt::ZERO,
             price_start: BigInt::ZERO,
             price_effective: BigInt::ZERO,
