@@ -1,0 +1,34 @@
+Pool1
+USDC -> WETH - S1
+amount_in = 1000 USDC
+
+Pool2 
+USDC -> WBTC
+
+Pool3
+WBTC -> WETH
+
+Pool4
+DAI -> WETH 
+
+Pool5
+ZEUS -> WETH
+
+slippage = 1 - (Price_post / price_pre)
+price = amount_out / amount_in
+
+Shortest Path
+USDC -> WBTC -> DAI -> WETH
+
+amount = 1000 USDC
+
+
+
+
+A -> B - 10
+A -> C - 20
+B -> C -  5
+
+
+C -> D
+D -> A

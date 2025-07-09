@@ -8,11 +8,11 @@ pub async fn update_reserves<'a>(
         >,
         RootProvider,
     >,
-    pools: Vec<Pools>,
+    pools: Vec<v2::Pools>,
     pool_address: &PoolAddress,
-) -> Result<PoolData, CustomError<'a>> {
-    let mut pool_data: PoolData = HashMap::with_capacity(pools.len());
-    let pools_v3: Vec<Pools> = pools.iter().filter(|p| p.fee > 0).cloned().collect();
+) -> Result<v2::PoolData, CustomError<'a>> {
+    let mut pool_data: v2::PoolData = HashMap::with_capacity(pools.len());
+    let pools_v3: Vec<v2::Pools> = pools.iter().filter(|p| p.fee > 0).cloned().collect();
 
     debug_time!("update_reserves::pool_data()", {
         pools.iter().for_each(|pool| {
@@ -43,7 +43,7 @@ pub async fn update_reserves<'a>(
 
 pub fn update_reserve_abs<'a>(
     scanner: ScanData,
-    pool_data: &mut PoolData,
+    pool_data: &mut v2::PoolData,
 ) -> Result<(), CustomError<'a>> {
     debug_time!("calc_slippage::update_reserve_abs()", {
         pool_data
@@ -54,32 +54,7 @@ pub fn update_reserve_abs<'a>(
     Ok(())
 }
 
-pub async fn update_reserve_v3<'a>(
-    provider: &FillProvider<
-        JoinFill<
-            Identity,
-            JoinFill<GasFiller, JoinFill<BlobGasFiller, JoinFill<NonceFiller, ChainIdFiller>>>,
-        >,
-        RootProvider,
-    >,
-    pool_address: Address,
-    pool_data: &mut PoolData,
-) -> Result<(), CustomError<'a>> {
-    debug_time!("calc_slippage::update_reserve_abs()", {
-        let token_data = pool_data
-            .get(&pool_address)
-            .ok_or_else(|| CustomError::NotFound("token_data"))?;
-
-        let reserves = get_reserves_v3_single(&provider, pool_address, *token_data).await?;
-        pool_data
-            .entry(pool_address)
-            .and_modify(|data| data.update_reserves(reserves))
-    });
-
-    Ok(())
-}
-
-pub fn calc_slippage<'a>(pool_data: &mut PoolData) -> Result<SwapGraph, CustomError<'a>> {
+pub fn calc_slippage<'a>(pool_data: &mut v2::PoolData) -> Result<SwapGraph, CustomError<'a>> {
     let mut edges = Vec::with_capacity(pool_data.len());
 
     debug_time!("calc_slippage::calc_slippage()", {

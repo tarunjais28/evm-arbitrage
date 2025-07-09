@@ -8,12 +8,34 @@ pub struct InputData {
     pub amount_in: U256,
 }
 
-fn calculate_path<'a>(
-    pool_data: &mut PoolData,
+async fn calculate_path<'a>(
+    provider: &FillProvider<
+        JoinFill<
+            Identity,
+            JoinFill<GasFiller, JoinFill<BlobGasFiller, JoinFill<NonceFiller, ChainIdFiller>>>,
+        >,
+        RootProvider,
+    >,
+    pool_data_v2: &mut v2::PoolData,
+    pool_data_v3: &mut v3::PoolData,
     input_data: InputData,
 ) -> Result<(), CustomError<'a>> {
-    let graph = debug_time!("scanner::calculate_path::calc_slippage()", {
-        calc_slippage(pool_data)?
+    let mut graph = debug_time!("scanner::calculate_path::calc_slippage_v2()", {
+        calc_slippage(pool_data_v2)?
+    });
+
+    debug_time!("scanner::calculate_path::calc_effective_price_v3()", {
+        pool_data_v3
+            .calc_effective_price(provider, input_data.amount_in.to_big_int())
+            .await?;
+    });
+
+    debug_time!("scanner::calculate_path::calc_slippage_v3()", {
+        pool_data_v3.calc_slippage()?;
+    });
+
+    debug_time!("scanner::calculate_path::into_v3_swap_graph()", {
+        pool_data_v3.to_swap_graph(&mut graph);
     });
 
     let path = debug_time!("scanner::calculate_path::best_path()", {
@@ -37,7 +59,8 @@ pub async fn scan<'a>(
         RootProvider,
     >,
     pool_addresses: Vec<Address>,
-    pool_data: PoolData,
+    pool_data_v2: v2::PoolData,
+    pool_data_v3: v3::PoolData,
 ) -> Result<(), CustomError<'a>> {
     // Create a filter for the events.
     let filter = provider
@@ -51,11 +74,13 @@ pub async fn scan<'a>(
     let (tx, rx) = mpsc::channel(32);
 
     // Create a shared state for the current amount
-    let pool_data = Arc::new(Mutex::new(pool_data));
+    let pool_data_v2 = Arc::new(Mutex::new(pool_data_v2));
+    let pool_data_v3 = Arc::new(Mutex::new(pool_data_v3));
 
     // Spawn a task to handle user input
     let input_handle = {
-        let pool_data_clone = Arc::clone(&pool_data);
+        let pool_data_v2_clone = Arc::clone(&pool_data_v2);
+        let pool_data_v3_clone = Arc::clone(&pool_data_v3);
         tokio::spawn(async move {
             let stdin = tokio::io::stdin();
             let mut reader = BufReader::new(stdin);
@@ -78,7 +103,14 @@ pub async fn scan<'a>(
                 let buffer = input.trim();
                 if let Ok(input_data) = serde_json::from_str::<InputData>(buffer) {
                     // Calculate path immediately after receiving amount
-                    if let Err(e) = calculate_path(&mut *pool_data_clone.lock().await, input_data) {
+                    if let Err(e) = calculate_path(
+                        &provider,
+                        &mut *pool_data_v2_clone.lock().await,
+                        &mut *pool_data_v3_clone.lock().await,
+                        input_data,
+                    )
+                    .await
+                    {
                         log::error!("Error calculating path: {}", e);
                     }
 
@@ -102,17 +134,15 @@ pub async fn scan<'a>(
             scanner.update_sync(sync, decoded.inner.address);
 
             // Update reserves based on the event
-            update_reserve_abs(scanner, &mut *pool_data.lock().await)?;
+            update_reserve_abs(scanner, &mut *pool_data_v2.lock().await)?;
         } else if let Ok(decoded) = log.log_decode() {
-            let _: IUniswapV3Pool::Swap = decoded.inner.data;
-
-            // Update reserves based on the event
-            update_reserve_v3(
-                &provider,
-                decoded.inner.address,
-                &mut *pool_data.lock().await,
-            )
-            .await?;
+            log::info!("v2 swap captured!");
+            let swap: IUniswapV3Pool::Swap = decoded.inner.data;
+            let pool_data = &mut pool_data_v3.lock().await;
+            pool_data.calc_start_price_from_sqrt_price_x96(
+                &decoded.inner.address,
+                swap.sqrtPriceX96.to_big_int(),
+            )?;
         }
     }
 

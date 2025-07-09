@@ -29,12 +29,9 @@ pub fn calc_individual_slippage(
         .unwrap_or_default();
 
     let slippage = (U256::from(1) * precision)
-        .checked_sub(
-            effective_price
-                .checked_div(expected_price)
-                .unwrap_or_default(),
-        )
-        .unwrap_or_default();
+        - effective_price
+            .checked_div(expected_price)
+            .unwrap_or_default();
 
     slippage
 }

@@ -4,12 +4,12 @@ use super::*;
 pub struct SwapEdge {
     pub to: Address,
     pub pool: Address,
-    pub slippage: U256,
+    pub slippage: BigInt,
     pub fee: u16,
 }
 
 impl SwapEdge {
-    pub fn new(to: Address, pool: Address, slippage: U256, fee: u16) -> Self {
+    pub fn new(to: Address, pool: Address, slippage: BigInt, fee: u16) -> Self {
         Self {
             to,
             pool,
@@ -24,7 +24,7 @@ pub type SwapGraph = HashMap<Address, Vec<SwapEdge>>;
 #[derive(Debug, Eq)]
 pub struct State {
     pub token: Address,
-    pub cost: U256,
+    pub cost: BigInt,
     pub paths: Vec<Address>,
     pub pools: Vec<Address>,
     pub fees: Vec<u16>,
@@ -54,11 +54,11 @@ pub struct ShortestPath {
     pub paths: Vec<Address>,
     pub pools: Vec<Address>,
     pub fees: Vec<u16>,
-    pub cost: U256,
+    pub cost: BigInt,
 }
 
 impl ShortestPath {
-    pub fn new(paths: Vec<Address>, pools: Vec<Address>, fees: Vec<u16>, cost: U256) -> Self {
+    pub fn new(paths: Vec<Address>, pools: Vec<Address>, fees: Vec<u16>, cost: BigInt) -> Self {
         Self {
             paths,
             pools,
@@ -76,13 +76,13 @@ pub fn build_bidirectional_graph(
         graph.entry(from.clone()).or_default().push(SwapEdge::new(
             to.clone(),
             pool.clone(),
-            *slippage0,
+            slippage0.to_big_int(),
             *fee,
         ));
         graph.entry(to.clone()).or_default().push(SwapEdge::new(
             from.clone(),
             pool.clone(),
-            *slippage1,
+            slippage1.to_big_int(),
             *fee,
         ));
     }
@@ -95,7 +95,7 @@ pub fn best_path(graph: &SwapGraph, start: &Address, end: &Address) -> ShortestP
 
     heap.push(State {
         token: start.clone(),
-        cost: U256::ZERO,
+        cost: BigInt::ZERO,
         paths: vec![start.clone()],
         pools: vec![],
         fees: vec![],
@@ -113,14 +113,14 @@ pub fn best_path(graph: &SwapGraph, start: &Address, end: &Address) -> ShortestP
             return ShortestPath::new(paths, pools, fees, cost);
         }
 
-        if cost > *best_cost.get(&token).unwrap_or(&U256::MAX) {
+        if cost > *best_cost.get(&token).unwrap_or(&BigInt::MAX) {
             continue;
         }
 
         if let Some(neighbors) = graph.get(&token) {
             for edge in neighbors {
                 let new_cost = cost + edge.slippage;
-                if new_cost < *best_cost.get(&edge.to).unwrap_or(&U256::MAX) {
+                if new_cost < *best_cost.get(&edge.to).unwrap_or(&BigInt::MAX) {
                     let mut new_paths = paths.clone();
                     new_paths.push(edge.to.clone());
 
@@ -166,12 +166,12 @@ mod tests {
         graph.insert(
             a,
             vec![
-                SwapEdge::new(b, p_a_b, U256::from(10), 0),
-                SwapEdge::new(c, p_a_c, U256::from(20), 0),
+                SwapEdge::new(b, p_a_b, BigInt::from(10), 0),
+                SwapEdge::new(c, p_a_c, BigInt::from(20), 0),
             ],
         );
-        graph.insert(b, vec![SwapEdge::new(d, p_b_d, U256::from(5), 0)]);
-        graph.insert(c, vec![SwapEdge::new(d, p_c_d, U256::from(10), 0)]);
+        graph.insert(b, vec![SwapEdge::new(d, p_b_d, BigInt::from(5), 0)]);
+        graph.insert(c, vec![SwapEdge::new(d, p_c_d, BigInt::from(10), 0)]);
         graph
     }
 
@@ -182,7 +182,7 @@ mod tests {
         let b = address!("000000000000000000000000000000000000000B");
         let path = best_path(&graph, &a, &b);
         assert_eq!(path.paths, vec![a, b]);
-        assert_eq!(path.cost, U256::from(10));
+        assert_eq!(path.cost, BigInt::from(10));
     }
 
     #[test]
@@ -193,7 +193,7 @@ mod tests {
         let d = address!("000000000000000000000000000000000000000D");
         let path = best_path(&graph, &a, &d);
         assert_eq!(path.paths, vec![a, b, d]);
-        assert_eq!(path.cost, U256::from(15));
+        assert_eq!(path.cost, BigInt::from(15));
     }
 
     #[test]
@@ -203,7 +203,7 @@ mod tests {
         let e = address!("000000000000000000000000000000000000000E");
         let path = best_path(&graph, &a, &e);
         assert!(path.paths.is_empty());
-        assert_eq!(path.cost, U256::ZERO);
+        assert_eq!(path.cost, BigInt::ZERO);
     }
 
     #[test]
@@ -219,14 +219,14 @@ mod tests {
         graph.insert(
             a,
             vec![
-                SwapEdge::new(b, p_a_b, U256::from(10), 0),
-                SwapEdge::new(c, p_a_c, U256::from(5), 0),
+                SwapEdge::new(b, p_a_b, BigInt::from(10), 0),
+                SwapEdge::new(c, p_a_c, BigInt::from(5), 0),
             ],
         );
-        graph.insert(c, vec![SwapEdge::new(d, p_c_d, U256::from(5), 0)]);
+        graph.insert(c, vec![SwapEdge::new(d, p_c_d, BigInt::from(5), 0)]);
         let path = best_path(&graph, &a, &d);
         assert_eq!(path.paths, vec![a, c, d]);
-        assert_eq!(path.cost, U256::from(10));
+        assert_eq!(path.cost, BigInt::from(10));
     }
 
     #[test]
@@ -250,12 +250,12 @@ mod tests {
         // Test forward path
         let path_forward = best_path(&graph, &a, &d);
         assert_eq!(path_forward.paths, vec![a, b, d]);
-        assert_eq!(path_forward.cost, U256::from(15));
+        assert_eq!(path_forward.cost, BigInt::from(15));
 
         // Test reverse path
         let path_reverse = best_path(&graph, &d, &a);
         assert_eq!(path_reverse.paths, vec![d, b, a]);
-        assert_eq!(path_reverse.cost, U256::from(15));
+        assert_eq!(path_reverse.cost, BigInt::from(15));
     }
 
     #[test]
@@ -287,13 +287,13 @@ mod tests {
         // A -> B -> D -> E : 10 + 5 + 8 = 23
         let path_forward = best_path(&graph, &a, &e);
         assert_eq!(path_forward.paths, vec![a, b, e]);
-        assert_eq!(path_forward.cost, U256::from(12));
+        assert_eq!(path_forward.cost, BigInt::from(12));
 
         // Test reverse path E -> A
         // E -> B -> A : 2 + 10 = 12
         // E -> D -> C -> A : 8 + 5 + 5 = 18
         let path_reverse = best_path(&graph, &e, &a);
         assert_eq!(path_reverse.paths, vec![e, b, a]);
-        assert_eq!(path_reverse.cost, U256::from(12));
+        assert_eq!(path_reverse.cost, BigInt::from(12));
     }
 }

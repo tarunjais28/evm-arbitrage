@@ -61,7 +61,7 @@ pub async fn get_reserves_v3<'a>(
         RootProvider,
     >,
     reserves_map: &mut HashMap<Address, Reserves>,
-    pools: Vec<Pools>,
+    pools: Vec<v2::Pools>,
 ) -> Result<(), CustomError<'a>> {
     let mut futures = Vec::with_capacity(pools.len());
 
@@ -103,7 +103,7 @@ pub async fn get_reserves_v3_single<'a>(
         RootProvider,
     >,
     pool_address: Address,
-    token_data: TokenData,
+    token_data: v2::TokenData,
 ) -> Result<Reserves, CustomError<'a>> {
     let mut contract = ERC20::new(token_data.token_a, provider.clone());
     let reserve0 = contract.balanceOf(pool_address).call().await?;

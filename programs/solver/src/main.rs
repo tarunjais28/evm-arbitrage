@@ -3,7 +3,7 @@ use crate::{
     slippage::*, structs::*,
 };
 use alloy::{
-    primitives::{Address, TxHash, U256},
+    primitives::{address, Address, TxHash, U256},
     providers::{
         fillers::{BlobGasFiller, ChainIdFiller, FillProvider, GasFiller, JoinFill, NonceFiller},
         Identity, Provider, ProviderBuilder, RootProvider, WsConnect,
@@ -25,6 +25,7 @@ use std::{
     io::BufReader,
     sync::Arc,
 };
+use uniswap_sdk_core::{prelude::*, token};
 
 use tokio::sync::{mpsc, Mutex};
 use utils::CustomError;
@@ -61,9 +62,20 @@ async fn main() -> Result<(), anyhow::Error> {
             File::open("resources/tokens_to_pool.json")?
         });
         let reader = debug_time!("reader()", { BufReader::new(file) });
-        let pools: Vec<Pools> = debug_time!("pools_serialize()", { from_reader(reader)? });
-        let pool_data: PoolData = debug_time!("update_reserves", {
-            update_reserves(provider.clone(), pools, &env_parser.pool_address).await?
+        let pools_v2: Vec<v2::Pools> = debug_time!("pools_serialize()", { from_reader(reader)? });
+        let pool_data_v2: v2::PoolData = debug_time!("update_reserves", {
+            update_reserves(provider.clone(), pools_v2, &env_parser.pool_address).await?
+        });
+
+        let token_map: TokenMap = debug_time!("token_map creation()", {
+            token_metadata_to_tokens(&env_parser.token_metadata)
+        });
+        let mut pool_data_v3: v3::PoolData = debug_time!("pool_data_v3()", {
+            v3::PoolData::new(&env_parser.serialised_v3_pool, token_map)?
+        });
+
+        debug_time!("calulate_start_price()", {
+            pool_data_v3.calc_start_price(&provider).await?
         });
 
         // Scanning the ethereum blockchain for events
@@ -71,7 +83,8 @@ async fn main() -> Result<(), anyhow::Error> {
             scan(
                 provider.clone(),
                 env_parser.pool_address.single(),
-                pool_data,
+                pool_data_v2,
+                pool_data_v3,
             )
             .await?
         });
