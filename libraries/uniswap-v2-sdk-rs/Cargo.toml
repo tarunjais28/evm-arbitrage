@@ -1,0 +1,26 @@
+[package]
+name = "uniswap-v2-sdk"
+version = "2.0.0"
+edition = "2021"
+description = "Uniswap V2 SDK for Rust"
+license = "MIT"
+readme = "README.md"
+repository = "https://github.com/shuhuiluo/uniswap-v2-sdk-rs"
+keywords = ["uniswap-v2", "ethereum", "sdk"]
+exclude = [".github", ".gitignore", "rustfmt.toml"]
+
+[package.metadata.docs.rs]
+all-features = true
+
+[dependencies]
+alloy-primitives.workspace = true
+alloy-sol-types.workspace = true
+num-traits.workspace = true
+num-integer.workspace = true
+once_cell.workspace = true
+thiserror.workspace = true
+uniswap-sdk-core.workspace = true
+
+[features]
+default = []
+std = ["uniswap-sdk-core/std"]
