@@ -58,20 +58,22 @@ async fn main() -> Result<(), anyhow::Error> {
         let ws = WsConnect::new(env_parser.ws_address);
         let provider = ProviderBuilder::new().connect_ws(ws).await?;
 
-        let pool_data_v2: v2::PoolData = debug_time!("update_reserves", {
-            update_reserves(
-                provider.clone(),
-                env_parser.pools_v2,
-                &env_parser.pool_address,
-            )
-            .await?
-        });
-
         let token_map: TokenMap = debug_time!("token_map creation()", {
             token_metadata_to_tokens(&env_parser.token_metadata)
         });
+
+        let mut pool_data_v2: v2::PoolData = debug_time!("pool_data_v2()", {
+            v2::PoolData::new(&env_parser.pools_v2, &token_map)?
+        });
+
+        debug_time!("update_reserve()", {
+            pool_data_v2
+                .update_reserves(&provider, &env_parser.pool_address.v2)
+                .await?
+        });
+
         let mut pool_data_v3: v3::PoolData = debug_time!("pool_data_v3()", {
-            v3::PoolData::new(&env_parser.serialised_v3_pool, token_map)?
+            v3::PoolData::new(&env_parser.serialised_v3_pool, &token_map)?
         });
 
         debug_time!("calulate_start_price()", {

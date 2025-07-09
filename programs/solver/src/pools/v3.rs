@@ -1,5 +1,3 @@
-use uniswap_v3_sdk::prelude::*;
-
 use super::*;
 
 pub struct PoolData {
@@ -9,7 +7,7 @@ pub struct PoolData {
 impl PoolData {
     pub fn new<'a>(
         serialised_v3_pool: &[SerialisedV3Pools],
-        tokens: TokenMap,
+        tokens: &TokenMap,
     ) -> Result<PoolData, CustomError<'a>> {
         let mut data = HashMap::with_capacity(tokens.len());
 
@@ -19,11 +17,11 @@ impl PoolData {
                 TokenData::new(
                     tokens
                         .get(&pool.token0)
-                        .ok_or_else(move || CustomError::AddressNotFound(pool.token0))?
+                        .ok_or_else(|| CustomError::AddressNotFound(pool.token0))?
                         .clone(),
                     tokens
                         .get(&pool.token1)
-                        .ok_or_else(move || CustomError::AddressNotFound(pool.token1))?
+                        .ok_or_else(|| CustomError::AddressNotFound(pool.token1))?
                         .clone(),
                     pool.fee,
                 ),
@@ -112,18 +110,12 @@ impl PoolData {
             )
             .await?;
 
-            let amount0_in = CurrencyAmount::from_fractional_amount(
-                token_data.token_a.token.clone(),
-                amount,
-                token_data.token_a.precision(),
-            )?;
+            let amount0_in =
+                CurrencyAmount::from_raw_amount(token_data.token_a.token.clone(), amount)?;
             let amount0_out = pool.get_output_amount(&amount0_in, None).await?;
 
-            let amount1_out = CurrencyAmount::from_fractional_amount(
-                token_data.token_b.token.clone(),
-                amount,
-                token_data.token_b.precision(),
-            )?;
+            let amount1_out =
+                CurrencyAmount::from_raw_amount(token_data.token_b.token.clone(), amount)?;
             let amount1_in = pool.get_input_amount(&amount1_out, None).await?;
 
             token_data.token_a.price_effective = amount0_out.divide(&amount0_in)?.quotient();
@@ -173,38 +165,6 @@ impl PoolData {
                 .or_default()
                 .push(SwapEdge::new(from, *pool, slippage1, fee));
         }
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct TokenDetails {
-    pub token: Token,
-    pub slippage: BigInt,
-    pub price_start: BigInt,
-    pub price_effective: BigInt,
-}
-
-impl Default for TokenDetails {
-    fn default() -> Self {
-        Self {
-            token: token!(1, address!(), 0),
-            slippage: BigInt::ZERO,
-            price_start: BigInt::ZERO,
-            price_effective: BigInt::ZERO,
-        }
-    }
-}
-
-impl TokenDetails {
-    fn new(token: Token) -> Self {
-        Self {
-            token,
-            ..Default::default()
-        }
-    }
-
-    fn precision(&self) -> BigInt {
-        BigInt::from(10u128.pow(self.token.decimals() as u32))
     }
 }
 

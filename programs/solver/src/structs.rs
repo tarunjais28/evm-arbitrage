@@ -44,8 +44,8 @@ pub struct ScanData {
     amount1_in: U256,
     amount0_out: U256,
     amount1_out: U256,
-    pub reserve0: U256,
-    pub reserve1: U256,
+    pub reserve0: BigInt,
+    pub reserve1: BigInt,
 }
 
 impl From<ScanData> for Reserves {
@@ -79,8 +79,8 @@ impl ScanData {
 
     pub fn update_sync(&mut self, sync: Sync, pool_address: Address) {
         self.pool_address = pool_address;
-        self.reserve0 = U256::from(sync.reserve0);
-        self.reserve1 = U256::from(sync.reserve1);
+        self.reserve0 = U256::from(sync.reserve0).to_big_int();
+        self.reserve1 = U256::from(sync.reserve1).to_big_int();
     }
 
     pub fn update_liquidity_events(&mut self, event: impl Into<EventData>, pool_address: Address) {

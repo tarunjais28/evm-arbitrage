@@ -20,18 +20,27 @@ async fn calculate_path<'a>(
     pool_data_v3: &mut v3::PoolData,
     input_data: InputData,
 ) -> Result<(), CustomError<'a>> {
-    let mut graph = debug_time!("scanner::calculate_path::calc_slippage_v2()", {
-        calc_slippage(pool_data_v2)?
+    let amount_in = input_data.amount_in.to_big_int();
+
+    debug_time!("scanner::calculate_path::calc_slippage_v2()", {
+        pool_data_v2.calc_slippage(amount_in)?;
     });
 
     debug_time!("scanner::calculate_path::calc_effective_price_v3()", {
         pool_data_v3
-            .calc_effective_price(provider, input_data.amount_in.to_big_int())
+            .calc_effective_price(provider, amount_in)
             .await?;
     });
 
     debug_time!("scanner::calculate_path::calc_slippage_v3()", {
         pool_data_v3.calc_slippage()?;
+    });
+
+    let mut graph: SwapGraph =
+        HashMap::with_capacity((pool_data_v2.data.len() + pool_data_v2.data.len()) * 2);
+
+    debug_time!("scanner::calculate_path::into_v2_swap_graph()", {
+        pool_data_v2.to_swap_graph(&mut graph);
     });
 
     debug_time!("scanner::calculate_path::into_v3_swap_graph()", {
