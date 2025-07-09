@@ -128,7 +128,6 @@ impl Pools {
     }
 }
 enum Exchanges {
-    Sushi,
     Uniswap,
 }
 
@@ -149,7 +148,6 @@ async fn get_addresses_v3<'a>(
     use Exchanges::*;
     let factory = match exchanges {
         Uniswap => address!("0x1F98431c8aD98523631AE4a59f267346ea31F984"),
-        Sushi => address!(),
     };
 
     let mut handles = Vec::with_capacity((3 * n * (n - 1)) / 2);

@@ -566,7 +566,8 @@
     "decimals1": 18,
     "fee": 100,
     "address": "0x5777d92f208679db4b9778590fa3cab3ac9e2168"
-  },
+  }
+]
   {
     "token_a": "0x6b175474e89094c44da98b954eedeac495271d0f",
     "token_b": "0xdac17f958d2ee523a2206206994597c13d831ec7",

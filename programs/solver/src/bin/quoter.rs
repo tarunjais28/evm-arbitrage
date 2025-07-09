@@ -18,6 +18,22 @@ use uniswap_sdk_core::{prelude::*, token};
 use uniswap_v3_sdk::prelude::*;
 use utils::EnvParser;
 
+/// Computes price = (sqrtPriceX96)^2 / 2^192
+/// Returns price as an f64 for readability.
+///
+/// sqrtPriceX96 is the Q96 fixed-point square root price.
+pub fn price_from_sqrt_price_x96(sqrt_price_x96: U256) -> (U256, U256) {
+    // Numerator: (sqrtPriceX96)^2
+    let numerator = sqrt_price_x96 * sqrt_price_x96;
+
+    // Denominator: 2^192 = 1 << 192
+    let denominator = U256::from(1) << 192;
+
+    let price = numerator.checked_div(denominator).unwrap_or_default();
+    let rec = U256::from(1).checked_div(price).unwrap_or_default();
+    (price, rec)
+}
+
 #[tokio::main]
 async fn main() {
     // Load environment variables from .env file
@@ -56,9 +72,24 @@ async fn main() {
         CurrencyAmount::from_raw_amount(weth.clone(), 100000000000000000u128).unwrap();
     let local_amount_out = pool.get_output_amount(&amount_in, None).await.unwrap();
     let local_amount_out_b = pool.get_input_amount(&amount_in_b, None).await.unwrap();
+
+    let price_usdc = pool.price_of(&usdc).unwrap().quotient();
+    let price_weth = pool.price_of(&weth).unwrap().quotient();
+    let sqrt = pool.sqrt_ratio_x96;
     let local_amount_out = local_amount_out.quotient();
     println!("Local amount out: {}", local_amount_out);
     println!("Local amount in: {}", local_amount_out_b.quotient());
+    println!("Price USDC: {}", price_usdc);
+    println!("Price WETH: {}", price_weth);
+    println!("sqrt price: {}", sqrt);
+    println!("price: {:?}", price_from_sqrt_price_x96(U256::from(sqrt)));
+    println!(
+        "price: {} {}",
+        pool.token0_price().quotient(),
+        pool.token1_price().quotient()
+    );
+    println!("address: {}", pool.address(None, None));
+    println!("address: {}", pool.address(None, None));
 
     // Get the output amount from the quoter
     let route = Route::new(vec![pool], usdc, weth);
