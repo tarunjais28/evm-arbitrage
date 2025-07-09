@@ -27,10 +27,10 @@ pub fn price_from_sqrt_price_x96(sqrt_price_x96: U256) -> (U256, U256) {
     let numerator = sqrt_price_x96 * sqrt_price_x96;
 
     // Denominator: 2^192 = 1 << 192
-    let denominator = U256::from(1) << 192;
+    let denominator = U256::ONE << 192;
 
     let price = numerator.checked_div(denominator).unwrap_or_default();
-    let rec = U256::from(1).checked_div(price).unwrap_or_default();
+    let rec = U256::ONE.checked_div(price).unwrap_or_default();
     (price, rec)
 }
 

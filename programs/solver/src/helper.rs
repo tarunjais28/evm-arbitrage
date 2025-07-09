@@ -8,7 +8,7 @@ pub fn calc_individual_slippage(
     precision_out: U256,
     fee: U256,
 ) -> U256 {
-    let amount_in = U256::from(1) * precision_in;
+    let amount_in = U256::ONE * precision_in;
     let precision = U256::from(10u128.pow(9));
     let net_percent = U256::from(1000000);
 
@@ -28,10 +28,8 @@ pub fn calc_individual_slippage(
         .checked_div(amount_in * precision_out)
         .unwrap_or_default();
 
-    let slippage = (U256::from(1) * precision)
+    (U256::ONE * precision)
         - effective_price
             .checked_div(expected_price)
-            .unwrap_or_default();
-
-    slippage
+            .unwrap_or_default()
 }

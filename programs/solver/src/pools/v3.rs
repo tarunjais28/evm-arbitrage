@@ -72,7 +72,7 @@ impl PoolData {
             let numerator = sqrt_price_x96 * sqrt_price_x96;
 
             // Denominator: 2^192 = 1 << 192
-            let denominator = BigInt::from(1) << 192;
+            let denominator = BigInt::ONE << 192;
 
             let token_data = self
                 .data
@@ -163,19 +163,15 @@ impl PoolData {
             let slippage1 = token_data.token_b.slippage;
             let fee = token_data.fee;
 
-            graph.entry(from.clone()).or_default().push(SwapEdge::new(
-                to,
-                pool.clone(),
-                slippage0,
-                fee,
-            ));
+            graph
+                .entry(from)
+                .or_default()
+                .push(SwapEdge::new(to, *pool, slippage0, fee));
 
-            graph.entry(to.clone()).or_default().push(SwapEdge::new(
-                from.clone(),
-                pool.clone(),
-                slippage1,
-                fee,
-            ));
+            graph
+                .entry(to)
+                .or_default()
+                .push(SwapEdge::new(from, *pool, slippage1, fee));
         }
     }
 }

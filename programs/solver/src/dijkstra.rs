@@ -73,15 +73,15 @@ pub fn build_bidirectional_graph(
 ) -> SwapGraph {
     let mut graph = SwapGraph::with_capacity(edges.len() * 2);
     for (from, to, pool, slippage0, slippage1, fee) in edges {
-        graph.entry(from.clone()).or_default().push(SwapEdge::new(
-            to.clone(),
-            pool.clone(),
+        graph.entry(*from).or_default().push(SwapEdge::new(
+            *to,
+            *pool,
             slippage0.to_big_int(),
             *fee,
         ));
-        graph.entry(to.clone()).or_default().push(SwapEdge::new(
-            from.clone(),
-            pool.clone(),
+        graph.entry(*to).or_default().push(SwapEdge::new(
+            *from,
+            *pool,
             slippage1.to_big_int(),
             *fee,
         ));
@@ -94,9 +94,9 @@ pub fn best_path(graph: &SwapGraph, start: &Address, end: &Address) -> ShortestP
     let mut best_cost = HashMap::new();
 
     heap.push(State {
-        token: start.clone(),
+        token: *start,
         cost: BigInt::ZERO,
-        paths: vec![start.clone()],
+        paths: vec![*start],
         pools: vec![],
         fees: vec![],
     });
@@ -122,18 +122,18 @@ pub fn best_path(graph: &SwapGraph, start: &Address, end: &Address) -> ShortestP
                 let new_cost = cost + edge.slippage;
                 if new_cost < *best_cost.get(&edge.to).unwrap_or(&BigInt::MAX) {
                     let mut new_paths = paths.clone();
-                    new_paths.push(edge.to.clone());
+                    new_paths.push(edge.to);
 
                     let mut new_pools = pools.clone();
-                    new_pools.push(edge.pool.clone());
+                    new_pools.push(edge.pool);
 
                     let mut new_fees = fees.clone();
-                    new_fees.push(edge.fee.clone());
+                    new_fees.push(edge.fee);
 
-                    best_cost.insert(edge.to.clone(), new_cost);
+                    best_cost.insert(edge.to, new_cost);
 
                     heap.push(State {
-                        token: edge.to.clone(),
+                        token: edge.to,
                         cost: new_cost,
                         paths: new_paths,
                         pools: new_pools,
