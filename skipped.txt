@@ -1,0 +1,1178 @@
+1
+CurrencyLike {
+    chain_id: 1,
+    decimals: 18,
+    symbol: Some(
+        "DRGN",
+    ),
+    name: Some(
+        "Dragon",
+    ),
+    meta: TokenMeta {
+        address: 0x419c4db4b9e25d6db2ad9691ccb832c8d9fda05e,
+        buy_fee_bps: 0,
+        sell_fee_bps: 0,
+    },
+}, CurrencyLike {
+    chain_id: 1,
+    decimals: 18,
+    symbol: Some(
+        "WETH",
+    ),
+    name: Some(
+        "Wrapped Ether",
+    ),
+    meta: TokenMeta {
+        address: 0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2,
+        buy_fee_bps: 0,
+        sell_fee_bps: 0,
+    },
+}, 0x1415db6d7F91e79d1b03d179673FE63A6A6Bc0b2, 3000, Length is empty
+====================================================================================================
+2
+CurrencyLike {
+    chain_id: 1,
+    decimals: 18,
+    symbol: Some(
+        "PAXG",
+    ),
+    name: Some(
+        "Paxos Gold",
+    ),
+    meta: TokenMeta {
+        address: 0x45804880de22913dafe09f4980848ece6ecbaf78,
+        buy_fee_bps: 0,
+        sell_fee_bps: 0,
+    },
+}, CurrencyLike {
+    chain_id: 1,
+    decimals: 18,
+    symbol: Some(
+        "DAI",
+    ),
+    name: Some(
+        "Dai Stablecoin",
+    ),
+    meta: TokenMeta {
+        address: 0x6b175474e89094c44da98b954eedeac495271d0f,
+        buy_fee_bps: 0,
+        sell_fee_bps: 0,
+    },
+}, 0x0eCfF5d9AcDBD54274aed608CE6E39569854a3C1, 10000, Length is empty
+====================================================================================================
+3
+CurrencyLike {
+    chain_id: 1,
+    decimals: 8,
+    symbol: Some(
+        "WBTC",
+    ),
+    name: Some(
+        "Wrapped BTC",
+    ),
+    meta: TokenMeta {
+        address: 0x2260fac5e5542a773aa44fbcfedf7c193bc2c599,
+        buy_fee_bps: 0,
+        sell_fee_bps: 0,
+    },
+}, CurrencyLike {
+    chain_id: 1,
+    decimals: 18,
+    symbol: Some(
+        "WETH",
+    ),
+    name: Some(
+        "Wrapped Ether",
+    ),
+    meta: TokenMeta {
+        address: 0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2,
+        buy_fee_bps: 0,
+        sell_fee_bps: 0,
+    },
+}, 0xe6ff8b9A37B0fab776134636D9981Aa778c4e718, 100, Invalid revert data
+====================================================================================================
+4
+CurrencyLike {
+    chain_id: 1,
+    decimals: 8,
+    symbol: Some(
+        "WBTC",
+    ),
+    name: Some(
+        "Wrapped BTC",
+    ),
+    meta: TokenMeta {
+        address: 0x2260fac5e5542a773aa44fbcfedf7c193bc2c599,
+        buy_fee_bps: 0,
+        sell_fee_bps: 0,
+    },
+}, CurrencyLike {
+    chain_id: 1,
+    decimals: 18,
+    symbol: Some(
+        "PAXG",
+    ),
+    name: Some(
+        "Paxos Gold",
+    ),
+    meta: TokenMeta {
+        address: 0x45804880de22913dafe09f4980848ece6ecbaf78,
+        buy_fee_bps: 0,
+        sell_fee_bps: 0,
+    },
+}, 0x5A2AbDC02EcC86Fa3d015f498EC2f2C190C11700, 3000, Length is empty
+====================================================================================================
+5
+CurrencyLike {
+    chain_id: 1,
+    decimals: 8,
+    symbol: Some(
+        "WBTC",
+    ),
+    name: Some(
+        "Wrapped BTC",
+    ),
+    meta: TokenMeta {
+        address: 0x2260fac5e5542a773aa44fbcfedf7c193bc2c599,
+        buy_fee_bps: 0,
+        sell_fee_bps: 0,
+    },
+}, CurrencyLike {
+    chain_id: 1,
+    decimals: 18,
+    symbol: Some(
+        "PAXG",
+    ),
+    name: Some(
+        "Paxos Gold",
+    ),
+    meta: TokenMeta {
+        address: 0x45804880de22913dafe09f4980848ece6ecbaf78,
+        buy_fee_bps: 0,
+        sell_fee_bps: 0,
+    },
+}, 0xBBC43895c8e9D58C537e437611303A5681613662, 500, Length is empty
+====================================================================================================
+6
+CurrencyLike {
+    chain_id: 1,
+    decimals: 18,
+    symbol: Some(
+        "DRGN",
+    ),
+    name: Some(
+        "Dragon",
+    ),
+    meta: TokenMeta {
+        address: 0x419c4db4b9e25d6db2ad9691ccb832c8d9fda05e,
+        buy_fee_bps: 0,
+        sell_fee_bps: 0,
+    },
+}, CurrencyLike {
+    chain_id: 1,
+    decimals: 6,
+    symbol: Some(
+        "USDC",
+    ),
+    name: Some(
+        "USD Coin",
+    ),
+    meta: TokenMeta {
+        address: 0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48,
+        buy_fee_bps: 0,
+        sell_fee_bps: 0,
+    },
+}, 0x63BDFE1166c2d518879DFe42aF6C3Fa2c6A70619, 10000, Length is empty
+====================================================================================================
+7
+CurrencyLike {
+    chain_id: 1,
+    decimals: 6,
+    symbol: Some(
+        "USDC",
+    ),
+    name: Some(
+        "USD Coin",
+    ),
+    meta: TokenMeta {
+        address: 0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48,
+        buy_fee_bps: 0,
+        sell_fee_bps: 0,
+    },
+}, CurrencyLike {
+    chain_id: 1,
+    decimals: 6,
+    symbol: Some(
+        "USDT",
+    ),
+    name: Some(
+        "Tether USD",
+    ),
+    meta: TokenMeta {
+        address: 0xdac17f958d2ee523a2206206994597c13d831ec7,
+        buy_fee_bps: 0,
+        sell_fee_bps: 0,
+    },
+}, 0x3416cF6C708Da44DB2624D63ea0AAef7113527C6, 100, Invalid revert data
+====================================================================================================
+8
+CurrencyLike {
+    chain_id: 1,
+    decimals: 18,
+    symbol: Some(
+        "TOKE",
+    ),
+    name: Some(
+        "Tokemak",
+    ),
+    meta: TokenMeta {
+        address: 0x2e9d63788249371f1dfc918a52f8d799f4a38c94,
+        buy_fee_bps: 0,
+        sell_fee_bps: 0,
+    },
+}, CurrencyLike {
+    chain_id: 1,
+    decimals: 6,
+    symbol: Some(
+        "USDC",
+    ),
+    name: Some(
+        "USD Coin",
+    ),
+    meta: TokenMeta {
+        address: 0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48,
+        buy_fee_bps: 0,
+        sell_fee_bps: 0,
+    },
+}, 0xEfcF2a3680CC89956Eb6c30Acd48c04004F3BEbF, 10000, Length is empty
+====================================================================================================
+9
+CurrencyLike {
+    chain_id: 1,
+    decimals: 18,
+    symbol: Some(
+        "PAXG",
+    ),
+    name: Some(
+        "Paxos Gold",
+    ),
+    meta: TokenMeta {
+        address: 0x45804880de22913dafe09f4980848ece6ecbaf78,
+        buy_fee_bps: 0,
+        sell_fee_bps: 0,
+    },
+}, CurrencyLike {
+    chain_id: 1,
+    decimals: 18,
+    symbol: Some(
+        "WETH",
+    ),
+    name: Some(
+        "Wrapped Ether",
+    ),
+    meta: TokenMeta {
+        address: 0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2,
+        buy_fee_bps: 0,
+        sell_fee_bps: 0,
+    },
+}, 0x19053608fA7472A4fee2Ad11992652cc91E67972, 500, Length is empty
+====================================================================================================
+10
+CurrencyLike {
+    chain_id: 1,
+    decimals: 9,
+    symbol: Some(
+        "ZEUS",
+    ),
+    name: Some(
+        "Zeus",
+    ),
+    meta: TokenMeta {
+        address: 0x4d4574f50dd8b9dbe623cf329dcc78d76935e610,
+        buy_fee_bps: 0,
+        sell_fee_bps: 0,
+    },
+}, CurrencyLike {
+    chain_id: 1,
+    decimals: 18,
+    symbol: Some(
+        "WETH",
+    ),
+    name: Some(
+        "Wrapped Ether",
+    ),
+    meta: TokenMeta {
+        address: 0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2,
+        buy_fee_bps: 0,
+        sell_fee_bps: 0,
+    },
+}, 0x986177eD873483bd746C6207EdCCC8488cC93a09, 3000, Length is empty
+====================================================================================================
+11
+CurrencyLike {
+    chain_id: 1,
+    decimals: 18,
+    symbol: Some(
+        "LINK",
+    ),
+    name: Some(
+        "ChainLink Token",
+    ),
+    meta: TokenMeta {
+        address: 0x514910771af9ca656af840dff83e8264ecf986ca,
+        buy_fee_bps: 0,
+        sell_fee_bps: 0,
+    },
+}, CurrencyLike {
+    chain_id: 1,
+    decimals: 6,
+    symbol: Some(
+        "USDT",
+    ),
+    name: Some(
+        "Tether USD",
+    ),
+    meta: TokenMeta {
+        address: 0xdac17f958d2ee523a2206206994597c13d831ec7,
+        buy_fee_bps: 0,
+        sell_fee_bps: 0,
+    },
+}, 0x55ec9256077A311256B2DaF81f70c0992d9fbd66, 500, Length is empty
+====================================================================================================
+12
+CurrencyLike {
+    chain_id: 1,
+    decimals: 18,
+    symbol: Some(
+        "LINK",
+    ),
+    name: Some(
+        "ChainLink Token",
+    ),
+    meta: TokenMeta {
+        address: 0x514910771af9ca656af840dff83e8264ecf986ca,
+        buy_fee_bps: 0,
+        sell_fee_bps: 0,
+    },
+}, CurrencyLike {
+    chain_id: 1,
+    decimals: 18,
+    symbol: Some(
+        "WETH",
+    ),
+    name: Some(
+        "Wrapped Ether",
+    ),
+    meta: TokenMeta {
+        address: 0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2,
+        buy_fee_bps: 0,
+        sell_fee_bps: 0,
+    },
+}, 0x4EA16aE82145731390D77485DB5CFb616A9582a6, 100, Invalid revert data
+====================================================================================================
+13
+CurrencyLike {
+    chain_id: 1,
+    decimals: 18,
+    symbol: Some(
+        "DAI",
+    ),
+    name: Some(
+        "Dai Stablecoin",
+    ),
+    meta: TokenMeta {
+        address: 0x6b175474e89094c44da98b954eedeac495271d0f,
+        buy_fee_bps: 0,
+        sell_fee_bps: 0,
+    },
+}, CurrencyLike {
+    chain_id: 1,
+    decimals: 6,
+    symbol: Some(
+        "USDT",
+    ),
+    name: Some(
+        "Tether USD",
+    ),
+    meta: TokenMeta {
+        address: 0xdac17f958d2ee523a2206206994597c13d831ec7,
+        buy_fee_bps: 0,
+        sell_fee_bps: 0,
+    },
+}, 0x48DA0965ab2d2cbf1C17C09cFB5Cbe67Ad5B1406, 100, Invalid revert data
+====================================================================================================
+14
+CurrencyLike {
+    chain_id: 1,
+    decimals: 18,
+    symbol: Some(
+        "WETH",
+    ),
+    name: Some(
+        "Wrapped Ether",
+    ),
+    meta: TokenMeta {
+        address: 0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2,
+        buy_fee_bps: 0,
+        sell_fee_bps: 0,
+    },
+}, CurrencyLike {
+    chain_id: 1,
+    decimals: 6,
+    symbol: Some(
+        "USDT",
+    ),
+    name: Some(
+        "Tether USD",
+    ),
+    meta: TokenMeta {
+        address: 0xdac17f958d2ee523a2206206994597c13d831ec7,
+        buy_fee_bps: 0,
+        sell_fee_bps: 0,
+    },
+}, 0xc7bBeC68d12a0d1830360F8Ec58fA599bA1b0e9b, 100, Invalid revert data
+====================================================================================================
+15
+CurrencyLike {
+    chain_id: 1,
+    decimals: 18,
+    symbol: Some(
+        "LINK",
+    ),
+    name: Some(
+        "ChainLink Token",
+    ),
+    meta: TokenMeta {
+        address: 0x514910771af9ca656af840dff83e8264ecf986ca,
+        buy_fee_bps: 0,
+        sell_fee_bps: 0,
+    },
+}, CurrencyLike {
+    chain_id: 1,
+    decimals: 6,
+    symbol: Some(
+        "USDT",
+    ),
+    name: Some(
+        "Tether USD",
+    ),
+    meta: TokenMeta {
+        address: 0xdac17f958d2ee523a2206206994597c13d831ec7,
+        buy_fee_bps: 0,
+        sell_fee_bps: 0,
+    },
+}, 0x106A1A525e9b404D02Db8A21Dbe4C30f4C807107, 10000, Length is empty
+====================================================================================================
+16
+CurrencyLike {
+    chain_id: 1,
+    decimals: 6,
+    symbol: Some(
+        "USDT",
+    ),
+    name: Some(
+        "Tether USD",
+    ),
+    meta: TokenMeta {
+        address: 0xdac17f958d2ee523a2206206994597c13d831ec7,
+        buy_fee_bps: 0,
+        sell_fee_bps: 0,
+    },
+}, CurrencyLike {
+    chain_id: 1,
+    decimals: 7,
+    symbol: Some(
+        "SHX",
+    ),
+    name: Some(
+        "Stronghold SHx",
+    ),
+    meta: TokenMeta {
+        address: 0xee7527841a932d2912224e20a405e1a1ff747084,
+        buy_fee_bps: 0,
+        sell_fee_bps: 0,
+    },
+}, 0xEee645eF3736d63358852deC46bE7cDA61E5aeEF, 10000, Length is empty
+====================================================================================================
+17
+CurrencyLike {
+    chain_id: 1,
+    decimals: 18,
+    symbol: Some(
+        "PAXG",
+    ),
+    name: Some(
+        "Paxos Gold",
+    ),
+    meta: TokenMeta {
+        address: 0x45804880de22913dafe09f4980848ece6ecbaf78,
+        buy_fee_bps: 0,
+        sell_fee_bps: 0,
+    },
+}, CurrencyLike {
+    chain_id: 1,
+    decimals: 6,
+    symbol: Some(
+        "USDT",
+    ),
+    name: Some(
+        "Tether USD",
+    ),
+    meta: TokenMeta {
+        address: 0xdac17f958d2ee523a2206206994597c13d831ec7,
+        buy_fee_bps: 0,
+        sell_fee_bps: 0,
+    },
+}, 0x7Cb85f75e61226060453a997a7733F76707Df337, 500, Length is empty
+====================================================================================================
+18
+CurrencyLike {
+    chain_id: 1,
+    decimals: 18,
+    symbol: Some(
+        "PAXG",
+    ),
+    name: Some(
+        "Paxos Gold",
+    ),
+    meta: TokenMeta {
+        address: 0x45804880de22913dafe09f4980848ece6ecbaf78,
+        buy_fee_bps: 0,
+        sell_fee_bps: 0,
+    },
+}, CurrencyLike {
+    chain_id: 1,
+    decimals: 6,
+    symbol: Some(
+        "USDT",
+    ),
+    name: Some(
+        "Tether USD",
+    ),
+    meta: TokenMeta {
+        address: 0xdac17f958d2ee523a2206206994597c13d831ec7,
+        buy_fee_bps: 0,
+        sell_fee_bps: 0,
+    },
+}, 0x2BeDb3F68D12E4B2Ee72f3DE7227e51246353fcB, 100, Invalid revert data
+====================================================================================================
+19
+CurrencyLike {
+    chain_id: 1,
+    decimals: 18,
+    symbol: Some(
+        "PAXG",
+    ),
+    name: Some(
+        "Paxos Gold",
+    ),
+    meta: TokenMeta {
+        address: 0x45804880de22913dafe09f4980848ece6ecbaf78,
+        buy_fee_bps: 0,
+        sell_fee_bps: 0,
+    },
+}, CurrencyLike {
+    chain_id: 1,
+    decimals: 18,
+    symbol: Some(
+        "WETH",
+    ),
+    name: Some(
+        "Wrapped Ether",
+    ),
+    meta: TokenMeta {
+        address: 0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2,
+        buy_fee_bps: 0,
+        sell_fee_bps: 0,
+    },
+}, 0x8A7e585048bdA875e64024118c506B14f78166dd, 3000, Length is empty
+====================================================================================================
+20
+CurrencyLike {
+    chain_id: 1,
+    decimals: 18,
+    symbol: Some(
+        "DAI",
+    ),
+    name: Some(
+        "Dai Stablecoin",
+    ),
+    meta: TokenMeta {
+        address: 0x6b175474e89094c44da98b954eedeac495271d0f,
+        buy_fee_bps: 0,
+        sell_fee_bps: 0,
+    },
+}, CurrencyLike {
+    chain_id: 1,
+    decimals: 6,
+    symbol: Some(
+        "USDC",
+    ),
+    name: Some(
+        "USD Coin",
+    ),
+    meta: TokenMeta {
+        address: 0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48,
+        buy_fee_bps: 0,
+        sell_fee_bps: 0,
+    },
+}, 0x5777d92f208679DB4b9778590Fa3CAB3aC9e2168, 100, Invalid revert data
+====================================================================================================
+21
+CurrencyLike {
+    chain_id: 1,
+    decimals: 18,
+    symbol: Some(
+        "ILV",
+    ),
+    name: Some(
+        "Illuvium",
+    ),
+    meta: TokenMeta {
+        address: 0x767fe9edc9e0df98e07454847909b5e959d7ca0e,
+        buy_fee_bps: 0,
+        sell_fee_bps: 0,
+    },
+}, CurrencyLike {
+    chain_id: 1,
+    decimals: 6,
+    symbol: Some(
+        "USDT",
+    ),
+    name: Some(
+        "Tether USD",
+    ),
+    meta: TokenMeta {
+        address: 0xdac17f958d2ee523a2206206994597c13d831ec7,
+        buy_fee_bps: 0,
+        sell_fee_bps: 0,
+    },
+}, 0xfFB2A30E51eC15CF6853912fbA181eF0Cc666199, 10000, Length is empty
+====================================================================================================
+22
+CurrencyLike {
+    chain_id: 1,
+    decimals: 8,
+    symbol: Some(
+        "WBTC",
+    ),
+    name: Some(
+        "Wrapped BTC",
+    ),
+    meta: TokenMeta {
+        address: 0x2260fac5e5542a773aa44fbcfedf7c193bc2c599,
+        buy_fee_bps: 0,
+        sell_fee_bps: 0,
+    },
+}, CurrencyLike {
+    chain_id: 1,
+    decimals: 18,
+    symbol: Some(
+        "DAI",
+    ),
+    name: Some(
+        "Dai Stablecoin",
+    ),
+    meta: TokenMeta {
+        address: 0x6b175474e89094c44da98b954eedeac495271d0f,
+        buy_fee_bps: 0,
+        sell_fee_bps: 0,
+    },
+}, 0xA93eb5b410b651514A18724872306F5ce9928Dde, 500, Length is empty
+====================================================================================================
+23
+CurrencyLike {
+    chain_id: 1,
+    decimals: 8,
+    symbol: Some(
+        "WBTC",
+    ),
+    name: Some(
+        "Wrapped BTC",
+    ),
+    meta: TokenMeta {
+        address: 0x2260fac5e5542a773aa44fbcfedf7c193bc2c599,
+        buy_fee_bps: 0,
+        sell_fee_bps: 0,
+    },
+}, CurrencyLike {
+    chain_id: 1,
+    decimals: 6,
+    symbol: Some(
+        "USDT",
+    ),
+    name: Some(
+        "Tether USD",
+    ),
+    meta: TokenMeta {
+        address: 0xdac17f958d2ee523a2206206994597c13d831ec7,
+        buy_fee_bps: 0,
+        sell_fee_bps: 0,
+    },
+}, 0x5a59E4e647A3Acc42b01715F3A1D271c1f7e7aeb, 10000, Length is empty
+====================================================================================================
+24
+CurrencyLike {
+    chain_id: 1,
+    decimals: 9,
+    symbol: Some(
+        "DORKY",
+    ),
+    name: Some(
+        "Dork Lord",
+    ),
+    meta: TokenMeta {
+        address: 0x95ed629b028cf6aadd1408bb988c6d1daabe4767,
+        buy_fee_bps: 0,
+        sell_fee_bps: 0,
+    },
+}, CurrencyLike {
+    chain_id: 1,
+    decimals: 18,
+    symbol: Some(
+        "WETH",
+    ),
+    name: Some(
+        "Wrapped Ether",
+    ),
+    meta: TokenMeta {
+        address: 0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2,
+        buy_fee_bps: 0,
+        sell_fee_bps: 0,
+    },
+}, 0x89B1BaE19f78caBc79EE6d2B8a1A5fEbEE07A13E, 10000, Length is empty
+====================================================================================================
+25
+CurrencyLike {
+    chain_id: 1,
+    decimals: 6,
+    symbol: Some(
+        "USDC",
+    ),
+    name: Some(
+        "USD Coin",
+    ),
+    meta: TokenMeta {
+        address: 0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48,
+        buy_fee_bps: 0,
+        sell_fee_bps: 0,
+    },
+}, CurrencyLike {
+    chain_id: 1,
+    decimals: 18,
+    symbol: Some(
+        "WETH",
+    ),
+    name: Some(
+        "Wrapped Ether",
+    ),
+    meta: TokenMeta {
+        address: 0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2,
+        buy_fee_bps: 0,
+        sell_fee_bps: 0,
+    },
+}, 0xE0554a476A092703abdB3Ef35c80e0D76d32939F, 100, Invalid revert data
+====================================================================================================
+26
+CurrencyLike {
+    chain_id: 1,
+    decimals: 18,
+    symbol: Some(
+        "DAI",
+    ),
+    name: Some(
+        "Dai Stablecoin",
+    ),
+    meta: TokenMeta {
+        address: 0x6b175474e89094c44da98b954eedeac495271d0f,
+        buy_fee_bps: 0,
+        sell_fee_bps: 0,
+    },
+}, CurrencyLike {
+    chain_id: 1,
+    decimals: 18,
+    symbol: Some(
+        "WETH",
+    ),
+    name: Some(
+        "Wrapped Ether",
+    ),
+    meta: TokenMeta {
+        address: 0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2,
+        buy_fee_bps: 0,
+        sell_fee_bps: 0,
+    },
+}, 0xD8dEC118e1215F02e10DB846DCbBfE27d477aC19, 100, Invalid revert data
+====================================================================================================
+27
+CurrencyLike {
+    chain_id: 1,
+    decimals: 18,
+    symbol: Some(
+        "JOE",
+    ),
+    name: Some(
+        "Joe Coin",
+    ),
+    meta: TokenMeta {
+        address: 0x76e222b07c53d28b89b0bac18602810fc22b49a8,
+        buy_fee_bps: 0,
+        sell_fee_bps: 0,
+    },
+}, CurrencyLike {
+    chain_id: 1,
+    decimals: 18,
+    symbol: Some(
+        "WETH",
+    ),
+    name: Some(
+        "Wrapped Ether",
+    ),
+    meta: TokenMeta {
+        address: 0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2,
+        buy_fee_bps: 0,
+        sell_fee_bps: 0,
+    },
+}, 0x3Bb7C94ebE2b131C29351B964b066169c685394b, 3000, Length is empty
+====================================================================================================
+28
+CurrencyLike {
+    chain_id: 1,
+    decimals: 9,
+    symbol: Some(
+        "DORKY",
+    ),
+    name: Some(
+        "Dork Lord",
+    ),
+    meta: TokenMeta {
+        address: 0x95ed629b028cf6aadd1408bb988c6d1daabe4767,
+        buy_fee_bps: 0,
+        sell_fee_bps: 0,
+    },
+}, CurrencyLike {
+    chain_id: 1,
+    decimals: 18,
+    symbol: Some(
+        "WETH",
+    ),
+    name: Some(
+        "Wrapped Ether",
+    ),
+    meta: TokenMeta {
+        address: 0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2,
+        buy_fee_bps: 0,
+        sell_fee_bps: 0,
+    },
+}, 0x851c7e37f2C88cf4Fa2A825A0e924dd0e9Bc6a66, 3000, Length is empty
+====================================================================================================
+29
+CurrencyLike {
+    chain_id: 1,
+    decimals: 18,
+    symbol: Some(
+        "LINK",
+    ),
+    name: Some(
+        "ChainLink Token",
+    ),
+    meta: TokenMeta {
+        address: 0x514910771af9ca656af840dff83e8264ecf986ca,
+        buy_fee_bps: 0,
+        sell_fee_bps: 0,
+    },
+}, CurrencyLike {
+    chain_id: 1,
+    decimals: 6,
+    symbol: Some(
+        "USDC",
+    ),
+    name: Some(
+        "USD Coin",
+    ),
+    meta: TokenMeta {
+        address: 0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48,
+        buy_fee_bps: 0,
+        sell_fee_bps: 0,
+    },
+}, 0xd24B1542323096CcBf9cBA3b13c5b9eb4A92c506, 10000, Length is empty
+====================================================================================================
+30
+CurrencyLike {
+    chain_id: 1,
+    decimals: 18,
+    symbol: Some(
+        "ILV",
+    ),
+    name: Some(
+        "Illuvium",
+    ),
+    meta: TokenMeta {
+        address: 0x767fe9edc9e0df98e07454847909b5e959d7ca0e,
+        buy_fee_bps: 0,
+        sell_fee_bps: 0,
+    },
+}, CurrencyLike {
+    chain_id: 1,
+    decimals: 6,
+    symbol: Some(
+        "USDC",
+    ),
+    name: Some(
+        "USD Coin",
+    ),
+    meta: TokenMeta {
+        address: 0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48,
+        buy_fee_bps: 0,
+        sell_fee_bps: 0,
+    },
+}, 0xc0C4a01dd88224E5D9833171294f606b27766333, 3000, Length is empty
+====================================================================================================
+31
+CurrencyLike {
+    chain_id: 1,
+    decimals: 8,
+    symbol: Some(
+        "WBTC",
+    ),
+    name: Some(
+        "Wrapped BTC",
+    ),
+    meta: TokenMeta {
+        address: 0x2260fac5e5542a773aa44fbcfedf7c193bc2c599,
+        buy_fee_bps: 0,
+        sell_fee_bps: 0,
+    },
+}, CurrencyLike {
+    chain_id: 1,
+    decimals: 18,
+    symbol: Some(
+        "DAI",
+    ),
+    name: Some(
+        "Dai Stablecoin",
+    ),
+    meta: TokenMeta {
+        address: 0x6b175474e89094c44da98b954eedeac495271d0f,
+        buy_fee_bps: 0,
+        sell_fee_bps: 0,
+    },
+}, 0x649Caaf37F36E67D1129C0FD6C6539d390Ca2B82, 10000, Length is empty
+====================================================================================================
+32
+CurrencyLike {
+    chain_id: 1,
+    decimals: 18,
+    symbol: Some(
+        "ILV",
+    ),
+    name: Some(
+        "Illuvium",
+    ),
+    meta: TokenMeta {
+        address: 0x767fe9edc9e0df98e07454847909b5e959d7ca0e,
+        buy_fee_bps: 0,
+        sell_fee_bps: 0,
+    },
+}, CurrencyLike {
+    chain_id: 1,
+    decimals: 6,
+    symbol: Some(
+        "USDC",
+    ),
+    name: Some(
+        "USD Coin",
+    ),
+    meta: TokenMeta {
+        address: 0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48,
+        buy_fee_bps: 0,
+        sell_fee_bps: 0,
+    },
+}, 0xa7837df2fbf7dE553AA23CDBfB81d2ca1a8a0a5a, 10000, Length is empty
+====================================================================================================
+33
+CurrencyLike {
+    chain_id: 1,
+    decimals: 8,
+    symbol: Some(
+        "WBTC",
+    ),
+    name: Some(
+        "Wrapped BTC",
+    ),
+    meta: TokenMeta {
+        address: 0x2260fac5e5542a773aa44fbcfedf7c193bc2c599,
+        buy_fee_bps: 0,
+        sell_fee_bps: 0,
+    },
+}, CurrencyLike {
+    chain_id: 1,
+    decimals: 6,
+    symbol: Some(
+        "USDC",
+    ),
+    name: Some(
+        "USD Coin",
+    ),
+    meta: TokenMeta {
+        address: 0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48,
+        buy_fee_bps: 0,
+        sell_fee_bps: 0,
+    },
+}, 0x026Babd2ae9379525030Fc2574e39bc156C10583, 100, Length is empty
+====================================================================================================
+34
+CurrencyLike {
+    chain_id: 1,
+    decimals: 18,
+    symbol: Some(
+        "GOG",
+    ),
+    name: Some(
+        "Guild of Guardians",
+    ),
+    meta: TokenMeta {
+        address: 0x9ab7bb7fdc60f4357ecfef43986818a2a3569c62,
+        buy_fee_bps: 0,
+        sell_fee_bps: 0,
+    },
+}, CurrencyLike {
+    chain_id: 1,
+    decimals: 18,
+    symbol: Some(
+        "WETH",
+    ),
+    name: Some(
+        "Wrapped Ether",
+    ),
+    meta: TokenMeta {
+        address: 0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2,
+        buy_fee_bps: 0,
+        sell_fee_bps: 0,
+    },
+}, 0x132a6e4fD04B862a83Bf95127D23be2c3aB28502, 10000, Length is empty
+====================================================================================================
+35
+CurrencyLike {
+    chain_id: 1,
+    decimals: 8,
+    symbol: Some(
+        "WBTC",
+    ),
+    name: Some(
+        "Wrapped BTC",
+    ),
+    meta: TokenMeta {
+        address: 0x2260fac5e5542a773aa44fbcfedf7c193bc2c599,
+        buy_fee_bps: 0,
+        sell_fee_bps: 0,
+    },
+}, CurrencyLike {
+    chain_id: 1,
+    decimals: 18,
+    symbol: Some(
+        "PAXG",
+    ),
+    name: Some(
+        "Paxos Gold",
+    ),
+    meta: TokenMeta {
+        address: 0x45804880de22913dafe09f4980848ece6ecbaf78,
+        buy_fee_bps: 0,
+        sell_fee_bps: 0,
+    },
+}, 0xa0d9fEf6843337828a5eE8aA71f241811e52aD9d, 100, Invalid revert data
+====================================================================================================
+36
+CurrencyLike {
+    chain_id: 1,
+    decimals: 8,
+    symbol: Some(
+        "WBTC",
+    ),
+    name: Some(
+        "Wrapped BTC",
+    ),
+    meta: TokenMeta {
+        address: 0x2260fac5e5542a773aa44fbcfedf7c193bc2c599,
+        buy_fee_bps: 0,
+        sell_fee_bps: 0,
+    },
+}, CurrencyLike {
+    chain_id: 1,
+    decimals: 6,
+    symbol: Some(
+        "USDT",
+    ),
+    name: Some(
+        "Tether USD",
+    ),
+    meta: TokenMeta {
+        address: 0xdac17f958d2ee523a2206206994597c13d831ec7,
+        buy_fee_bps: 0,
+        sell_fee_bps: 0,
+    },
+}, 0xf98cf0D979CFBb780774F318e3dA4f7317aF50d7, 100, Invalid revert data
+====================================================================================================
+37
+CurrencyLike {
+    chain_id: 1,
+    decimals: 18,
+    symbol: Some(
+        "LINK",
+    ),
+    name: Some(
+        "ChainLink Token",
+    ),
+    meta: TokenMeta {
+        address: 0x514910771af9ca656af840dff83e8264ecf986ca,
+        buy_fee_bps: 0,
+        sell_fee_bps: 0,
+    },
+}, CurrencyLike {
+    chain_id: 1,
+    decimals: 6,
+    symbol: Some(
+        "USDC",
+    ),
+    name: Some(
+        "USD Coin",
+    ),
+    meta: TokenMeta {
+        address: 0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48,
+        buy_fee_bps: 0,
+        sell_fee_bps: 0,
+    },
+}, 0x22fe40544Ac2b387f9A68C6C53b9A8E34e4dd40E, 500, Length is empty
+====================================================================================================
+38
+CurrencyLike {
+    chain_id: 1,
+    decimals: 18,
+    symbol: Some(
+        "ILV",
+    ),
+    name: Some(
+        "Illuvium",
+    ),
+    meta: TokenMeta {
+        address: 0x767fe9edc9e0df98e07454847909b5e959d7ca0e,
+        buy_fee_bps: 0,
+        sell_fee_bps: 0,
+    },
+}, CurrencyLike {
+    chain_id: 1,
+    decimals: 6,
+    symbol: Some(
+        "USDT",
+    ),
+    name: Some(
+        "Tether USD",
+    ),
+    meta: TokenMeta {
+        address: 0xdac17f958d2ee523a2206206994597c13d831ec7,
+        buy_fee_bps: 0,
+        sell_fee_bps: 0,
+    },
+}, 0xB1932ff4B443636F57A6fc96568905fc63B6BC20, 3000, Length is empty
+====================================================================================================

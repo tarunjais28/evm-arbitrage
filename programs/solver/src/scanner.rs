@@ -143,15 +143,18 @@ pub async fn scan<'a>(
         let mut scanner = ScanData::new(&log);
 
         if let Ok(decoded) = log.log_decode() {
+            log::info!("v2 swap captured!");
             let sync: IUniswapV2Pool::Sync = decoded.inner.data;
             scanner.update_sync(sync, decoded.inner.address);
 
             // Update reserves based on the event
             update_reserve_abs(scanner, &mut *pool_data_v2.lock().await)?;
         } else if let Ok(decoded) = log.log_decode() {
-            log::info!("v2 swap captured!");
+            log::info!("v3 swap captured!");
             let swap: IUniswapV3Pool::Swap = decoded.inner.data;
             let pool_data = &mut pool_data_v3.lock().await;
+
+            // Update start price
             pool_data.calc_start_price_from_sqrt_price_x96(
                 &decoded.inner.address,
                 swap.sqrtPriceX96.to_big_int(),

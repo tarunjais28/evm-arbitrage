@@ -81,5 +81,11 @@ async fn main() -> Result<(), anyhow::Error> {
     println!("reserve1: {}", reserves.reserve1);
     println!("reserve1: {}", pair.reserve1().quotient());
 
+    let res = get_reserves_v2(
+        &provider,
+        &address!("0x559eBE4E206e6B4D50e9bd3008cDA7ce640C52cb"),
+    )
+    .await?;
+    println!("{:#?}", res);
     Ok(())
 }

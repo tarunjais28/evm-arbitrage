@@ -22,7 +22,7 @@ pub fn token_metadata_to_tokens(token_metadata: &[TokenMetadata]) -> TokenMap {
         .map(|meta| {
             (
                 meta.address,
-                token!(1, meta.address, meta.decimals, meta.name, meta.symbol),
+                token!(1, meta.address, meta.decimals, meta.symbol, meta.name),
             )
         })
         .collect()

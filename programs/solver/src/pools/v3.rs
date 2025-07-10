@@ -41,22 +41,41 @@ impl PoolData {
             RootProvider,
         >,
     ) -> Result<(), CustomError<'a>> {
-        for token_data in self.data.values_mut() {
-            let pool = Pool::<EphemeralTickMapDataProvider>::from_pool_key_with_tick_data_provider(
-                1,
-                FACTORY_ADDRESS,
-                token_data.token_a.token.address(),
-                token_data.token_b.token.address(),
-                token_data.fee(),
-                provider,
-                None,
-            )
-            .await?;
+        let mut count = 0;
+        for (addr, token_data) in self.data.iter_mut() {
+            let pool =
+                match Pool::<EphemeralTickMapDataProvider>::from_pool_key_with_tick_data_provider(
+                    1,
+                    FACTORY_ADDRESS,
+                    token_data.token_a.token.address(),
+                    token_data.token_b.token.address(),
+                    token_data.fee(),
+                    provider,
+                    None,
+                )
+                .await
+                {
+                    Ok(p) => p,
+                    Err(err) => {
+                        count += 1;
+                        log::error!(
+                            "token0: {}, token1: {}, pool: {}, fee: {}, err: {}",
+                            token_data.token_a.token.address(),
+                            token_data.token_b.token.address(),
+                            addr,
+                            token_data.fee,
+                            err
+                        );
+                        continue;
+                    }
+                };
 
             token_data.token_a.price_start = pool.token0_price();
             token_data.token_b.price_start = pool.token1_price();
         }
 
+        log::info!("Total skipped: {count}");
+        
         Ok(())
     }
 
