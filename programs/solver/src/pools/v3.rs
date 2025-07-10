@@ -75,7 +75,7 @@ impl PoolData {
         }
 
         log::info!("Total skipped: {count}");
-        
+
         Ok(())
     }
 

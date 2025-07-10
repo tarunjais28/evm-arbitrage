@@ -177,105 +177,169 @@ pub struct Pools {
 mod tests {
     use super::*;
 
-    // #[test]
-    // fn test_calc_slippage_zero_reserves() {
-    //     let mut token_data = TokenData {
-    //         token_a: Address::ZERO,
-    //         token_b: Address::ZERO,
-    //         slippage0: U256::ZERO,
-    //         slippage1: U256::ZERO,
-    //         reserve0: U256::ZERO,
-    //         reserve1: U256::ZERO,
-    //         decimals0: 0,
-    //         decimals1: 0,
-    //         fee: 0,
-    //     };
-    //     token_data.calc_slippages(U256::ONE);
-    //     assert_eq!(token_data.slippage0, U256::from(1000000000));
-    //     assert_eq!(token_data.slippage1, U256::from(1000000000));
-    // }
+    // Helper function to create a test token
+    fn create_test_token(address: Address, decimals: u8) -> Token {
+        token!(1, address, decimals)
+    }
 
-    // #[test]
-    // fn test_calc_slippage_equal_reserves() {
-    //     let mut token_data = TokenData {
-    //         token_a: Address::ZERO,
-    //         token_b: Address::ZERO,
-    //         slippage0: U256::ZERO,
-    //         slippage1: U256::ZERO,
-    //         reserve0: U256::from(1000),
-    //         reserve1: U256::from(1000),
-    //         decimals0: 0,
-    //         decimals1: 0,
-    //         fee: 0,
-    //     };
-    //     token_data.calc_slippages(U256::ONE);
-    //     assert_eq!(token_data.slippage0, U256::from(999999001));
-    //     assert_eq!(token_data.slippage1, U256::from(999999001));
-    // }
+    // Helper function to create a test pool
+    fn create_test_pool(
+        token_a: Token,
+        token_b: Token,
+        reserve0: u128,
+        reserve1: u128,
+        fee: u16,
+    ) -> (Pools, TokenMap) {
+        let pool_address = address!("0x0000000000000000000000000000000000000001");
 
-    // #[test]
-    // fn test_calc_slippage_unequal_reserves() {
-    //     let mut token_data = TokenData {
-    //         token_a: Address::ZERO,
-    //         token_b: Address::ZERO,
-    //         slippage0: U256::ZERO,
-    //         slippage1: U256::ZERO,
-    //         reserve0: U256::from(1000),
-    //         reserve1: U256::from(2000),
-    //         decimals0: 0,
-    //         decimals1: 0,
-    //         fee: 0,
-    //     };
-    //     token_data.calc_slippages(U256::ONE);
-    //     assert_eq!(token_data.slippage0, U256::from(999999001));
-    //     assert_eq!(token_data.slippage1, U256::from(999998002));
-    // }
+        let mut tokens = TokenMap::new();
+        tokens.insert(token_a.address, token_a.clone());
+        tokens.insert(token_b.address, token_b.clone());
 
-    // #[test]
-    // fn test_calc_slippage_one_reserve_is_zero() {
-    //     let mut token_data = TokenData {
-    //         token_a: Address::ZERO,
-    //         token_b: Address::ZERO,
-    //         slippage0: U256::ZERO,
-    //         slippage1: U256::ZERO,
-    //         reserve0: U256::from(1000),
-    //         reserve1: U256::ZERO,
-    //         decimals0: 0,
-    //         decimals1: 0,
-    //         fee: 0,
-    //     };
-    //     token_data.calc_slippages(U256::ONE);
-    //     assert_eq!(token_data.slippage0, U256::from(1000000000));
-    //     assert_eq!(token_data.slippage1, U256::from(1000000000));
-    // }
+        let pool = Pools {
+            token_a: token_a.address,
+            token_b: token_b.address,
+            fee,
+            address: pool_address,
+        };
 
-    // #[test]
-    // fn test_calc_slippage() {
-    //     let mut token_data = TokenData {
-    //         token_a: Address::ZERO,
-    //         token_b: Address::ZERO,
-    //         slippage0: U256::ZERO,
-    //         slippage1: U256::ZERO,
-    //         reserve0: U256::from(1551650201200975628814u128),
-    //         reserve1: U256::from(1178164302654065252u128),
-    //         fee: 0,
-    //         decimals0: 18,
-    //         decimals1: 18,
-    //     };
-    //     token_data.calc_slippages(U256::ONE);
-    //     assert_eq!(token_data.slippage0, U256::from(3000144));
-    //     assert_eq!(token_data.slippage1, U256::from(999999999));
-    // }
+        (pool, tokens)
+    }
 
-    // #[test]
-    // fn test_calc_slippage_with_different_decimals() {
-    //     let mut token_data = TokenData {
-    //         token_a: TokenDetails::default(),
-    //         token_b: TokenDetails::default(),
-    //         reserve0: BigInt::from(1551650201200975628814u128),
-    //         reserve1: BigInt::from(1178164302654065252u128),
-    //         fee: 0,
-    //     };
-    //     token_data.calc_slippages(BigInt::ONE).unwrap();
-    // }
+    #[test]
+    fn test_calc_effective_price_basic() {
+        // Create test tokens
+        let token_a = create_test_token(address!("0x1000000000000000000000000000000000000001"), 18);
+        let token_b = create_test_token(address!("0x2000000000000000000000000000000000000002"), 18);
+
+        // Create test pool with 1:1 ratio (1000:1000)
+        let (pool, tokens) = create_test_pool(
+            token_a,
+            token_b,
+            1_000_000_000_000_000_000_000, // 1000 token A
+            1_000_000_000_000_000_000_000, // 1000 token B
+            3000,                            // 0.3% fee
+        );
+
+        // Create pool data
+        let mut pool_data = PoolData::new(&[pool], &tokens).unwrap();
+
+        // Set initial reserves
+        pool_data.data.values_mut().for_each(|data| {
+            data.reserve0 = BigInt::from(1_000_000_000_000_000_000_000u128); // 1000 token A
+            data.reserve1 = BigInt::from(1_000_000_000_000_000_000_000u128); // 1000 token B
+        });
+
+        // Calculate start price (should be 1:1)
+        pool_data.calc_start_price().unwrap();
+
+        // Calculate effective price for 1 token (accounting for 0.3% fee)
+        let amount = BigInt::from(1_000_000_000_000_000_000u128); // 1.0 token
+        pool_data.calc_effective_price(amount).unwrap();
+
+        // Verify effective prices
+        for data in pool_data.data.values() {
+            // Due to 0.3% fee, we expect slightly less than 1:1 output
+            assert!(data
+                .token_a
+                .price_effective
+                .lt(&data.token_a.price_start));
+            assert!(data
+                .token_b
+                .price_effective
+                .lt(&data.token_b.price_start));
+        }
+    }
+
+    #[test]
+    fn test_calc_slippage() {
+        // Create test tokens
+        let token_a = create_test_token(address!("0x1000000000000000000000000000000000000001"), 18);
+        let token_b = create_test_token(address!("0x2000000000000000000000000000000000000002"), 18);
+
+        // Create test pool with 1:1 ratio (1000:1000)
+        let (pool, tokens) = create_test_pool(
+            token_a,
+            token_b,
+            1_000_000_000_000_000_000_000, // 1000 token A
+            1_000_000_000_000_000_000_000, // 1000 token B
+            3000,                            // 0.3% fee
+        );
+
+        // Create pool data
+        let mut pool_data = PoolData::new(&[pool], &tokens).unwrap();
+
+        // Set initial reserves
+        pool_data.data.values_mut().for_each(|data| {
+            data.reserve0 = BigInt::from(1_000_000_000_000_000_000_000u128); // 1000 token A
+            data.reserve1 = BigInt::from(1_000_000_000_000_000_000_000u128); // 1000 token B
+        });
+
+        // Calculate start price (should be 1:1)
+        pool_data.calc_start_price().unwrap();
+
+        // Calculate effective price for 10% of the pool
+        let amount = BigInt::from(100_000_000_000_000_000_000u128); // 100 tokens (10% of reserve)
+        pool_data.calc_effective_price(amount).unwrap();
+
+        // Calculate slippage
+        pool_data.calc_slippage().unwrap();
+
+        // Verify slippage values
+        for data in pool_data.data.values() {
+            // Slippage should be positive (price impact from trade)
+            assert!(data.token_a.slippage > BigInt::ZERO);
+            assert!(data.token_b.slippage > BigInt::ZERO);
+
+            // Slippage should be relatively small for 10% of the pool
+            assert!(data.token_a.slippage < BigInt::ONE); // Less than 1% slippage
+            assert!(data.token_b.slippage < BigInt::ONE); // Less than 1% slippage
+        }
+    }
+
+    #[test]
+    fn test_calc_effective_price_large_trade() {
+        // Create test tokens
+        let token_a = create_test_token(address!("0x1000000000000000000000000000000000000001"), 18);
+        let token_b = create_test_token(address!("0x2000000000000000000000000000000000000002"), 18);
+
+        // Create test pool with 1:1 ratio (1000:1000)
+        let (pool, tokens) = create_test_pool(
+            token_a,
+            token_b,
+            1_000_000_000_000_000_000_000, // 1000 token A
+            1_000_000_000_000_000_000_000, // 1000 token B
+            3000,                            // 0.3% fee
+        );
+
+        // Create pool data
+        let mut pool_data = PoolData::new(&[pool], &tokens).unwrap();
+
+        // Set initial reserves
+        pool_data.data.values_mut().for_each(|data| {
+            data.reserve0 = BigInt::from(1_000_000_000_000_000_000_000u128); // 1000 token A
+            data.reserve1 = BigInt::from(1_000_000_000_000_000_000_000u128); // 1000 token B
+        });
+
+        // Calculate start price (should be 1:1)
+        pool_data.calc_start_price().unwrap();
+
+        // Calculate effective price for 50% of the pool (large trade)
+        let amount = BigInt::from(500_000_000_000_000_000_000u128); // 500 tokens (50% of reserve)
+        pool_data.calc_effective_price(amount).unwrap();
+
+        // Calculate slippage
+        pool_data.calc_slippage().unwrap();
+
+        // Verify slippage values
+        for data in pool_data.data.values() {
+            // Slippage should be significant for a 50% trade
+            assert!(data.token_a.slippage > BigInt::ONE);
+            assert!(data.token_b.slippage > BigInt::ONE);
+
+            // But still reasonable (less than 50%)
+            assert!(data.token_a.slippage < BigInt::from(50));
+            assert!(data.token_b.slippage < BigInt::from(50));
+        }
+    }
 }
