@@ -86,6 +86,7 @@ async fn main() -> Result<(), anyhow::Error> {
         &address!("0x559eBE4E206e6B4D50e9bd3008cDA7ce640C52cb"),
     )
     .await?;
+
     println!("{:#?}", res);
     Ok(())
 }
