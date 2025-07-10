@@ -161,7 +161,8 @@ pub(crate) fn make_pool(token0: Token, token1: Token) -> Pool<TickListDataProvid
                 ),
             ],
             FEE_AMOUNT.tick_spacing().as_i32(),
-        ),
+        )
+        .unwrap(),
     )
     .unwrap()
 }

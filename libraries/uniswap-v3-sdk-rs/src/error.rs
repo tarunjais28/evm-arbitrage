@@ -83,6 +83,16 @@ pub enum TickListError {
     AtOrAboveLargest,
     #[error("Not contained in tick list")]
     NotContained,
+    #[error("Tick is 0")]
+    Zero,
+    #[error("Length is empty")]
+    Length,
+    #[error("Tick spacing has non zero spacing")]
+    TickSpacing,
+    #[error("Tokens are not sorted")]
+    NotSorted,
+    #[error("Not zero net")]
+    NotZero,
 }
 
 #[cfg(feature = "extensions")]

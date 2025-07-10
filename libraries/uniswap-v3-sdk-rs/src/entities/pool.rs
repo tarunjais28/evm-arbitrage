@@ -714,7 +714,8 @@ mod tests {
                         ),
                     ],
                     FeeAmount::LOW.tick_spacing().as_i32(),
-                ),
+                )
+                .unwrap(),
             )
             .unwrap()
         });

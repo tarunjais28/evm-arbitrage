@@ -65,7 +65,7 @@ impl<I: TickIndex> From<EphemeralTickDataProvider<I>> for TickListDataProvider<I
     #[inline]
     fn from(provider: EphemeralTickDataProvider<I>) -> Self {
         assert!(!provider.ticks.is_empty());
-        Self::new(provider.ticks, provider.tick_spacing)
+        Self::new(provider.ticks, provider.tick_spacing).expect("Invalid tick")
     }
 }
 
@@ -88,7 +88,7 @@ mod tests {
         )
         .await?;
         assert!(!provider.ticks.is_empty());
-        provider.ticks.validate_list(TICK_SPACING);
+        provider.ticks.validate_list(TICK_SPACING).unwrap();
 
         let tick = provider.get_tick(-92110).await?;
         assert_eq!(tick.liquidity_gross, 398290794261);

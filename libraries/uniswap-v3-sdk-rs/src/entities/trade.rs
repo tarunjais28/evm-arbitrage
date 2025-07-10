@@ -853,7 +853,8 @@ mod tests {
                     ),
                 ],
                 tick_spacing.as_i32(),
-            ),
+            )
+            .unwrap(),
         )
         .unwrap()
     }

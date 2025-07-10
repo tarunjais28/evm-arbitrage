@@ -4,7 +4,7 @@ use crate::prelude::*;
 pub trait TickList {
     type Index: TickIndex;
 
-    fn validate_list(&self, tick_spacing: Self::Index);
+    fn validate_list(&self, tick_spacing: Self::Index) -> Result<(), Error>;
 
     fn is_below_smallest(&self, tick: Self::Index) -> bool;
 
@@ -33,23 +33,33 @@ impl<I: TickIndex> TickList for [Tick<I>] {
     type Index = I;
 
     #[inline]
-    fn validate_list(&self, tick_spacing: I) {
-        assert!(tick_spacing > I::ZERO, "TICK_SPACING_NONZERO");
-        assert!(!self.is_empty(), "LENGTH");
-        assert!(
-            self.iter().all(|x| x.index % tick_spacing == I::ZERO),
-            "TICK_SPACING"
-        );
-        for i in 1..self.len() {
-            assert!(self[i] >= self[i - 1], "SORTED");
+    fn validate_list(&self, tick_spacing: I) -> Result<(), Error> {
+        if tick_spacing <= I::ZERO {
+            return Err(TickListError::Zero.into());
         }
-        assert_eq!(
-            self.iter().fold(0_u128, |acc, x| acc
-                .checked_add_signed(x.liquidity_net)
-                .expect("ZERO_NET")),
-            0,
-            "ZERO_NET"
-        );
+
+        if self.is_empty() {
+            return Err(TickListError::Length.into());
+        }
+
+        if self.iter().any(|x| x.index % tick_spacing != I::ZERO) {
+            return Err(TickListError::TickSpacing.into());
+        }
+
+        for i in 1..self.len() {
+            if self[i] < self[i - 1] {
+                return Err(TickListError::NotSorted.into());
+            }
+        }
+
+        if self.iter().fold(0_u128, |acc, x| {
+            acc.checked_add_signed(x.liquidity_net).unwrap_or_default()
+        }) != 0
+        {
+            return Err(TickListError::NotZero.into());
+        }
+
+        Ok(())
     }
 
     #[inline]
@@ -182,19 +192,19 @@ mod tests {
         #[test]
         #[should_panic(expected = "ZERO_NET")]
         fn test_errors_for_incomplete_lists() {
-            [LOW_TICK].validate_list(1);
+            [LOW_TICK].validate_list(1).unwrap();
         }
 
         #[test]
         #[should_panic(expected = "SORTED")]
         fn test_errors_for_unsorted_lists() {
-            [HIGH_TICK, LOW_TICK, MID_TICK].validate_list(1);
+            [HIGH_TICK, LOW_TICK, MID_TICK].validate_list(1).unwrap();
         }
 
         #[test]
         #[should_panic(expected = "TICK_SPACING")]
         fn test_errors_if_ticks_are_not_on_multiples_of_tick_spacing() {
-            [HIGH_TICK, LOW_TICK, MID_TICK].validate_list(1337);
+            [HIGH_TICK, LOW_TICK, MID_TICK].validate_list(1337).unwrap();
         }
     }
 

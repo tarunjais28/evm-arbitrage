@@ -40,7 +40,7 @@ impl<I: TickIndex> EphemeralTickMapDataProvider<I> {
             tick_upper: provider.tick_upper,
             tick_spacing: provider.tick_spacing,
             block_id,
-            tick_map: TickMap::new(provider.ticks, provider.tick_spacing),
+            tick_map: TickMap::new(provider.ticks, provider.tick_spacing)?,
         })
     }
 }

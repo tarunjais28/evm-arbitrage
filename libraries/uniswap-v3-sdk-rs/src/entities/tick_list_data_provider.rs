@@ -8,9 +8,9 @@ pub struct TickListDataProvider<I = i32>(Vec<Tick<I>>);
 
 impl<I: TickIndex> TickListDataProvider<I> {
     #[inline]
-    pub fn new(ticks: Vec<Tick<I>>, tick_spacing: I) -> Self {
-        ticks.validate_list(tick_spacing);
-        Self(ticks)
+    pub fn new(ticks: Vec<Tick<I>>, tick_spacing: I) -> Result<Self, Error> {
+        ticks.validate_list(tick_spacing)?;
+        Ok(Self(ticks))
     }
 }
 
@@ -20,8 +20,9 @@ mod tests {
     use alloc::vec;
     use once_cell::sync::Lazy;
 
-    static PROVIDER: Lazy<TickListDataProvider> =
-        Lazy::new(|| TickListDataProvider::new(vec![Tick::new(-1, 1, 1), Tick::new(1, 1, -1)], 1));
+    static PROVIDER: Lazy<TickListDataProvider> = Lazy::new(|| {
+        TickListDataProvider::new(vec![Tick::new(-1, 1, 1), Tick::new(1, 1, -1)], 1).unwrap()
+    });
 
     #[test]
     fn can_take_an_empty_list_of_ticks() {
@@ -31,13 +32,13 @@ mod tests {
     #[test]
     #[should_panic(expected = "TICK_SPACING_NONZERO")]
     fn throws_for_0_tick_spacing() {
-        TickListDataProvider::new(vec![], 0);
+        TickListDataProvider::new(vec![], 0).unwrap();
     }
 
     #[test]
     #[should_panic(expected = "ZERO_NET")]
     fn throws_for_uneven_tick_list() {
-        TickListDataProvider::new(vec![Tick::new(-1, 1, -1), Tick::new(1, 1, 2)], 1);
+        TickListDataProvider::new(vec![Tick::new(-1, 1, -1), Tick::new(1, 1, 2)], 1).unwrap();
     }
 
     #[tokio::test]

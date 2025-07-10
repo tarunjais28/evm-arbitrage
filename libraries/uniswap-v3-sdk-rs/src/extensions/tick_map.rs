@@ -16,8 +16,8 @@ pub struct TickMap<I = I24> {
 impl<I: TickIndex> TickMap<I> {
     #[inline]
     #[must_use]
-    pub fn new(ticks: Vec<Tick<I>>, tick_spacing: I) -> Self {
-        ticks.validate_list(tick_spacing);
+    pub fn new(ticks: Vec<Tick<I>>, tick_spacing: I) -> Result<Self, Error> {
+        ticks.validate_list(tick_spacing)?;
         let mut bitmap = TickBitMap::default();
         for tick in &ticks {
             let compressed = tick.index.compress(tick_spacing);
@@ -25,11 +25,11 @@ impl<I: TickIndex> TickMap<I> {
             let word = bitmap.get(&word_pos).unwrap_or(&U256::ZERO);
             bitmap.insert(word_pos, word | (uint!(1_U256) << bit_pos));
         }
-        Self {
+        Ok(Self {
             bitmap,
             inner: FxHashMap::from_iter(ticks.into_iter().map(|tick| (tick.index, tick))),
             tick_spacing,
-        }
+        })
     }
 }
 

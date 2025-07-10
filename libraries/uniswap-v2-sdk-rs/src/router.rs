@@ -3,7 +3,7 @@
 
 use crate::prelude::{Error, *};
 use alloy::primitives::{Bytes, U256};
-use alloy::{sol_types::SolCall, sol};
+use alloy::{sol, sol_types::SolCall};
 use uniswap_sdk_core::prelude::*;
 
 /// Options for producing the arguments to send call to the router.
