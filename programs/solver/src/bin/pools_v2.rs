@@ -100,8 +100,11 @@ async fn get_addresses_v2<'a>(
         for j in (i + 1)..n {
             let provider_clone = provider.clone();
             let factory_clone = factory;
-            let token_a = tokens[i];
-            let token_b = tokens[j];
+            let (token_a, token_b) = if tokens[i] < tokens[j] {
+                (tokens[i], tokens[j])
+            } else {
+                (tokens[j], tokens[i])
+            };
 
             handles.push(tokio::spawn(async move {
                 get_pair_address(provider_clone, factory_clone, token_a, token_b).await
