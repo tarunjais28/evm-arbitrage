@@ -77,7 +77,7 @@ async fn main() -> Result<(), anyhow::Error> {
         });
 
         let mut pool_data_v3: v3::PoolData = debug_time!("pool_data_v3()", {
-            v3::PoolData::new(&env_parser.serialised_v3_pool, &token_map)?
+            v3::PoolData::new(&env_parser.pools_v3, &token_map)?
         });
 
         debug_time!("calulate_start_price_v3()", {

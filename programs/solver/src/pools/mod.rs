@@ -8,6 +8,14 @@ pub type TokenMap = HashMap<Address, Token>;
 pub type PriceData =
     FractionLike<PriceMeta<CurrencyLike<false, TokenMeta>, CurrencyLike<false, TokenMeta>>>;
 
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct Pools {
+    token0: Address,
+    token1: Address,
+    fee: u16,
+    address: Address,
+}
+
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct TokenMetadata {
     pub address: Address,
@@ -26,14 +34,6 @@ pub fn token_metadata_to_tokens(token_metadata: &[TokenMetadata]) -> TokenMap {
             )
         })
         .collect()
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct SerialisedV3Pools {
-    pub token0: Address,
-    pub token1: Address,
-    pub fee: u16,
-    pub address: Address,
 }
 
 #[derive(Debug, Clone)]

@@ -6,7 +6,7 @@ pub struct PoolData {
 
 impl PoolData {
     pub fn new<'a>(
-        serialised_v3_pool: &[SerialisedV3Pools],
+        serialised_v3_pool: &[Pools],
         tokens: &TokenMap,
     ) -> Result<PoolData, CustomError<'a>> {
         let mut data = HashMap::with_capacity(tokens.len());

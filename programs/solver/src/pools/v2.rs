@@ -14,12 +14,12 @@ impl PoolData {
                 pool.address,
                 TokenData::new(
                     tokens
-                        .get(&pool.token_a)
-                        .ok_or_else(|| CustomError::AddressNotFound(pool.token_a))?
+                        .get(&pool.token0)
+                        .ok_or_else(|| CustomError::AddressNotFound(pool.token0))?
                         .clone(),
                     tokens
-                        .get(&pool.token_b)
-                        .ok_or_else(|| CustomError::AddressNotFound(pool.token_b))?
+                        .get(&pool.token1)
+                        .ok_or_else(|| CustomError::AddressNotFound(pool.token1))?
                         .clone(),
                     pool.fee,
                 ),
@@ -56,47 +56,47 @@ impl PoolData {
 
     pub fn calc_start_price<'a>(&mut self) -> Result<(), CustomError<'a>> {
         for token_data in self.data.values_mut() {
-            let token_amount_a = CurrencyAmount::from_raw_amount(
-                token_data.token_a.token.clone(),
+            let token0mount_a = CurrencyAmount::from_raw_amount(
+                token_data.token0.token.clone(),
                 token_data.reserve0,
             )?;
-            let token_amount_b = CurrencyAmount::from_raw_amount(
-                token_data.token_b.token.clone(),
+            let token0mount_b = CurrencyAmount::from_raw_amount(
+                token_data.token1.token.clone(),
                 token_data.reserve1,
             )?;
 
-            let pair = Pair::new(token_amount_a.clone(), token_amount_b.clone())?;
+            let pair = Pair::new(token0mount_a.clone(), token0mount_b.clone())?;
 
-            token_data.token_a.price_start = pair.token0_price();
-            token_data.token_b.price_start = pair.token1_price();
+            token_data.token0.price_start = pair.token0_price();
+            token_data.token1.price_start = pair.token1_price();
         }
         Ok(())
     }
 
     pub fn calc_effective_price<'a>(&mut self, amount: BigInt) -> Result<(), CustomError<'a>> {
         for token_data in self.data.values_mut() {
-            let token_amount_a = CurrencyAmount::from_raw_amount(
-                token_data.token_a.token.clone(),
+            let token0mount_a = CurrencyAmount::from_raw_amount(
+                token_data.token0.token.clone(),
                 token_data.reserve0,
             )?;
-            let token_amount_b = CurrencyAmount::from_raw_amount(
-                token_data.token_b.token.clone(),
+            let token0mount_b = CurrencyAmount::from_raw_amount(
+                token_data.token1.token.clone(),
                 token_data.reserve1,
             )?;
 
-            let pair = Pair::new(token_amount_a.clone(), token_amount_b.clone())?;
+            let pair = Pair::new(token0mount_a.clone(), token0mount_b.clone())?;
 
             let amount0_in =
-                CurrencyAmount::from_raw_amount(token_data.token_a.token.clone(), amount)?;
+                CurrencyAmount::from_raw_amount(token_data.token0.token.clone(), amount)?;
             let (amount0_out, _) = pair.get_output_amount(&amount0_in, false)?;
 
             let amount1_out =
-                CurrencyAmount::from_raw_amount(token_data.token_b.token.clone(), amount)?;
+                CurrencyAmount::from_raw_amount(token_data.token1.token.clone(), amount)?;
             let (amount1_in, _) = pair.get_input_amount(&amount0_in, false)?;
 
-            token_data.token_a.price_effective =
+            token_data.token0.price_effective =
                 Price::from_currency_amounts(amount0_in, amount0_out);
-            token_data.token_b.price_effective =
+            token_data.token1.price_effective =
                 Price::from_currency_amounts(amount1_out, amount1_in);
         }
         Ok(())
@@ -104,14 +104,14 @@ impl PoolData {
 
     pub fn calc_slippage<'a>(&mut self) -> Result<(), CustomError<'a>> {
         for token_data in self.data.values_mut() {
-            token_data.token_a.slippage = calc_slippage(
-                token_data.token_a.price_start.clone(),
-                token_data.token_a.price_effective.clone(),
+            token_data.token0.slippage = calc_slippage(
+                token_data.token0.price_start.clone(),
+                token_data.token0.price_effective.clone(),
             )?;
 
-            token_data.token_b.slippage = calc_slippage(
-                token_data.token_b.price_start.clone(),
-                token_data.token_b.price_effective.clone(),
+            token_data.token1.slippage = calc_slippage(
+                token_data.token1.price_start.clone(),
+                token_data.token1.price_effective.clone(),
             )?;
         }
 
@@ -120,10 +120,10 @@ impl PoolData {
 
     pub fn to_swap_graph(&self, graph: &mut SwapGraph) {
         for (pool, token_data) in self.data.iter() {
-            let from = token_data.token_a.token.address();
-            let to = token_data.token_b.token.address();
-            let slippage0 = token_data.token_a.slippage;
-            let slippage1 = token_data.token_b.slippage;
+            let from = token_data.token0.token.address();
+            let to = token_data.token1.token.address();
+            let slippage0 = token_data.token0.slippage;
+            let slippage1 = token_data.token1.slippage;
             let fee = token_data.fee;
 
             graph
@@ -141,18 +141,18 @@ impl PoolData {
 
 #[derive(Debug, Clone)]
 pub struct TokenData {
-    pub token_a: TokenDetails,
-    pub token_b: TokenDetails,
+    pub token0: TokenDetails,
+    pub token1: TokenDetails,
     pub reserve0: BigInt,
     pub reserve1: BigInt,
     pub fee: u16,
 }
 
 impl TokenData {
-    fn new(token_a: Token, token_b: Token, fee: u16) -> Self {
+    fn new(token0: Token, token1: Token, fee: u16) -> Self {
         Self {
-            token_a: TokenDetails::new(token_a),
-            token_b: TokenDetails::new(token_b),
+            token0: TokenDetails::new(token0),
+            token1: TokenDetails::new(token1),
             fee,
             reserve0: BigInt::ZERO,
             reserve1: BigInt::ZERO,
@@ -163,14 +163,6 @@ impl TokenData {
         self.reserve0 = reserves.reserve0;
         self.reserve1 = reserves.reserve1;
     }
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct Pools {
-    token_a: Address,
-    token_b: Address,
-    fee: u16,
-    address: Address,
 }
 
 #[cfg(test)]
@@ -184,8 +176,8 @@ mod tests {
 
     // Helper function to create a test pool
     fn create_test_pool(
-        token_a: Token,
-        token_b: Token,
+        token0: Token,
+        token1: Token,
         reserve0: u128,
         reserve1: u128,
         fee: u16,
@@ -193,12 +185,12 @@ mod tests {
         let pool_address = address!("0x0000000000000000000000000000000000000001");
 
         let mut tokens = TokenMap::new();
-        tokens.insert(token_a.address, token_a.clone());
-        tokens.insert(token_b.address, token_b.clone());
+        tokens.insert(token0.address, token0.clone());
+        tokens.insert(token1.address, token1.clone());
 
         let pool = Pools {
-            token_a: token_a.address,
-            token_b: token_b.address,
+            token0: token0.address,
+            token1: token1.address,
             fee,
             address: pool_address,
         };
@@ -209,16 +201,16 @@ mod tests {
     #[test]
     fn test_calc_effective_price_basic() {
         // Create test tokens
-        let token_a = create_test_token(address!("0x1000000000000000000000000000000000000001"), 18);
-        let token_b = create_test_token(address!("0x2000000000000000000000000000000000000002"), 18);
+        let token0 = create_test_token(address!("0x1000000000000000000000000000000000000001"), 18);
+        let token1 = create_test_token(address!("0x2000000000000000000000000000000000000002"), 18);
 
         // Create test pool with 1:1 ratio (1000:1000)
         let (pool, tokens) = create_test_pool(
-            token_a,
-            token_b,
+            token0,
+            token1,
             1_000_000_000_000_000_000_000, // 1000 token A
             1_000_000_000_000_000_000_000, // 1000 token B
-            3000,                            // 0.3% fee
+            3000,                          // 0.3% fee
         );
 
         // Create pool data
@@ -240,30 +232,24 @@ mod tests {
         // Verify effective prices
         for data in pool_data.data.values() {
             // Due to 0.3% fee, we expect slightly less than 1:1 output
-            assert!(data
-                .token_a
-                .price_effective
-                .lt(&data.token_a.price_start));
-            assert!(data
-                .token_b
-                .price_effective
-                .lt(&data.token_b.price_start));
+            assert!(data.token0.price_effective.lt(&data.token0.price_start));
+            assert!(data.token1.price_effective.lt(&data.token1.price_start));
         }
     }
 
     #[test]
     fn test_calc_slippage() {
         // Create test tokens
-        let token_a = create_test_token(address!("0x1000000000000000000000000000000000000001"), 18);
-        let token_b = create_test_token(address!("0x2000000000000000000000000000000000000002"), 18);
+        let token0 = create_test_token(address!("0x1000000000000000000000000000000000000001"), 18);
+        let token1 = create_test_token(address!("0x2000000000000000000000000000000000000002"), 18);
 
         // Create test pool with 1:1 ratio (1000:1000)
         let (pool, tokens) = create_test_pool(
-            token_a,
-            token_b,
+            token0,
+            token1,
             1_000_000_000_000_000_000_000, // 1000 token A
             1_000_000_000_000_000_000_000, // 1000 token B
-            3000,                            // 0.3% fee
+            3000,                          // 0.3% fee
         );
 
         // Create pool data
@@ -288,28 +274,28 @@ mod tests {
         // Verify slippage values
         for data in pool_data.data.values() {
             // Slippage should be positive (price impact from trade)
-            assert!(data.token_a.slippage > BigInt::ZERO);
-            assert!(data.token_b.slippage > BigInt::ZERO);
+            assert!(data.token0.slippage > BigInt::ZERO);
+            assert!(data.token1.slippage > BigInt::ZERO);
 
             // Slippage should be relatively small for 10% of the pool
-            assert!(data.token_a.slippage < BigInt::ONE); // Less than 1% slippage
-            assert!(data.token_b.slippage < BigInt::ONE); // Less than 1% slippage
+            assert!(data.token0.slippage < BigInt::ONE); // Less than 1% slippage
+            assert!(data.token1.slippage < BigInt::ONE); // Less than 1% slippage
         }
     }
 
     #[test]
     fn test_calc_effective_price_large_trade() {
         // Create test tokens
-        let token_a = create_test_token(address!("0x1000000000000000000000000000000000000001"), 18);
-        let token_b = create_test_token(address!("0x2000000000000000000000000000000000000002"), 18);
+        let token0 = create_test_token(address!("0x1000000000000000000000000000000000000001"), 18);
+        let token1 = create_test_token(address!("0x2000000000000000000000000000000000000002"), 18);
 
         // Create test pool with 1:1 ratio (1000:1000)
         let (pool, tokens) = create_test_pool(
-            token_a,
-            token_b,
+            token0,
+            token1,
             1_000_000_000_000_000_000_000, // 1000 token A
             1_000_000_000_000_000_000_000, // 1000 token B
-            3000,                            // 0.3% fee
+            3000,                          // 0.3% fee
         );
 
         // Create pool data
@@ -334,12 +320,12 @@ mod tests {
         // Verify slippage values
         for data in pool_data.data.values() {
             // Slippage should be significant for a 50% trade
-            assert!(data.token_a.slippage > BigInt::ONE);
-            assert!(data.token_b.slippage > BigInt::ONE);
+            assert!(data.token0.slippage > BigInt::ONE);
+            assert!(data.token1.slippage > BigInt::ONE);
 
             // But still reasonable (less than 50%)
-            assert!(data.token_a.slippage < BigInt::from(50));
-            assert!(data.token_b.slippage < BigInt::from(50));
+            assert!(data.token0.slippage < BigInt::from(50));
+            assert!(data.token1.slippage < BigInt::from(50));
         }
     }
 }

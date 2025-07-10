@@ -53,8 +53,8 @@ async fn get_pair_address<'a>(
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Pools {
-    token_a: Address,
-    token_b: Address,
+    token0: Address,
+    token1: Address,
     fee: u16,
     address: Address,
 }
@@ -62,8 +62,8 @@ pub struct Pools {
 impl Pools {
     fn new(token_a: Address, token_b: Address, address: Address) -> Self {
         Self {
-            token_a: token_a,
-            token_b: token_b,
+            token0: token_a,
+            token1: token_b,
             fee: 3000,
             address,
         }
