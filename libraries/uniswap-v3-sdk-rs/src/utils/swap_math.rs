@@ -173,11 +173,19 @@ pub async fn v3_swap<TP: TickDataProvider>(
     });
 
     if zero_for_one {
-        assert!(sqrt_price_limit_x96 > MIN_SQRT_RATIO, "RATIO_MIN");
-        assert!(sqrt_price_limit_x96 < sqrt_price_x96, "RATIO_CURRENT");
+        if sqrt_price_limit_x96 <= MIN_SQRT_RATIO {
+            return Err(Error::LesserThanMinimumSqrtRatio);
+        }
+        if sqrt_price_limit_x96 >= sqrt_price_x96 {
+            return Err(Error::SqrtLimitGT);
+        }
     } else {
-        assert!(sqrt_price_limit_x96 < MAX_SQRT_RATIO, "RATIO_MAX");
-        assert!(sqrt_price_limit_x96 > sqrt_price_x96, "RATIO_CURRENT");
+        if sqrt_price_limit_x96 >= MAX_SQRT_RATIO {
+            return Err(Error::GreaterThanMaximumSqrtRatio);
+        }
+        if sqrt_price_limit_x96 <= sqrt_price_x96 {
+            return Err(Error::SqrtLimitLT);
+        }
     }
 
     let exact_input = amount_specified >= I256::ZERO;

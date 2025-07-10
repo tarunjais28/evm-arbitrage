@@ -73,24 +73,47 @@ pub enum Error {
     #[cfg(feature = "extensions")]
     #[error("Invalid access list")]
     InvalidAccessList,
+
+    #[cfg(feature = "extensions")]
+    #[error("Lesser than minimum sqrt ratio")]
+    LesserThanMinimumSqrtRatio,
+
+    #[cfg(feature = "extensions")]
+    #[error("Greater than maximum sqrt ratio")]
+    GreaterThanMaximumSqrtRatio,
+
+    #[cfg(feature = "extensions")]
+    #[error("sqrt_price_limit_x96 must be less")]
+    SqrtLimitGT,
+
+    #[cfg(feature = "extensions")]
+    #[error("sqrt_price_limit_x96 must be greater")]
+    SqrtLimitLT,
 }
 
 #[derive(Clone, Copy, Debug, Hash, PartialEq, Eq, thiserror::Error)]
 pub enum TickListError {
     #[error("Below smallest tick")]
     BelowSmallest,
+
     #[error("At or above largest tick")]
     AtOrAboveLargest,
+
     #[error("Not contained in tick list")]
     NotContained,
+
     #[error("Tick is 0")]
     Zero,
+
     #[error("Length is empty")]
     Length,
+
     #[error("Tick spacing has non zero spacing")]
     TickSpacing,
+
     #[error("Tokens are not sorted")]
     NotSorted,
+
     #[error("Not zero net")]
     NotZero,
 }
