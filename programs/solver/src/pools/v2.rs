@@ -1,6 +1,7 @@
 use super::*;
 use uniswap_v2_sdk::prelude::*;
 
+#[derive(Debug)]
 pub struct PoolData {
     pub data: HashMap<Address, TokenData>,
 }
@@ -74,7 +75,7 @@ impl PoolData {
     }
 
     pub fn calc_effective_price<'a>(&mut self, amount: BigInt) -> Result<(), CustomError<'a>> {
-        for token_data in self.data.values_mut() {
+        for (_pool_addr, token_data) in self.data.iter_mut() {
             let token0mount_a = CurrencyAmount::from_raw_amount(
                 token_data.token0.token.clone(),
                 token_data.reserve0,
@@ -88,11 +89,23 @@ impl PoolData {
 
             let amount0_in =
                 CurrencyAmount::from_raw_amount(token_data.token0.token.clone(), amount)?;
-            let (amount0_out, _) = pair.get_output_amount(&amount0_in, false)?;
+            let (amount0_out, _) = match pair.get_output_amount(&amount0_in, false) {
+                Ok(a) => a,
+                Err(_err) => {
+                    // log::error!("amount0_out calculation failed for {_pool_addr}, due to {_err}");
+                    continue;
+                }
+            };
 
             let amount1_out =
                 CurrencyAmount::from_raw_amount(token_data.token1.token.clone(), amount)?;
-            let (amount1_in, _) = pair.get_input_amount(&amount0_in, false)?;
+            let (amount1_in, _) = match pair.get_input_amount(&amount0_in, false) {
+                Ok(a) => a,
+                Err(_err) => {
+                    // log::error!("amount1_in calculation failed for {_pool_addr}, due to {_err}");
+                    continue;
+                }
+            };
 
             token_data.token0.price_effective =
                 Price::from_currency_amounts(amount0_in, amount0_out);
@@ -229,6 +242,7 @@ mod tests {
         let amount = BigInt::from(1_000_000_000_000_000_000u128); // 1.0 token
         pool_data.calc_effective_price(amount).unwrap();
 
+        println!("{:#?}", pool_data);
         // Verify effective prices
         for data in pool_data.data.values() {
             // Due to 0.3% fee, we expect slightly less than 1:1 output

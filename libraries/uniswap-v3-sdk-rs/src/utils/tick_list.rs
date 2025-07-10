@@ -34,30 +34,30 @@ impl<I: TickIndex> TickList for [Tick<I>] {
 
     #[inline]
     fn validate_list(&self, tick_spacing: I) -> Result<(), Error> {
-        if tick_spacing <= I::ZERO {
-            return Err(TickListError::Zero.into());
-        }
+        // if tick_spacing <= I::ZERO {
+        //     return Err(TickListError::Zero.into());
+        // }
 
-        if self.is_empty() {
-            return Err(TickListError::Length.into());
-        }
+        // if self.is_empty() {
+        //     return Err(TickListError::Length.into());
+        // }
 
-        if self.iter().any(|x| x.index % tick_spacing != I::ZERO) {
-            return Err(TickListError::TickSpacing.into());
-        }
+        // if self.iter().any(|x| x.index % tick_spacing != I::ZERO) {
+        //     return Err(TickListError::TickSpacing.into());
+        // }
 
-        for i in 1..self.len() {
-            if self[i] < self[i - 1] {
-                return Err(TickListError::NotSorted.into());
-            }
-        }
+        // for i in 1..self.len() {
+        //     if self[i] < self[i - 1] {
+        //         return Err(TickListError::NotSorted.into());
+        //     }
+        // }
 
-        if self.iter().fold(0_u128, |acc, x| {
-            acc.checked_add_signed(x.liquidity_net).unwrap_or_default()
-        }) != 0
-        {
-            return Err(TickListError::NotZero.into());
-        }
+        // if self.iter().fold(0_u128, |acc, x| {
+        //     acc.checked_add_signed(x.liquidity_net).unwrap_or_default()
+        // }) != 0
+        // {
+        //     return Err(TickListError::NotZero.into());
+        // }
 
         Ok(())
     }

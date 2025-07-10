@@ -1,0 +1,2126 @@
+[
+  {
+    "address": "0x6b3595068778dd592e39a122f4f5a5cf09c90fe2",
+    "swap_edge": [
+      {
+        "to": "0xdac17f958d2ee523a2206206994597c13d831ec7",
+        "pool": "0x680a025da7b1be2c204d7745e809919bce074026",
+        "slippage": -4124,
+        "fee": 3000
+      },
+      {
+        "to": "0xdbdb4d16eda451d0503b854cf79d55697f90c8df",
+        "pool": "0x73b20b0a6677c175ebaa09d3e1e76f98e46b4c72",
+        "slippage": -498625,
+        "fee": 3000
+      },
+      {
+        "to": "0x6b175474e89094c44da98b954eedeac495271d0f",
+        "pool": "0x7ee3be9a82f051401ca028db1825ac2640884d0a",
+        "slippage": 1267690,
+        "fee": 3000
+      },
+      {
+        "to": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+        "pool": "0x795065dcc9f64b5614c407a6efdc400da6221fb0",
+        "slippage": -3001,
+        "fee": 3000
+      },
+      {
+        "to": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "pool": "0x239650663a422273c0b2c7a1f1a8bdab69e78d1b",
+        "slippage": -424480,
+        "fee": 3000
+      },
+      {
+        "to": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "pool": "0xba87dc891945dbb3caeeaf822de208d7ea89b298",
+        "slippage": -3763,
+        "fee": 3000
+      },
+      {
+        "to": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+        "pool": "0xce84867c3c02b05dc570d0135103d3fb9cc19433",
+        "slippage": -3006,
+        "fee": 3000
+      },
+      {
+        "to": "0x2e9d63788249371f1dfc918a52f8d799f4a38c94",
+        "pool": "0x6496da23de48db0dceca14fa8dc5ae44cdaf8ebe",
+        "slippage": -849979,
+        "fee": 3000
+      },
+      {
+        "to": "0xdac17f958d2ee523a2206206994597c13d831ec7",
+        "pool": "0xe3ffab89e53422f468be955e7011932efe80aa26",
+        "slippage": -15377,
+        "fee": 3000
+      },
+      {
+        "to": "0x767fe9edc9e0df98e07454847909b5e959d7ca0e",
+        "pool": "0x0cd198a5f6cc84ca8499dd97a6c1a1c4b4a12da1",
+        "slippage": -56252,
+        "fee": 3000
+      },
+      {
+        "to": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+        "pool": "0x73a6a761fe483ba19debb8f56ac5bbf14c0cdad1",
+        "slippage": -3154,
+        "fee": 3000
+      },
+      {
+        "to": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "pool": "0x184c33b7b1089747440057e46b4e2bb61f09bc8d",
+        "slippage": -1000000,
+        "fee": 10000
+      },
+      {
+        "to": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+        "pool": "0x19e286157200418d6a1f7d1df834b82e65c920aa",
+        "slippage": -1000000,
+        "fee": 10000
+      },
+      {
+        "to": "0xdac17f958d2ee523a2206206994597c13d831ec7",
+        "pool": "0x206c9f6ad08a8f2a3cc05bd3939cd49287560096",
+        "slippage": -1000000,
+        "fee": 3000
+      }
+    ]
+  },
+  {
+    "address": "0x45804880de22913dafe09f4980848ece6ecbaf78",
+    "swap_edge": [
+      {
+        "to": "0x6b175474e89094c44da98b954eedeac495271d0f",
+        "pool": "0x3d65e308a5d6e9938b2fed1c8a18089db697d126",
+        "slippage": -1000000,
+        "fee": 3000
+      },
+      {
+        "to": "0x2260fac5e5542a773aa44fbcfedf7c193bc2c599",
+        "pool": "0x538ddd4bbeaaea496fecac5a770256e0cae2faed",
+        "slippage": -1000000,
+        "fee": 3000
+      },
+      {
+        "to": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+        "pool": "0xf957fc1b6ed557c698ed6f1d336e00f306773975",
+        "slippage": -1000000,
+        "fee": 3000
+      },
+      {
+        "to": "0xdac17f958d2ee523a2206206994597c13d831ec7",
+        "pool": "0xf3f8a942f9d0827d32ea1b9f1a0724b5fa7397db",
+        "slippage": -1000000,
+        "fee": 3000
+      },
+      {
+        "to": "0x2260fac5e5542a773aa44fbcfedf7c193bc2c599",
+        "pool": "0x8e0859ea441fe5d788dd0a2544075f0088b74410",
+        "slippage": -1000000,
+        "fee": 3000
+      },
+      {
+        "to": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "pool": "0x6d74443bb2d50785989a7212ebfd3a8dbabd1f60",
+        "slippage": -1000000,
+        "fee": 3000
+      },
+      {
+        "to": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+        "pool": "0x9c4fe5ffd9a9fc5678cfbd93aa2d4fd684b67c4c",
+        "slippage": -3568,
+        "fee": 3000
+      },
+      {
+        "to": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "pool": "0x56983afc748ee88d695f1bcf8d8fa25831a71a21",
+        "slippage": -1000000,
+        "fee": 3000
+      },
+      {
+        "to": "0x6b175474e89094c44da98b954eedeac495271d0f",
+        "pool": "0x0ecff5d9acdbd54274aed608ce6e39569854a3c1",
+        "slippage": 1000000,
+        "fee": 10000
+      },
+      {
+        "to": "0x2260fac5e5542a773aa44fbcfedf7c193bc2c599",
+        "pool": "0x5a2abdc02ecc86fa3d015f498ec2f2c190c11700",
+        "slippage": 1000000,
+        "fee": 3000
+      },
+      {
+        "to": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+        "pool": "0x19053608fa7472a4fee2ad11992652cc91e67972",
+        "slippage": 1000000,
+        "fee": 500
+      },
+      {
+        "to": "0xdac17f958d2ee523a2206206994597c13d831ec7",
+        "pool": "0x7cb85f75e61226060453a997a7733f76707df337",
+        "slippage": 1000000,
+        "fee": 500
+      },
+      {
+        "to": "0xdac17f958d2ee523a2206206994597c13d831ec7",
+        "pool": "0x2bedb3f68d12e4b2ee72f3de7227e51246353fcb",
+        "slippage": 1000000,
+        "fee": 100
+      },
+      {
+        "to": "0x2260fac5e5542a773aa44fbcfedf7c193bc2c599",
+        "pool": "0xbbc43895c8e9d58c537e437611303a5681613662",
+        "slippage": 1000000,
+        "fee": 500
+      },
+      {
+        "to": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+        "pool": "0xcb1abb2731a48d8819f03808013c0a0e48d9b3d9",
+        "slippage": -18662,
+        "fee": 10000
+      },
+      {
+        "to": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "pool": "0x5ae13baaef0620fdae1d355495dc51a17adb4082",
+        "slippage": -1000000,
+        "fee": 500
+      },
+      {
+        "to": "0x2260fac5e5542a773aa44fbcfedf7c193bc2c599",
+        "pool": "0xa0d9fef6843337828a5ee8aa71f241811e52ad9d",
+        "slippage": 1000000,
+        "fee": 100
+      },
+      {
+        "to": "0x6b175474e89094c44da98b954eedeac495271d0f",
+        "pool": "0x477e1a178f308fb8c2967d3e56e157c4b8b6f5df",
+        "slippage": -998907,
+        "fee": 3000
+      },
+      {
+        "to": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "pool": "0xb431c70f800100d87554ac1142c4a94c5fe4c0c4",
+        "slippage": -1000000,
+        "fee": 3000
+      },
+      {
+        "to": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+        "pool": "0x8a7e585048bda875e64024118c506b14f78166dd",
+        "slippage": 1000000,
+        "fee": 3000
+      },
+      {
+        "to": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "pool": "0x1d61fb4c87361f27bd3be39a06d1a19f0c5d696b",
+        "slippage": -1000000,
+        "fee": 10000
+      },
+      {
+        "to": "0xdac17f958d2ee523a2206206994597c13d831ec7",
+        "pool": "0x123712f44b4fd26b36b8d4c81e2ed01ae6e9607a",
+        "slippage": -1000000,
+        "fee": 3000
+      }
+    ]
+  },
+  {
+    "address": "0x76e222b07c53d28b89b0bac18602810fc22b49a8",
+    "swap_edge": [
+      {
+        "to": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+        "pool": "0x704ad8d95c12d7fea531738faa94402725acb035",
+        "slippage": -3001,
+        "fee": 3000
+      },
+      {
+        "to": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+        "pool": "0x3bb7c94ebe2b131c29351b964b066169c685394b",
+        "slippage": 1000000,
+        "fee": 3000
+      },
+      {
+        "to": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+        "pool": "0xceb63a909d95c9222cdf5b08044f5dae72cd036e",
+        "slippage": -1000000,
+        "fee": 10000
+      }
+    ]
+  },
+  {
+    "address": "0xdbdb4d16eda451d0503b854cf79d55697f90c8df",
+    "swap_edge": [
+      {
+        "to": "0x6b3595068778dd592e39a122f4f5a5cf09c90fe2",
+        "pool": "0x73b20b0a6677c175ebaa09d3e1e76f98e46b4c72",
+        "slippage": -472382,
+        "fee": 3000
+      },
+      {
+        "to": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+        "pool": "0xc3f279090a47e80990fe3a9c30d24cb117ef91a8",
+        "slippage": 124088016485,
+        "fee": 3000
+      },
+      {
+        "to": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+        "pool": "0x352e5eee2d9c957710be656534d51fbb3ce074d6",
+        "slippage": -1000000,
+        "fee": 3000
+      },
+      {
+        "to": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+        "pool": "0x689b322bf5056487eec7f9b2577cd43a37eb6302",
+        "slippage": 480378,
+        "fee": 3000
+      },
+      {
+        "to": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+        "pool": "0xb80946cd2b4b68bedd769a21ca2f096ead6e0ee8",
+        "slippage": 27036,
+        "fee": 10000
+      },
+      {
+        "to": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "pool": "0x17474e83216942d6d7bce129ef5957c94194c716",
+        "slippage": -1000000,
+        "fee": 10000
+      }
+    ]
+  },
+  {
+    "address": "0x44709a920fccf795fbc57baa433cc3dd53c44dbe",
+    "swap_edge": [
+      {
+        "to": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+        "pool": "0x0fd3faf056382a25507de89022d8acf66b3d7410",
+        "slippage": -83413,
+        "fee": 3000
+      },
+      {
+        "to": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+        "pool": "0x559ebe4e206e6b4d50e9bd3008cda7ce640c52cb",
+        "slippage": -3001,
+        "fee": 3000
+      },
+      {
+        "to": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+        "pool": "0x47841ec00564a33402f16b876ed148b52dfbe188",
+        "slippage": -1000000,
+        "fee": 10000
+      },
+      {
+        "to": "0xdac17f958d2ee523a2206206994597c13d831ec7",
+        "pool": "0x105f7a72d9449d48e7094dae8d7102420c34bfc8",
+        "slippage": -1000000,
+        "fee": 10000
+      }
+    ]
+  },
+  {
+    "address": "0x9ab7bb7fdc60f4357ecfef43986818a2a3569c62",
+    "swap_edge": [
+      {
+        "to": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+        "pool": "0x5c596c6a65f628fc1090853d8eb1927651e9d9b2",
+        "slippage": -3001,
+        "fee": 3000
+      },
+      {
+        "to": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+        "pool": "0x132a6e4fd04b862a83bf95127d23be2c3ab28502",
+        "slippage": 1000000,
+        "fee": 10000
+      }
+    ]
+  },
+  {
+    "address": "0x514910771af9ca656af840dff83e8264ecf986ca",
+    "swap_edge": [
+      {
+        "to": "0x6b175474e89094c44da98b954eedeac495271d0f",
+        "pool": "0x6d4fd456edeca58cf53a8b586cd50754547dbdb2",
+        "slippage": -10094,
+        "fee": 3000
+      },
+      {
+        "to": "0x6b175474e89094c44da98b954eedeac495271d0f",
+        "pool": "0x23a1081bad58465e30a0a5083fbc8409c3d76960",
+        "slippage": -1000000,
+        "fee": 3000
+      },
+      {
+        "to": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "pool": "0x2101072e369761435a532a83369984ec3950aef2",
+        "slippage": -473539,
+        "fee": 3000
+      },
+      {
+        "to": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+        "pool": "0xc40d16476380e4037e6b1a2594caf6a6cc8da967",
+        "slippage": -3019,
+        "fee": 3000
+      },
+      {
+        "to": "0xdac17f958d2ee523a2206206994597c13d831ec7",
+        "pool": "0x665daa5e280edd60b81c67d583ed85b9a5cc45a6",
+        "slippage": -38628,
+        "fee": 3000
+      },
+      {
+        "to": "0x2260fac5e5542a773aa44fbcfedf7c193bc2c599",
+        "pool": "0x8a01ba64fbc7b12ee13f817dfa862881fec531b8",
+        "slippage": -1000000,
+        "fee": 3000
+      },
+      {
+        "to": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+        "pool": "0xa2107fa5b38d9bbd2c461d6edf11b11a50f6b974",
+        "slippage": -3016,
+        "fee": 3000
+      },
+      {
+        "to": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "pool": "0xd8c8a2b125527bf97c8e4845b25de7e964468f77",
+        "slippage": -30584,
+        "fee": 3000
+      },
+      {
+        "to": "0xdac17f958d2ee523a2206206994597c13d831ec7",
+        "pool": "0x9db10c305c671153662119d453c4d2c123725566",
+        "slippage": -52611,
+        "fee": 3000
+      },
+      {
+        "to": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+        "pool": "0x5d4f3c6fa16908609bac31ff148bd002aa6b8c83",
+        "slippage": -586,
+        "fee": 500
+      },
+      {
+        "to": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "pool": "0xfad57d2039c21811c8f2b5d5b65308aa99d31559",
+        "slippage": -1000000,
+        "fee": 3000
+      },
+      {
+        "to": "0x2260fac5e5542a773aa44fbcfedf7c193bc2c599",
+        "pool": "0x618004783d422dfb792d07d742549d5a24648df2",
+        "slippage": -1000000,
+        "fee": 3000
+      },
+      {
+        "to": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+        "pool": "0x3a0f221ea8b150f3d3d27de8928851ab5264bb65",
+        "slippage": -1000000,
+        "fee": 10000
+      },
+      {
+        "to": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "pool": "0xd24b1542323096ccbf9cba3b13c5b9eb4a92c506",
+        "slippage": 1000000,
+        "fee": 10000
+      },
+      {
+        "to": "0xdac17f958d2ee523a2206206994597c13d831ec7",
+        "pool": "0x55ec9256077a311256b2daf81f70c0992d9fbd66",
+        "slippage": 1000000,
+        "fee": 500
+      },
+      {
+        "to": "0x6b175474e89094c44da98b954eedeac495271d0f",
+        "pool": "0x091c0158ab410bd73ca1541409d5a22e90146a04",
+        "slippage": -1000000,
+        "fee": 3000
+      },
+      {
+        "to": "0xdac17f958d2ee523a2206206994597c13d831ec7",
+        "pool": "0xac5a2c404ebba22a869998089ac7893ff4e1f0a7",
+        "slippage": -1000000,
+        "fee": 3000
+      },
+      {
+        "to": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+        "pool": "0xa6cc3c2531fdaa6ae1a3ca84c2855806728693e8",
+        "slippage": -3001,
+        "fee": 3000
+      },
+      {
+        "to": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+        "pool": "0x4ea16ae82145731390d77485db5cfb616a9582a6",
+        "slippage": 1000000,
+        "fee": 100
+      },
+      {
+        "to": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "pool": "0x22fe40544ac2b387f9a68c6c53b9a8e34e4dd40e",
+        "slippage": 1000000,
+        "fee": 500
+      },
+      {
+        "to": "0x6b175474e89094c44da98b954eedeac495271d0f",
+        "pool": "0x3209c64bf470fafecb8b87db3d8ac1baa3ecf629",
+        "slippage": -1000000,
+        "fee": 500
+      },
+      {
+        "to": "0xdac17f958d2ee523a2206206994597c13d831ec7",
+        "pool": "0x106a1a525e9b404d02db8a21dbe4c30f4c807107",
+        "slippage": 1000000,
+        "fee": 10000
+      }
+    ]
+  },
+  {
+    "address": "0x4d4574f50dd8b9dbe623cf329dcc78d76935e610",
+    "swap_edge": [
+      {
+        "to": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+        "pool": "0x055fb841cce69000fbaff2691ad39fa6e23826a1",
+        "slippage": -3049,
+        "fee": 3000
+      },
+      {
+        "to": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+        "pool": "0x986177ed873483bd746c6207edccc8488cc93a09",
+        "slippage": 1000000,
+        "fee": 3000
+      },
+      {
+        "to": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+        "pool": "0x5b60eed941aa99bb2d8ee6359872ed64e64280c8",
+        "slippage": -1000000,
+        "fee": 10000
+      }
+    ]
+  },
+  {
+    "address": "0x2260fac5e5542a773aa44fbcfedf7c193bc2c599",
+    "swap_edge": [
+      {
+        "to": "0x6b175474e89094c44da98b954eedeac495271d0f",
+        "pool": "0x622d4a772b72f56602546559c95d7ca214ebb24f",
+        "slippage": -1000000,
+        "fee": 3000
+      },
+      {
+        "to": "0xdac17f958d2ee523a2206206994597c13d831ec7",
+        "pool": "0x784178d58b641a4febf8d477a6abd28504273132",
+        "slippage": -1000000,
+        "fee": 3000
+      },
+      {
+        "to": "0xdac17f958d2ee523a2206206994597c13d831ec7",
+        "pool": "0x0de0fa91b6dbab8c8503aaa2d1dfa91a192cb149",
+        "slippage": -1000000,
+        "fee": 3000
+      },
+      {
+        "to": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+        "pool": "0xbb2b8038a1640196fbe3e38816f3e67cba72d940",
+        "slippage": -1000000,
+        "fee": 3000
+      },
+      {
+        "to": "0x45804880de22913dafe09f4980848ece6ecbaf78",
+        "pool": "0x538ddd4bbeaaea496fecac5a770256e0cae2faed",
+        "slippage": -1000000,
+        "fee": 3000
+      },
+      {
+        "to": "0x514910771af9ca656af840dff83e8264ecf986ca",
+        "pool": "0x8a01ba64fbc7b12ee13f817dfa862881fec531b8",
+        "slippage": -1000000,
+        "fee": 3000
+      },
+      {
+        "to": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "pool": "0x004375dff511095cc5a197a54140a24efef3a416",
+        "slippage": -1000000,
+        "fee": 3000
+      },
+      {
+        "to": "0x45804880de22913dafe09f4980848ece6ecbaf78",
+        "pool": "0x8e0859ea441fe5d788dd0a2544075f0088b74410",
+        "slippage": -1000000,
+        "fee": 3000
+      },
+      {
+        "to": "0x6b175474e89094c44da98b954eedeac495271d0f",
+        "pool": "0x231b7589426ffe1b75405526fc32ac09d44364c4",
+        "slippage": -1000000,
+        "fee": 3000
+      },
+      {
+        "to": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+        "pool": "0xceff51756c56ceffca006cd410b03ffc46dd3a58",
+        "slippage": -1000000,
+        "fee": 3000
+      },
+      {
+        "to": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+        "pool": "0x4585fe77225b41b697c938b018e2ac67ac5a20c0",
+        "slippage": -1000000,
+        "fee": 500
+      },
+      {
+        "to": "0x45804880de22913dafe09f4980848ece6ecbaf78",
+        "pool": "0x5a2abdc02ecc86fa3d015f498ec2f2c190c11700",
+        "slippage": 1000000,
+        "fee": 3000
+      },
+      {
+        "to": "0xdac17f958d2ee523a2206206994597c13d831ec7",
+        "pool": "0x56534741cd8b152df6d48adf7ac51f75169a83b2",
+        "slippage": -1000000,
+        "fee": 500
+      },
+      {
+        "to": "0x6b175474e89094c44da98b954eedeac495271d0f",
+        "pool": "0xa93eb5b410b651514a18724872306f5ce9928dde",
+        "slippage": 1000000,
+        "fee": 500
+      },
+      {
+        "to": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+        "pool": "0x6ab3bba2f41e7eaa262fa5a1a9b3932fa161526f",
+        "slippage": -1000000,
+        "fee": 10000
+      },
+      {
+        "to": "0x514910771af9ca656af840dff83e8264ecf986ca",
+        "pool": "0x618004783d422dfb792d07d742549d5a24648df2",
+        "slippage": -1000000,
+        "fee": 3000
+      },
+      {
+        "to": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "pool": "0x026babd2ae9379525030fc2574e39bc156c10583",
+        "slippage": 1000000,
+        "fee": 100
+      },
+      {
+        "to": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "pool": "0xcbfb0745b8489973bf7b334d54fdbd573df7ef3c",
+        "slippage": -1000000,
+        "fee": 10000
+      },
+      {
+        "to": "0xdac17f958d2ee523a2206206994597c13d831ec7",
+        "pool": "0xf98cf0d979cfbb780774f318e3da4f7317af50d7",
+        "slippage": 1000000,
+        "fee": 100
+      },
+      {
+        "to": "0xdac17f958d2ee523a2206206994597c13d831ec7",
+        "pool": "0x5a59e4e647a3acc42b01715f3a1d271c1f7e7aeb",
+        "slippage": 1000000,
+        "fee": 10000
+      },
+      {
+        "to": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+        "pool": "0xcbcdf9626bc03e24f779434178a73a0b4bad62ed",
+        "slippage": -1000000,
+        "fee": 3000
+      },
+      {
+        "to": "0x45804880de22913dafe09f4980848ece6ecbaf78",
+        "pool": "0xbbc43895c8e9d58c537e437611303a5681613662",
+        "slippage": 1000000,
+        "fee": 500
+      },
+      {
+        "to": "0x6b175474e89094c44da98b954eedeac495271d0f",
+        "pool": "0x391e8501b626c623d39474afca6f9e46c2686649",
+        "slippage": -1000000,
+        "fee": 3000
+      },
+      {
+        "to": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "pool": "0x9a772018fbd77fcd2d25657e5c547baff3fd7d16",
+        "slippage": -1000000,
+        "fee": 500
+      },
+      {
+        "to": "0x6b175474e89094c44da98b954eedeac495271d0f",
+        "pool": "0x649caaf37f36e67d1129c0fd6c6539d390ca2b82",
+        "slippage": 1000000,
+        "fee": 10000
+      },
+      {
+        "to": "0xdac17f958d2ee523a2206206994597c13d831ec7",
+        "pool": "0x9db9e0e53058c89e5b94e29621a205198648425b",
+        "slippage": -1000000,
+        "fee": 3000
+      },
+      {
+        "to": "0x45804880de22913dafe09f4980848ece6ecbaf78",
+        "pool": "0xa0d9fef6843337828a5ee8aa71f241811e52ad9d",
+        "slippage": 1000000,
+        "fee": 100
+      },
+      {
+        "to": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+        "pool": "0xe6ff8b9a37b0fab776134636d9981aa778c4e718",
+        "slippage": -1000000,
+        "fee": 100
+      },
+      {
+        "to": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "pool": "0x99ac8ca7087fa4a2a1fb6357269965a2014abc35",
+        "slippage": -1000000,
+        "fee": 3000
+      }
+    ]
+  },
+  {
+    "address": "0x2e44f3f609ff5aa4819b323fd74690f07c3607c4",
+    "swap_edge": [
+      {
+        "to": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+        "pool": "0x8d547a3e42828093e31a8c3f2a864036984b64ee",
+        "slippage": -3001,
+        "fee": 3000
+      },
+      {
+        "to": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+        "pool": "0x241fc1cdbf9f741933e5fa515c5b884da93b81b6",
+        "slippage": -1000000,
+        "fee": 10000
+      }
+    ]
+  },
+  {
+    "address": "0x95ed629b028cf6aadd1408bb988c6d1daabe4767",
+    "swap_edge": [
+      {
+        "to": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+        "pool": "0xfa3551ee99a4ac691673a569d586c8cc7e78672f",
+        "slippage": -1000000,
+        "fee": 3000
+      },
+      {
+        "to": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+        "pool": "0x89b1bae19f78cabc79ee6d2b8a1a5febee07a13e",
+        "slippage": 1000000,
+        "fee": 10000
+      },
+      {
+        "to": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+        "pool": "0x851c7e37f2c88cf4fa2a825a0e924dd0e9bc6a66",
+        "slippage": 1000000,
+        "fee": 3000
+      }
+    ]
+  },
+  {
+    "address": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+    "swap_edge": [
+      {
+        "to": "0x514910771af9ca656af840dff83e8264ecf986ca",
+        "pool": "0x2101072e369761435a532a83369984ec3950aef2",
+        "slippage": -1000000,
+        "fee": 3000
+      },
+      {
+        "to": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+        "pool": "0xb4e16d0168e52d35cacd2c6185b44281ec28c9dc",
+        "slippage": -1000000,
+        "fee": 3000
+      },
+      {
+        "to": "0x6b3595068778dd592e39a122f4f5a5cf09c90fe2",
+        "pool": "0x239650663a422273c0b2c7a1f1a8bdab69e78d1b",
+        "slippage": -1000000,
+        "fee": 3000
+      },
+      {
+        "to": "0xdac17f958d2ee523a2206206994597c13d831ec7",
+        "pool": "0x3041cbd36888becc7bbcbc0045e3b1f144466f5f",
+        "slippage": -1000000,
+        "fee": 3000
+      },
+      {
+        "to": "0x767fe9edc9e0df98e07454847909b5e959d7ca0e",
+        "pool": "0x2e102d10493558c58a03f3297519dc939f8ad097",
+        "slippage": -1000000,
+        "fee": 3000
+      },
+      {
+        "to": "0xdac17f958d2ee523a2206206994597c13d831ec7",
+        "pool": "0xd86a120a06255df8d4e2248ab04d4267e23adfaa",
+        "slippage": -1000000,
+        "fee": 3000
+      },
+      {
+        "to": "0x6b175474e89094c44da98b954eedeac495271d0f",
+        "pool": "0xaaf5110db6e744ff70fb339de037b990a20bdace",
+        "slippage": -1000000,
+        "fee": 3000
+      },
+      {
+        "to": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+        "pool": "0x397ff1542f962076d0bfe58ea045ffa2d347aca0",
+        "slippage": -1000000,
+        "fee": 3000
+      },
+      {
+        "to": "0x2260fac5e5542a773aa44fbcfedf7c193bc2c599",
+        "pool": "0x004375dff511095cc5a197a54140a24efef3a416",
+        "slippage": -1000000,
+        "fee": 3000
+      },
+      {
+        "to": "0x514910771af9ca656af840dff83e8264ecf986ca",
+        "pool": "0xd8c8a2b125527bf97c8e4845b25de7e964468f77",
+        "slippage": -1000000,
+        "fee": 3000
+      },
+      {
+        "to": "0x6b175474e89094c44da98b954eedeac495271d0f",
+        "pool": "0xae461ca67b15dc8dc81ce7615e0320da1a9ab8d5",
+        "slippage": -1000000,
+        "fee": 3000
+      },
+      {
+        "to": "0x45804880de22913dafe09f4980848ece6ecbaf78",
+        "pool": "0x6d74443bb2d50785989a7212ebfd3a8dbabd1f60",
+        "slippage": -1000000,
+        "fee": 3000
+      },
+      {
+        "to": "0x6b3595068778dd592e39a122f4f5a5cf09c90fe2",
+        "pool": "0xba87dc891945dbb3caeeaf822de208d7ea89b298",
+        "slippage": -1000000,
+        "fee": 3000
+      },
+      {
+        "to": "0x45804880de22913dafe09f4980848ece6ecbaf78",
+        "pool": "0x56983afc748ee88d695f1bcf8d8fa25831a71a21",
+        "slippage": -1000000,
+        "fee": 3000
+      },
+      {
+        "to": "0x767fe9edc9e0df98e07454847909b5e959d7ca0e",
+        "pool": "0xc0c4a01dd88224e5d9833171294f606b27766333",
+        "slippage": 1000000,
+        "fee": 3000
+      },
+      {
+        "to": "0xdac17f958d2ee523a2206206994597c13d831ec7",
+        "pool": "0xbb256c2f1b677e27118b0345fd2b3894d2e6d487",
+        "slippage": -1000000,
+        "fee": 10000
+      },
+      {
+        "to": "0x514910771af9ca656af840dff83e8264ecf986ca",
+        "pool": "0xfad57d2039c21811c8f2b5d5b65308aa99d31559",
+        "slippage": -1000000,
+        "fee": 3000
+      },
+      {
+        "to": "0xdac17f958d2ee523a2206206994597c13d831ec7",
+        "pool": "0xee4cf3b78a74affa38c6a926282bcd8b5952818d",
+        "slippage": -1000000,
+        "fee": 3000
+      },
+      {
+        "to": "0x2260fac5e5542a773aa44fbcfedf7c193bc2c599",
+        "pool": "0x026babd2ae9379525030fc2574e39bc156c10583",
+        "slippage": 1000000,
+        "fee": 100
+      },
+      {
+        "to": "0x2260fac5e5542a773aa44fbcfedf7c193bc2c599",
+        "pool": "0xcbfb0745b8489973bf7b334d54fdbd573df7ef3c",
+        "slippage": -1000000,
+        "fee": 10000
+      },
+      {
+        "to": "0x514910771af9ca656af840dff83e8264ecf986ca",
+        "pool": "0xd24b1542323096ccbf9cba3b13c5b9eb4a92c506",
+        "slippage": 1000000,
+        "fee": 10000
+      },
+      {
+        "to": "0x6b175474e89094c44da98b954eedeac495271d0f",
+        "pool": "0x6c6bc977e13df9b0de53b251522280bb72383700",
+        "slippage": -1000000,
+        "fee": 500
+      },
+      {
+        "to": "0xdac17f958d2ee523a2206206994597c13d831ec7",
+        "pool": "0x7858e59e0c01ea06df3af3d20ac7b0003275d4bf",
+        "slippage": -1000000,
+        "fee": 500
+      },
+      {
+        "to": "0x6b175474e89094c44da98b954eedeac495271d0f",
+        "pool": "0xa63b490aa077f541c9d64bfc1cc0db2a752157b5",
+        "slippage": -1000000,
+        "fee": 3000
+      },
+      {
+        "to": "0x6b175474e89094c44da98b954eedeac495271d0f",
+        "pool": "0x5777d92f208679db4b9778590fa3cab3ac9e2168",
+        "slippage": 1000000,
+        "fee": 100
+      },
+      {
+        "to": "0xdac17f958d2ee523a2206206994597c13d831ec7",
+        "pool": "0x3416cf6c708da44db2624d63ea0aaef7113527c6",
+        "slippage": -1000000,
+        "fee": 100
+      },
+      {
+        "to": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+        "pool": "0x8ad599c3a0ff1de082011efddc58f1908eb6e6d8",
+        "slippage": -999975,
+        "fee": 3000
+      },
+      {
+        "to": "0x6b3595068778dd592e39a122f4f5a5cf09c90fe2",
+        "pool": "0x184c33b7b1089747440057e46b4e2bb61f09bc8d",
+        "slippage": -1000000,
+        "fee": 10000
+      },
+      {
+        "to": "0x419c4db4b9e25d6db2ad9691ccb832c8d9fda05e",
+        "pool": "0x63bdfe1166c2d518879dfe42af6c3fa2c6a70619",
+        "slippage": 1000000,
+        "fee": 10000
+      },
+      {
+        "to": "0x767fe9edc9e0df98e07454847909b5e959d7ca0e",
+        "pool": "0xa7837df2fbf7de553aa23cdbfb81d2ca1a8a0a5a",
+        "slippage": 1000000,
+        "fee": 10000
+      },
+      {
+        "to": "0x2260fac5e5542a773aa44fbcfedf7c193bc2c599",
+        "pool": "0x9a772018fbd77fcd2d25657e5c547baff3fd7d16",
+        "slippage": -1000000,
+        "fee": 500
+      },
+      {
+        "to": "0x45804880de22913dafe09f4980848ece6ecbaf78",
+        "pool": "0x5ae13baaef0620fdae1d355495dc51a17adb4082",
+        "slippage": -1000000,
+        "fee": 500
+      },
+      {
+        "to": "0x6b175474e89094c44da98b954eedeac495271d0f",
+        "pool": "0x6958686b6348c3d6d5f2dca3106a5c09c156873a",
+        "slippage": -1000000,
+        "fee": 10000
+      },
+      {
+        "to": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+        "pool": "0xe0554a476a092703abdb3ef35c80e0d76d32939f",
+        "slippage": -1000000,
+        "fee": 100
+      },
+      {
+        "to": "0x2260fac5e5542a773aa44fbcfedf7c193bc2c599",
+        "pool": "0x99ac8ca7087fa4a2a1fb6357269965a2014abc35",
+        "slippage": -1000000,
+        "fee": 3000
+      },
+      {
+        "to": "0xdbdb4d16eda451d0503b854cf79d55697f90c8df",
+        "pool": "0x17474e83216942d6d7bce129ef5957c94194c716",
+        "slippage": -1000000,
+        "fee": 10000
+      },
+      {
+        "to": "0x2e9d63788249371f1dfc918a52f8d799f4a38c94",
+        "pool": "0xefcf2a3680cc89956eb6c30acd48c04004f3bebf",
+        "slippage": 1000000,
+        "fee": 10000
+      },
+      {
+        "to": "0x514910771af9ca656af840dff83e8264ecf986ca",
+        "pool": "0x22fe40544ac2b387f9a68c6c53b9a8e34e4dd40e",
+        "slippage": 1000000,
+        "fee": 500
+      },
+      {
+        "to": "0x45804880de22913dafe09f4980848ece6ecbaf78",
+        "pool": "0xb431c70f800100d87554ac1142c4a94c5fe4c0c4",
+        "slippage": -1000000,
+        "fee": 3000
+      },
+      {
+        "to": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+        "pool": "0x7bea39867e4169dbe237d55c8242a8f2fcdcc387",
+        "slippage": -1000000,
+        "fee": 10000
+      },
+      {
+        "to": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+        "pool": "0x88e6a0c2ddd26feeb64f039a2c41296fcb3f5640",
+        "slippage": -999978,
+        "fee": 500
+      },
+      {
+        "to": "0x45804880de22913dafe09f4980848ece6ecbaf78",
+        "pool": "0x1d61fb4c87361f27bd3be39a06d1a19f0c5d696b",
+        "slippage": -1000000,
+        "fee": 10000
+      }
+    ]
+  },
+  {
+    "address": "0x419c4db4b9e25d6db2ad9691ccb832c8d9fda05e",
+    "swap_edge": [
+      {
+        "to": "0xdac17f958d2ee523a2206206994597c13d831ec7",
+        "pool": "0xbf65eff021840f34b0923d8cf37288ab6a348372",
+        "slippage": -1000000,
+        "fee": 3000
+      },
+      {
+        "to": "0x6b175474e89094c44da98b954eedeac495271d0f",
+        "pool": "0x9ab88bd93206fac46869627ab19143fbee026974",
+        "slippage": -1000000,
+        "fee": 3000
+      },
+      {
+        "to": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+        "pool": "0x4f9fcdae3950a033074b93e269b6c382109fae71",
+        "slippage": -3014,
+        "fee": 3000
+      },
+      {
+        "to": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+        "pool": "0xe0a0de6a56a79f45669f15b467dbeb4649ae67e2",
+        "slippage": -3046,
+        "fee": 3000
+      },
+      {
+        "to": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+        "pool": "0x1415db6d7f91e79d1b03d179673fe63a6a6bc0b2",
+        "slippage": 1000000,
+        "fee": 3000
+      },
+      {
+        "to": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+        "pool": "0x44f9469d0d5393d3a01a0d4fa14fe7713c1ad1f7",
+        "slippage": -10001,
+        "fee": 10000
+      },
+      {
+        "to": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "pool": "0x63bdfe1166c2d518879dfe42af6c3fa2c6a70619",
+        "slippage": 1000000,
+        "fee": 10000
+      }
+    ]
+  },
+  {
+    "address": "0x969ce55826bb4b3a572ed4f17c795a3ebcb0079f",
+    "swap_edge": [
+      {
+        "to": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+        "pool": "0x0f417870fc97924337266c10102016a076729da9",
+        "slippage": -3035,
+        "fee": 3000
+      },
+      {
+        "to": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+        "pool": "0x67a628809c4e7f357cb3900a57db3ade9f2bd570",
+        "slippage": -1000000,
+        "fee": 10000
+      }
+    ]
+  },
+  {
+    "address": "0x7abc8a5768e6be61a6c693a6e4eacb5b60602c4d",
+    "swap_edge": [
+      {
+        "to": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+        "pool": "0xc783d210c483d76d158fd502af6b48439ffed9c5",
+        "slippage": -3001,
+        "fee": 3000
+      }
+    ]
+  },
+  {
+    "address": "0xa9a660e7d49bbef606d07210ddd6568b70b93dd3",
+    "swap_edge": [
+      {
+        "to": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+        "pool": "0x6090341b15b7e9397f11e85e6afb944058bbfd9a",
+        "slippage": -3001,
+        "fee": 3000
+      }
+    ]
+  },
+  {
+    "address": "0x4e9623b7e5b6438542458f5ee828d65c24d3af8c",
+    "swap_edge": [
+      {
+        "to": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+        "pool": "0x2623edc6008d057786a6bf9dd34185dcddebbf2f",
+        "slippage": -3001,
+        "fee": 3000
+      }
+    ]
+  },
+  {
+    "address": "0x614f611300d8fb0108fa2a860dbca1ff8fc62624",
+    "swap_edge": [
+      {
+        "to": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+        "pool": "0x74b00e5197525554eb463589d0e3d7da547b067d",
+        "slippage": -1000000,
+        "fee": 3000
+      }
+    ]
+  },
+  {
+    "address": "0x767fe9edc9e0df98e07454847909b5e959d7ca0e",
+    "swap_edge": [
+      {
+        "to": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+        "pool": "0x6a091a3406e0073c3cd6340122143009adac0eda",
+        "slippage": -3004,
+        "fee": 3000
+      },
+      {
+        "to": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "pool": "0x2e102d10493558c58a03f3297519dc939f8ad097",
+        "slippage": -1000000,
+        "fee": 3000
+      },
+      {
+        "to": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+        "pool": "0x8fb8bf2b444e37379e46de8bb77c551bd008f0ad",
+        "slippage": -1000000,
+        "fee": 3000
+      },
+      {
+        "to": "0x6b3595068778dd592e39a122f4f5a5cf09c90fe2",
+        "pool": "0x0cd198a5f6cc84ca8499dd97a6c1a1c4b4a12da1",
+        "slippage": -996661,
+        "fee": 3000
+      },
+      {
+        "to": "0xdac17f958d2ee523a2206206994597c13d831ec7",
+        "pool": "0xffb2a30e51ec15cf6853912fba181ef0cc666199",
+        "slippage": 1000000,
+        "fee": 10000
+      },
+      {
+        "to": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "pool": "0xc0c4a01dd88224e5d9833171294f606b27766333",
+        "slippage": 1000000,
+        "fee": 3000
+      },
+      {
+        "to": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+        "pool": "0xbaec0e18c770993ffb1175fef493b5113cc6e32d",
+        "slippage": -10031,
+        "fee": 10000
+      },
+      {
+        "to": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+        "pool": "0xa89a1cdf5fe93d754b6064b9f761747d03176c54",
+        "slippage": -1000000,
+        "fee": 3000
+      },
+      {
+        "to": "0xdac17f958d2ee523a2206206994597c13d831ec7",
+        "pool": "0xb1932ff4b443636f57a6fc96568905fc63b6bc20",
+        "slippage": 1000000,
+        "fee": 3000
+      },
+      {
+        "to": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "pool": "0xa7837df2fbf7de553aa23cdbfb81d2ca1a8a0a5a",
+        "slippage": 1000000,
+        "fee": 10000
+      }
+    ]
+  },
+  {
+    "address": "0xdac17f958d2ee523a2206206994597c13d831ec7",
+    "swap_edge": [
+      {
+        "to": "0x6b3595068778dd592e39a122f4f5a5cf09c90fe2",
+        "pool": "0x680a025da7b1be2c204d7745e809919bce074026",
+        "slippage": -1000000,
+        "fee": 3000
+      },
+      {
+        "to": "0x2260fac5e5542a773aa44fbcfedf7c193bc2c599",
+        "pool": "0x784178d58b641a4febf8d477a6abd28504273132",
+        "slippage": -1000000,
+        "fee": 3000
+      },
+      {
+        "to": "0x419c4db4b9e25d6db2ad9691ccb832c8d9fda05e",
+        "pool": "0xbf65eff021840f34b0923d8cf37288ab6a348372",
+        "slippage": -1000000,
+        "fee": 3000
+      },
+      {
+        "to": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "pool": "0x3041cbd36888becc7bbcbc0045e3b1f144466f5f",
+        "slippage": -1000000,
+        "fee": 3000
+      },
+      {
+        "to": "0x2260fac5e5542a773aa44fbcfedf7c193bc2c599",
+        "pool": "0x0de0fa91b6dbab8c8503aaa2d1dfa91a192cb149",
+        "slippage": -1000000,
+        "fee": 3000
+      },
+      {
+        "to": "0x514910771af9ca656af840dff83e8264ecf986ca",
+        "pool": "0x665daa5e280edd60b81c67d583ed85b9a5cc45a6",
+        "slippage": -1000000,
+        "fee": 3000
+      },
+      {
+        "to": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+        "pool": "0x0d4a11d5eeaac28ec3f61d100daf4d40471f1852",
+        "slippage": -1000000,
+        "fee": 3000
+      },
+      {
+        "to": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "pool": "0xd86a120a06255df8d4e2248ab04d4267e23adfaa",
+        "slippage": -1000000,
+        "fee": 3000
+      },
+      {
+        "to": "0x45804880de22913dafe09f4980848ece6ecbaf78",
+        "pool": "0xf3f8a942f9d0827d32ea1b9f1a0724b5fa7397db",
+        "slippage": -1000000,
+        "fee": 3000
+      },
+      {
+        "to": "0x6b175474e89094c44da98b954eedeac495271d0f",
+        "pool": "0x055cedfe14bce33f985c41d9a1934b7654611aac",
+        "slippage": -1000000,
+        "fee": 3000
+      },
+      {
+        "to": "0x6b175474e89094c44da98b954eedeac495271d0f",
+        "pool": "0xb20bd5d04be54f870d5c0d3ca85d82b34b836405",
+        "slippage": -1000000,
+        "fee": 3000
+      },
+      {
+        "to": "0x514910771af9ca656af840dff83e8264ecf986ca",
+        "pool": "0x9db10c305c671153662119d453c4d2c123725566",
+        "slippage": -1000000,
+        "fee": 3000
+      },
+      {
+        "to": "0x6b3595068778dd592e39a122f4f5a5cf09c90fe2",
+        "pool": "0xe3ffab89e53422f468be955e7011932efe80aa26",
+        "slippage": -1000000,
+        "fee": 3000
+      },
+      {
+        "to": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+        "pool": "0x06da0fd433c1a5d7a4faa01111c044910a184553",
+        "slippage": -1000000,
+        "fee": 3000
+      },
+      {
+        "to": "0x767fe9edc9e0df98e07454847909b5e959d7ca0e",
+        "pool": "0xffb2a30e51ec15cf6853912fba181ef0cc666199",
+        "slippage": 1000000,
+        "fee": 10000
+      },
+      {
+        "to": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+        "pool": "0xc7bbec68d12a0d1830360f8ec58fa599ba1b0e9b",
+        "slippage": -1000000,
+        "fee": 100
+      },
+      {
+        "to": "0x2260fac5e5542a773aa44fbcfedf7c193bc2c599",
+        "pool": "0x56534741cd8b152df6d48adf7ac51f75169a83b2",
+        "slippage": -1000000,
+        "fee": 500
+      },
+      {
+        "to": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "pool": "0xbb256c2f1b677e27118b0345fd2b3894d2e6d487",
+        "slippage": -1000000,
+        "fee": 10000
+      },
+      {
+        "to": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "pool": "0xee4cf3b78a74affa38c6a926282bcd8b5952818d",
+        "slippage": -1000000,
+        "fee": 3000
+      },
+      {
+        "to": "0x45804880de22913dafe09f4980848ece6ecbaf78",
+        "pool": "0x7cb85f75e61226060453a997a7733f76707df337",
+        "slippage": 1000000,
+        "fee": 500
+      },
+      {
+        "to": "0x45804880de22913dafe09f4980848ece6ecbaf78",
+        "pool": "0x2bedb3f68d12e4b2ee72f3de7227e51246353fcb",
+        "slippage": 1000000,
+        "fee": 100
+      },
+      {
+        "to": "0x2260fac5e5542a773aa44fbcfedf7c193bc2c599",
+        "pool": "0xf98cf0d979cfbb780774f318e3da4f7317af50d7",
+        "slippage": 1000000,
+        "fee": 100
+      },
+      {
+        "to": "0x514910771af9ca656af840dff83e8264ecf986ca",
+        "pool": "0x55ec9256077a311256b2daf81f70c0992d9fbd66",
+        "slippage": 1000000,
+        "fee": 500
+      },
+      {
+        "to": "0x767fe9edc9e0df98e07454847909b5e959d7ca0e",
+        "pool": "0xb1932ff4b443636f57a6fc96568905fc63b6bc20",
+        "slippage": 1000000,
+        "fee": 3000
+      },
+      {
+        "to": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "pool": "0x7858e59e0c01ea06df3af3d20ac7b0003275d4bf",
+        "slippage": -1000000,
+        "fee": 500
+      },
+      {
+        "to": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "pool": "0x3416cf6c708da44db2624d63ea0aaef7113527c6",
+        "slippage": -1000000,
+        "fee": 100
+      },
+      {
+        "to": "0x2260fac5e5542a773aa44fbcfedf7c193bc2c599",
+        "pool": "0x5a59e4e647a3acc42b01715f3a1d271c1f7e7aeb",
+        "slippage": 1000000,
+        "fee": 10000
+      },
+      {
+        "to": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+        "pool": "0x4e68ccd3e89f51c3074ca5072bbac773960dfa36",
+        "slippage": -1000000,
+        "fee": 3000
+      },
+      {
+        "to": "0x514910771af9ca656af840dff83e8264ecf986ca",
+        "pool": "0xac5a2c404ebba22a869998089ac7893ff4e1f0a7",
+        "slippage": -1000000,
+        "fee": 3000
+      },
+      {
+        "to": "0x2260fac5e5542a773aa44fbcfedf7c193bc2c599",
+        "pool": "0x9db9e0e53058c89e5b94e29621a205198648425b",
+        "slippage": -1000000,
+        "fee": 3000
+      },
+      {
+        "to": "0x6b175474e89094c44da98b954eedeac495271d0f",
+        "pool": "0x48da0965ab2d2cbf1c17c09cfb5cbe67ad5b1406",
+        "slippage": 1000000,
+        "fee": 100
+      },
+      {
+        "to": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+        "pool": "0xc5af84701f98fa483ece78af83f11b6c38aca71d",
+        "slippage": -1000000,
+        "fee": 10000
+      },
+      {
+        "to": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+        "pool": "0x11b815efb8f581194ae79006d24e0d814b7697f6",
+        "slippage": -1000000,
+        "fee": 500
+      },
+      {
+        "to": "0x6b175474e89094c44da98b954eedeac495271d0f",
+        "pool": "0x4773e2c1c0b400a16dfec4ca6e305141859a5542",
+        "slippage": -1000000,
+        "fee": 3000
+      },
+      {
+        "to": "0xee7527841a932d2912224e20a405e1a1ff747084",
+        "pool": "0xeee645ef3736d63358852dec46be7cda61e5aeef",
+        "slippage": 1000000,
+        "fee": 10000
+      },
+      {
+        "to": "0x6b175474e89094c44da98b954eedeac495271d0f",
+        "pool": "0x6f48eca74b38d2936b02ab603ff4e36a6c0e3a77",
+        "slippage": -1000000,
+        "fee": 500
+      },
+      {
+        "to": "0x6b3595068778dd592e39a122f4f5a5cf09c90fe2",
+        "pool": "0x206c9f6ad08a8f2a3cc05bd3939cd49287560096",
+        "slippage": -1000000,
+        "fee": 3000
+      },
+      {
+        "to": "0x44709a920fccf795fbc57baa433cc3dd53c44dbe",
+        "pool": "0x105f7a72d9449d48e7094dae8d7102420c34bfc8",
+        "slippage": -1000000,
+        "fee": 10000
+      },
+      {
+        "to": "0x45804880de22913dafe09f4980848ece6ecbaf78",
+        "pool": "0x123712f44b4fd26b36b8d4c81e2ed01ae6e9607a",
+        "slippage": -1000000,
+        "fee": 3000
+      },
+      {
+        "to": "0x514910771af9ca656af840dff83e8264ecf986ca",
+        "pool": "0x106a1a525e9b404d02db8a21dbe4c30f4c807107",
+        "slippage": 1000000,
+        "fee": 10000
+      }
+    ]
+  },
+  {
+    "address": "0x2e9d63788249371f1dfc918a52f8d799f4a38c94",
+    "swap_edge": [
+      {
+        "to": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+        "pool": "0x5fa464cefe8901d66c09b85d5fcdc55b3738c688",
+        "slippage": -3003,
+        "fee": 3000
+      },
+      {
+        "to": "0x6b3595068778dd592e39a122f4f5a5cf09c90fe2",
+        "pool": "0x6496da23de48db0dceca14fa8dc5ae44cdaf8ebe",
+        "slippage": -168054,
+        "fee": 3000
+      },
+      {
+        "to": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+        "pool": "0xd4e7a6e2d03e4e48dfc27dd3f46df1c176647e38",
+        "slippage": -3001,
+        "fee": 3000
+      },
+      {
+        "to": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+        "pool": "0x3b330ea8ec7332f37cc5a7b03e05c6450329d6fb",
+        "slippage": -1000000,
+        "fee": 3000
+      },
+      {
+        "to": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+        "pool": "0x500cb7defd8302f1f97e38ac628e8c2eaf7307b6",
+        "slippage": -1000000,
+        "fee": 10000
+      },
+      {
+        "to": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "pool": "0xefcf2a3680cc89956eb6c30acd48c04004f3bebf",
+        "slippage": 1000000,
+        "fee": 10000
+      }
+    ]
+  },
+  {
+    "address": "0xee7527841a932d2912224e20a405e1a1ff747084",
+    "swap_edge": [
+      {
+        "to": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+        "pool": "0xea59a3da9cad8ece406a353ddede0e7d17604d28",
+        "slippage": -1000000,
+        "fee": 3000
+      },
+      {
+        "to": "0xdac17f958d2ee523a2206206994597c13d831ec7",
+        "pool": "0xeee645ef3736d63358852dec46be7cda61e5aeef",
+        "slippage": 1000000,
+        "fee": 10000
+      },
+      {
+        "to": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+        "pool": "0xe0397c1c28e587b55ad18c126cdcc5cdeeaffe41",
+        "slippage": -1000000,
+        "fee": 10000
+      }
+    ]
+  },
+  {
+    "address": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+    "swap_edge": [
+      {
+        "to": "0x969ce55826bb4b3a572ed4f17c795a3ebcb0079f",
+        "pool": "0x0f417870fc97924337266c10102016a076729da9",
+        "slippage": -1000000,
+        "fee": 3000
+      },
+      {
+        "to": "0x4e9623b7e5b6438542458f5ee828d65c24d3af8c",
+        "pool": "0x2623edc6008d057786a6bf9dd34185dcddebbf2f",
+        "slippage": -1000000,
+        "fee": 3000
+      },
+      {
+        "to": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "pool": "0xb4e16d0168e52d35cacd2c6185b44281ec28c9dc",
+        "slippage": -1000000,
+        "fee": 3000
+      },
+      {
+        "to": "0x514910771af9ca656af840dff83e8264ecf986ca",
+        "pool": "0xc40d16476380e4037e6b1a2594caf6a6cc8da967",
+        "slippage": -999974,
+        "fee": 3000
+      },
+      {
+        "to": "0x9ab7bb7fdc60f4357ecfef43986818a2a3569c62",
+        "pool": "0x5c596c6a65f628fc1090853d8eb1927651e9d9b2",
+        "slippage": -1000000,
+        "fee": 3000
+      },
+      {
+        "to": "0x767fe9edc9e0df98e07454847909b5e959d7ca0e",
+        "pool": "0x6a091a3406e0073c3cd6340122143009adac0eda",
+        "slippage": -999985,
+        "fee": 3000
+      },
+      {
+        "to": "0x6b3595068778dd592e39a122f4f5a5cf09c90fe2",
+        "pool": "0x795065dcc9f64b5614c407a6efdc400da6221fb0",
+        "slippage": -1000000,
+        "fee": 3000
+      },
+      {
+        "to": "0x95ed629b028cf6aadd1408bb988c6d1daabe4767",
+        "pool": "0xfa3551ee99a4ac691673a569d586c8cc7e78672f",
+        "slippage": -1000000,
+        "fee": 3000
+      },
+      {
+        "to": "0x2e9d63788249371f1dfc918a52f8d799f4a38c94",
+        "pool": "0x5fa464cefe8901d66c09b85d5fcdc55b3738c688",
+        "slippage": -1000000,
+        "fee": 3000
+      },
+      {
+        "to": "0x2260fac5e5542a773aa44fbcfedf7c193bc2c599",
+        "pool": "0xbb2b8038a1640196fbe3e38816f3e67cba72d940",
+        "slippage": -1000000,
+        "fee": 3000
+      },
+      {
+        "to": "0xdac17f958d2ee523a2206206994597c13d831ec7",
+        "pool": "0x0d4a11d5eeaac28ec3f61d100daf4d40471f1852",
+        "slippage": -3217,
+        "fee": 3000
+      },
+      {
+        "to": "0x45804880de22913dafe09f4980848ece6ecbaf78",
+        "pool": "0xf957fc1b6ed557c698ed6f1d336e00f306773975",
+        "slippage": -1000000,
+        "fee": 3000
+      },
+      {
+        "to": "0xdbdb4d16eda451d0503b854cf79d55697f90c8df",
+        "pool": "0xc3f279090a47e80990fe3a9c30d24cb117ef91a8",
+        "slippage": -5749,
+        "fee": 3000
+      },
+      {
+        "to": "0x514910771af9ca656af840dff83e8264ecf986ca",
+        "pool": "0xa2107fa5b38d9bbd2c461d6edf11b11a50f6b974",
+        "slippage": -999974,
+        "fee": 3000
+      },
+      {
+        "to": "0xee7527841a932d2912224e20a405e1a1ff747084",
+        "pool": "0xea59a3da9cad8ece406a353ddede0e7d17604d28",
+        "slippage": -29699,
+        "fee": 3000
+      },
+      {
+        "to": "0x6b175474e89094c44da98b954eedeac495271d0f",
+        "pool": "0xa478c2975ab1ea89e8196811f51a7b7ade33eb11",
+        "slippage": -1000000,
+        "fee": 3000
+      },
+      {
+        "to": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "pool": "0x397ff1542f962076d0bfe58ea045ffa2d347aca0",
+        "slippage": -1000000,
+        "fee": 3000
+      },
+      {
+        "to": "0x44709a920fccf795fbc57baa433cc3dd53c44dbe",
+        "pool": "0x0fd3faf056382a25507de89022d8acf66b3d7410",
+        "slippage": -1000000,
+        "fee": 3000
+      },
+      {
+        "to": "0xdbdb4d16eda451d0503b854cf79d55697f90c8df",
+        "pool": "0x352e5eee2d9c957710be656534d51fbb3ce074d6",
+        "slippage": -1000000,
+        "fee": 3000
+      },
+      {
+        "to": "0x7abc8a5768e6be61a6c693a6e4eacb5b60602c4d",
+        "pool": "0xc783d210c483d76d158fd502af6b48439ffed9c5",
+        "slippage": -1000000,
+        "fee": 3000
+      },
+      {
+        "to": "0x614f611300d8fb0108fa2a860dbca1ff8fc62624",
+        "pool": "0x74b00e5197525554eb463589d0e3d7da547b067d",
+        "slippage": -1000000,
+        "fee": 3000
+      },
+      {
+        "to": "0x4d4574f50dd8b9dbe623cf329dcc78d76935e610",
+        "pool": "0x055fb841cce69000fbaff2691ad39fa6e23826a1",
+        "slippage": -999990,
+        "fee": 3000
+      },
+      {
+        "to": "0x76e222b07c53d28b89b0bac18602810fc22b49a8",
+        "pool": "0x704ad8d95c12d7fea531738faa94402725acb035",
+        "slippage": -1000000,
+        "fee": 3000
+      },
+      {
+        "to": "0x767fe9edc9e0df98e07454847909b5e959d7ca0e",
+        "pool": "0x8fb8bf2b444e37379e46de8bb77c551bd008f0ad",
+        "slippage": -1000000,
+        "fee": 3000
+      },
+      {
+        "to": "0x45804880de22913dafe09f4980848ece6ecbaf78",
+        "pool": "0x9c4fe5ffd9a9fc5678cfbd93aa2d4fd684b67c4c",
+        "slippage": 433274,
+        "fee": 3000
+      },
+      {
+        "to": "0x419c4db4b9e25d6db2ad9691ccb832c8d9fda05e",
+        "pool": "0x4f9fcdae3950a033074b93e269b6c382109fae71",
+        "slippage": -1000000,
+        "fee": 3000
+      },
+      {
+        "to": "0x6b3595068778dd592e39a122f4f5a5cf09c90fe2",
+        "pool": "0xce84867c3c02b05dc570d0135103d3fb9cc19433",
+        "slippage": -1000000,
+        "fee": 3000
+      },
+      {
+        "to": "0x419c4db4b9e25d6db2ad9691ccb832c8d9fda05e",
+        "pool": "0xe0a0de6a56a79f45669f15b467dbeb4649ae67e2",
+        "slippage": -1000000,
+        "fee": 3000
+      },
+      {
+        "to": "0x44709a920fccf795fbc57baa433cc3dd53c44dbe",
+        "pool": "0x559ebe4e206e6b4d50e9bd3008cda7ce640c52cb",
+        "slippage": -1000000,
+        "fee": 3000
+      },
+      {
+        "to": "0x2e9d63788249371f1dfc918a52f8d799f4a38c94",
+        "pool": "0xd4e7a6e2d03e4e48dfc27dd3f46df1c176647e38",
+        "slippage": -1000000,
+        "fee": 3000
+      },
+      {
+        "to": "0xa9a660e7d49bbef606d07210ddd6568b70b93dd3",
+        "pool": "0x6090341b15b7e9397f11e85e6afb944058bbfd9a",
+        "slippage": -1000000,
+        "fee": 3000
+      },
+      {
+        "to": "0x2260fac5e5542a773aa44fbcfedf7c193bc2c599",
+        "pool": "0xceff51756c56ceffca006cd410b03ffc46dd3a58",
+        "slippage": -1000000,
+        "fee": 3000
+      },
+      {
+        "to": "0x6b175474e89094c44da98b954eedeac495271d0f",
+        "pool": "0xc3d03e4f041fd4cd388c549ee2a29a9e5075882f",
+        "slippage": -1000000,
+        "fee": 3000
+      },
+      {
+        "to": "0x2e44f3f609ff5aa4819b323fd74690f07c3607c4",
+        "pool": "0x8d547a3e42828093e31a8c3f2a864036984b64ee",
+        "slippage": -1000000,
+        "fee": 3000
+      },
+      {
+        "to": "0xdac17f958d2ee523a2206206994597c13d831ec7",
+        "pool": "0x06da0fd433c1a5d7a4faa01111c044910a184553",
+        "slippage": -5939,
+        "fee": 3000
+      },
+      {
+        "to": "0x514910771af9ca656af840dff83e8264ecf986ca",
+        "pool": "0x5d4f3c6fa16908609bac31ff148bd002aa6b8c83",
+        "slippage": 23935,
+        "fee": 500
+      },
+      {
+        "to": "0x2260fac5e5542a773aa44fbcfedf7c193bc2c599",
+        "pool": "0x4585fe77225b41b697c938b018e2ac67ac5a20c0",
+        "slippage": 557,
+        "fee": 500
+      },
+      {
+        "to": "0xdac17f958d2ee523a2206206994597c13d831ec7",
+        "pool": "0xc7bbec68d12a0d1830360f8ec58fa599ba1b0e9b",
+        "slippage": -1000000,
+        "fee": 100
+      },
+      {
+        "to": "0x76e222b07c53d28b89b0bac18602810fc22b49a8",
+        "pool": "0x3bb7c94ebe2b131c29351b964b066169c685394b",
+        "slippage": 1000000,
+        "fee": 3000
+      },
+      {
+        "to": "0x767fe9edc9e0df98e07454847909b5e959d7ca0e",
+        "pool": "0xbaec0e18c770993ffb1175fef493b5113cc6e32d",
+        "slippage": 17931,
+        "fee": 10000
+      },
+      {
+        "to": "0xdbdb4d16eda451d0503b854cf79d55697f90c8df",
+        "pool": "0x689b322bf5056487eec7f9b2577cd43a37eb6302",
+        "slippage": -972949,
+        "fee": 3000
+      },
+      {
+        "to": "0x45804880de22913dafe09f4980848ece6ecbaf78",
+        "pool": "0x19053608fa7472a4fee2ad11992652cc91e67972",
+        "slippage": 1000000,
+        "fee": 500
+      },
+      {
+        "to": "0x2260fac5e5542a773aa44fbcfedf7c193bc2c599",
+        "pool": "0x6ab3bba2f41e7eaa262fa5a1a9b3932fa161526f",
+        "slippage": 33648,
+        "fee": 10000
+      },
+      {
+        "to": "0x6b175474e89094c44da98b954eedeac495271d0f",
+        "pool": "0xc2e9f25be6257c210d7adf0d4cd6e3e881ba25f8",
+        "slippage": 3556,
+        "fee": 3000
+      },
+      {
+        "to": "0x6b175474e89094c44da98b954eedeac495271d0f",
+        "pool": "0xa80964c5bbd1a0e95777094420555fead1a26c1e",
+        "slippage": -1000000,
+        "fee": 10000
+      },
+      {
+        "to": "0x9ab7bb7fdc60f4357ecfef43986818a2a3569c62",
+        "pool": "0x132a6e4fd04b862a83bf95127d23be2c3ab28502",
+        "slippage": 1000000,
+        "fee": 10000
+      },
+      {
+        "to": "0x514910771af9ca656af840dff83e8264ecf986ca",
+        "pool": "0x3a0f221ea8b150f3d3d27de8928851ab5264bb65",
+        "slippage": -1000000,
+        "fee": 10000
+      },
+      {
+        "to": "0x419c4db4b9e25d6db2ad9691ccb832c8d9fda05e",
+        "pool": "0x1415db6d7f91e79d1b03d179673fe63a6a6bc0b2",
+        "slippage": 1000000,
+        "fee": 3000
+      },
+      {
+        "to": "0x44709a920fccf795fbc57baa433cc3dd53c44dbe",
+        "pool": "0x47841ec00564a33402f16b876ed148b52dfbe188",
+        "slippage": -1000000,
+        "fee": 10000
+      },
+      {
+        "to": "0x419c4db4b9e25d6db2ad9691ccb832c8d9fda05e",
+        "pool": "0x44f9469d0d5393d3a01a0d4fa14fe7713c1ad1f7",
+        "slippage": 77056,
+        "fee": 10000
+      },
+      {
+        "to": "0x6b175474e89094c44da98b954eedeac495271d0f",
+        "pool": "0xd8dec118e1215f02e10db846dcbbfe27d477ac19",
+        "slippage": -1000000,
+        "fee": 100
+      },
+      {
+        "to": "0x767fe9edc9e0df98e07454847909b5e959d7ca0e",
+        "pool": "0xa89a1cdf5fe93d754b6064b9f761747d03176c54",
+        "slippage": -1000000,
+        "fee": 3000
+      },
+      {
+        "to": "0x969ce55826bb4b3a572ed4f17c795a3ebcb0079f",
+        "pool": "0x67a628809c4e7f357cb3900a57db3ade9f2bd570",
+        "slippage": -1000000,
+        "fee": 10000
+      },
+      {
+        "to": "0x76e222b07c53d28b89b0bac18602810fc22b49a8",
+        "pool": "0xceb63a909d95c9222cdf5b08044f5dae72cd036e",
+        "slippage": -1000000,
+        "fee": 10000
+      },
+      {
+        "to": "0x6b3595068778dd592e39a122f4f5a5cf09c90fe2",
+        "pool": "0x73a6a761fe483ba19debb8f56ac5bbf14c0cdad1",
+        "slippage": 2129152,
+        "fee": 3000
+      },
+      {
+        "to": "0xdbdb4d16eda451d0503b854cf79d55697f90c8df",
+        "pool": "0xb80946cd2b4b68bedd769a21ca2f096ead6e0ee8",
+        "slippage": -962705,
+        "fee": 10000
+      },
+      {
+        "to": "0x95ed629b028cf6aadd1408bb988c6d1daabe4767",
+        "pool": "0x89b1bae19f78cabc79ee6d2b8a1a5febee07a13e",
+        "slippage": 1000000,
+        "fee": 10000
+      },
+      {
+        "to": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "pool": "0x8ad599c3a0ff1de082011efddc58f1908eb6e6d8",
+        "slippage": 3031,
+        "fee": 3000
+      },
+      {
+        "to": "0x2260fac5e5542a773aa44fbcfedf7c193bc2c599",
+        "pool": "0xcbcdf9626bc03e24f779434178a73a0b4bad62ed",
+        "slippage": 3048,
+        "fee": 3000
+      },
+      {
+        "to": "0xdac17f958d2ee523a2206206994597c13d831ec7",
+        "pool": "0x4e68ccd3e89f51c3074ca5072bbac773960dfa36",
+        "slippage": -1000000,
+        "fee": 3000
+      },
+      {
+        "to": "0x2e9d63788249371f1dfc918a52f8d799f4a38c94",
+        "pool": "0x3b330ea8ec7332f37cc5a7b03e05c6450329d6fb",
+        "slippage": -1000000,
+        "fee": 3000
+      },
+      {
+        "to": "0x45804880de22913dafe09f4980848ece6ecbaf78",
+        "pool": "0xcb1abb2731a48d8819f03808013c0a0e48d9b3d9",
+        "slippage": 17701,
+        "fee": 10000
+      },
+      {
+        "to": "0x2e9d63788249371f1dfc918a52f8d799f4a38c94",
+        "pool": "0x500cb7defd8302f1f97e38ac628e8c2eaf7307b6",
+        "slippage": -1000000,
+        "fee": 10000
+      },
+      {
+        "to": "0x6b175474e89094c44da98b954eedeac495271d0f",
+        "pool": "0x60594a405d53811d3bc4766596efd80fd545a270",
+        "slippage": 1104,
+        "fee": 500
+      },
+      {
+        "to": "0xdac17f958d2ee523a2206206994597c13d831ec7",
+        "pool": "0xc5af84701f98fa483ece78af83f11b6c38aca71d",
+        "slippage": -1000000,
+        "fee": 10000
+      },
+      {
+        "to": "0x6b3595068778dd592e39a122f4f5a5cf09c90fe2",
+        "pool": "0x19e286157200418d6a1f7d1df834b82e65c920aa",
+        "slippage": -1000000,
+        "fee": 10000
+      },
+      {
+        "to": "0x2e44f3f609ff5aa4819b323fd74690f07c3607c4",
+        "pool": "0x241fc1cdbf9f741933e5fa515c5b884da93b81b6",
+        "slippage": -1000000,
+        "fee": 10000
+      },
+      {
+        "to": "0xdac17f958d2ee523a2206206994597c13d831ec7",
+        "pool": "0x11b815efb8f581194ae79006d24e0d814b7697f6",
+        "slippage": -1000000,
+        "fee": 500
+      },
+      {
+        "to": "0x4d4574f50dd8b9dbe623cf329dcc78d76935e610",
+        "pool": "0x986177ed873483bd746c6207edccc8488cc93a09",
+        "slippage": 1000000,
+        "fee": 3000
+      },
+      {
+        "to": "0x4d4574f50dd8b9dbe623cf329dcc78d76935e610",
+        "pool": "0x5b60eed941aa99bb2d8ee6359872ed64e64280c8",
+        "slippage": -1000000,
+        "fee": 10000
+      },
+      {
+        "to": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "pool": "0xe0554a476a092703abdb3ef35c80e0d76d32939f",
+        "slippage": -1000000,
+        "fee": 100
+      },
+      {
+        "to": "0x2260fac5e5542a773aa44fbcfedf7c193bc2c599",
+        "pool": "0xe6ff8b9a37b0fab776134636d9981aa778c4e718",
+        "slippage": -1000000,
+        "fee": 100
+      },
+      {
+        "to": "0x514910771af9ca656af840dff83e8264ecf986ca",
+        "pool": "0xa6cc3c2531fdaa6ae1a3ca84c2855806728693e8",
+        "slippage": 3034,
+        "fee": 3000
+      },
+      {
+        "to": "0x514910771af9ca656af840dff83e8264ecf986ca",
+        "pool": "0x4ea16ae82145731390d77485db5cfb616a9582a6",
+        "slippage": 1000000,
+        "fee": 100
+      },
+      {
+        "to": "0x95ed629b028cf6aadd1408bb988c6d1daabe4767",
+        "pool": "0x851c7e37f2c88cf4fa2a825a0e924dd0e9bc6a66",
+        "slippage": 1000000,
+        "fee": 3000
+      },
+      {
+        "to": "0x45804880de22913dafe09f4980848ece6ecbaf78",
+        "pool": "0x8a7e585048bda875e64024118c506b14f78166dd",
+        "slippage": 1000000,
+        "fee": 3000
+      },
+      {
+        "to": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "pool": "0x7bea39867e4169dbe237d55c8242a8f2fcdcc387",
+        "slippage": 13713,
+        "fee": 10000
+      },
+      {
+        "to": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "pool": "0x88e6a0c2ddd26feeb64f039a2c41296fcb3f5640",
+        "slippage": 550,
+        "fee": 500
+      },
+      {
+        "to": "0xee7527841a932d2912224e20a405e1a1ff747084",
+        "pool": "0xe0397c1c28e587b55ad18c126cdcc5cdeeaffe41",
+        "slippage": -1000000,
+        "fee": 10000
+      }
+    ]
+  },
+  {
+    "address": "0x6b175474e89094c44da98b954eedeac495271d0f",
+    "swap_edge": [
+      {
+        "to": "0x514910771af9ca656af840dff83e8264ecf986ca",
+        "pool": "0x6d4fd456edeca58cf53a8b586cd50754547dbdb2",
+        "slippage": 206672557,
+        "fee": 3000
+      },
+      {
+        "to": "0x2260fac5e5542a773aa44fbcfedf7c193bc2c599",
+        "pool": "0x622d4a772b72f56602546559c95d7ca214ebb24f",
+        "slippage": -1000000,
+        "fee": 3000
+      },
+      {
+        "to": "0x514910771af9ca656af840dff83e8264ecf986ca",
+        "pool": "0x23a1081bad58465e30a0a5083fbc8409c3d76960",
+        "slippage": -1000000,
+        "fee": 3000
+      },
+      {
+        "to": "0x6b3595068778dd592e39a122f4f5a5cf09c90fe2",
+        "pool": "0x7ee3be9a82f051401ca028db1825ac2640884d0a",
+        "slippage": -5330,
+        "fee": 3000
+      },
+      {
+        "to": "0x45804880de22913dafe09f4980848ece6ecbaf78",
+        "pool": "0x3d65e308a5d6e9938b2fed1c8a18089db697d126",
+        "slippage": -1000000,
+        "fee": 3000
+      },
+      {
+        "to": "0x419c4db4b9e25d6db2ad9691ccb832c8d9fda05e",
+        "pool": "0x9ab88bd93206fac46869627ab19143fbee026974",
+        "slippage": -1000000,
+        "fee": 3000
+      },
+      {
+        "to": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "pool": "0xaaf5110db6e744ff70fb339de037b990a20bdace",
+        "slippage": -3081,
+        "fee": 3000
+      },
+      {
+        "to": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+        "pool": "0xa478c2975ab1ea89e8196811f51a7b7ade33eb11",
+        "slippage": -3001,
+        "fee": 3000
+      },
+      {
+        "to": "0xdac17f958d2ee523a2206206994597c13d831ec7",
+        "pool": "0x055cedfe14bce33f985c41d9a1934b7654611aac",
+        "slippage": -7062,
+        "fee": 3000
+      },
+      {
+        "to": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "pool": "0xae461ca67b15dc8dc81ce7615e0320da1a9ab8d5",
+        "slippage": -3002,
+        "fee": 3000
+      },
+      {
+        "to": "0xdac17f958d2ee523a2206206994597c13d831ec7",
+        "pool": "0xb20bd5d04be54f870d5c0d3ca85d82b34b836405",
+        "slippage": -3059,
+        "fee": 3000
+      },
+      {
+        "to": "0x2260fac5e5542a773aa44fbcfedf7c193bc2c599",
+        "pool": "0x231b7589426ffe1b75405526fc32ac09d44364c4",
+        "slippage": -1000000,
+        "fee": 3000
+      },
+      {
+        "to": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+        "pool": "0xc3d03e4f041fd4cd388c549ee2a29a9e5075882f",
+        "slippage": -3001,
+        "fee": 3000
+      },
+      {
+        "to": "0x45804880de22913dafe09f4980848ece6ecbaf78",
+        "pool": "0x0ecff5d9acdbd54274aed608ce6e39569854a3c1",
+        "slippage": 1000000,
+        "fee": 10000
+      },
+      {
+        "to": "0x2260fac5e5542a773aa44fbcfedf7c193bc2c599",
+        "pool": "0xa93eb5b410b651514a18724872306f5ce9928dde",
+        "slippage": 1000000,
+        "fee": 500
+      },
+      {
+        "to": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+        "pool": "0xc2e9f25be6257c210d7adf0d4cd6e3e881ba25f8",
+        "slippage": -3001,
+        "fee": 3000
+      },
+      {
+        "to": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+        "pool": "0xa80964c5bbd1a0e95777094420555fead1a26c1e",
+        "slippage": -1000000,
+        "fee": 10000
+      },
+      {
+        "to": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+        "pool": "0xd8dec118e1215f02e10db846dcbbfe27d477ac19",
+        "slippage": -1000000,
+        "fee": 100
+      },
+      {
+        "to": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "pool": "0x6c6bc977e13df9b0de53b251522280bb72383700",
+        "slippage": -1000000,
+        "fee": 500
+      },
+      {
+        "to": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "pool": "0xa63b490aa077f541c9d64bfc1cc0db2a752157b5",
+        "slippage": -1000000,
+        "fee": 3000
+      },
+      {
+        "to": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "pool": "0x5777d92f208679db4b9778590fa3cab3ac9e2168",
+        "slippage": 1000000,
+        "fee": 100
+      },
+      {
+        "to": "0x514910771af9ca656af840dff83e8264ecf986ca",
+        "pool": "0x091c0158ab410bd73ca1541409d5a22e90146a04",
+        "slippage": -1000000,
+        "fee": 3000
+      },
+      {
+        "to": "0x2260fac5e5542a773aa44fbcfedf7c193bc2c599",
+        "pool": "0x391e8501b626c623d39474afca6f9e46c2686649",
+        "slippage": -1000000,
+        "fee": 3000
+      },
+      {
+        "to": "0x2260fac5e5542a773aa44fbcfedf7c193bc2c599",
+        "pool": "0x649caaf37f36e67d1129c0fd6c6539d390ca2b82",
+        "slippage": 1000000,
+        "fee": 10000
+      },
+      {
+        "to": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+        "pool": "0x60594a405d53811d3bc4766596efd80fd545a270",
+        "slippage": -501,
+        "fee": 500
+      },
+      {
+        "to": "0xdac17f958d2ee523a2206206994597c13d831ec7",
+        "pool": "0x48da0965ab2d2cbf1c17c09cfb5cbe67ad5b1406",
+        "slippage": 1000000,
+        "fee": 100
+      },
+      {
+        "to": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "pool": "0x6958686b6348c3d6d5f2dca3106a5c09c156873a",
+        "slippage": -1000000,
+        "fee": 10000
+      },
+      {
+        "to": "0xdac17f958d2ee523a2206206994597c13d831ec7",
+        "pool": "0x4773e2c1c0b400a16dfec4ca6e305141859a5542",
+        "slippage": -1000000,
+        "fee": 3000
+      },
+      {
+        "to": "0xdac17f958d2ee523a2206206994597c13d831ec7",
+        "pool": "0x6f48eca74b38d2936b02ab603ff4e36a6c0e3a77",
+        "slippage": -1000000,
+        "fee": 500
+      },
+      {
+        "to": "0x45804880de22913dafe09f4980848ece6ecbaf78",
+        "pool": "0x477e1a178f308fb8c2967d3e56e157c4b8b6f5df",
+        "slippage": 374624,
+        "fee": 3000
+      },
+      {
+        "to": "0x514910771af9ca656af840dff83e8264ecf986ca",
+        "pool": "0x3209c64bf470fafecb8b87db3d8ac1baa3ecf629",
+        "slippage": -1000000,
+        "fee": 500
+      }
+    ]
+  }
+]

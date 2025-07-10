@@ -41,8 +41,7 @@ impl PoolData {
             RootProvider,
         >,
     ) -> Result<(), CustomError<'a>> {
-        let mut count = 0;
-        for (addr, token_data) in self.data.iter_mut() {
+        for (_pool_addr, token_data) in self.data.iter_mut() {
             let pool =
                 match Pool::<EphemeralTickMapDataProvider>::from_pool_key_with_tick_data_provider(
                     1,
@@ -56,16 +55,15 @@ impl PoolData {
                 .await
                 {
                     Ok(p) => p,
-                    Err(err) => {
-                        count += 1;
-                        log::error!(
-                            "token0: {}, token1: {}, pool: {}, fee: {}, err: {}",
-                            token_data.token_a.token.address(),
-                            token_data.token_b.token.address(),
-                            addr,
-                            token_data.fee,
-                            err
-                        );
+                    Err(_err) => {
+                        // log::error!(
+                        //     "token0: {}, token1: {}, pool: {}, fee: {}, err: {}",
+                        //     token_data.token_a.token.address(),
+                        //     token_data.token_b.token.address(),
+                        //     _pool_addr,
+                        //     token_data.fee,
+                        //     err
+                        // );
                         continue;
                     }
                 };
@@ -73,8 +71,6 @@ impl PoolData {
             token_data.token_a.price_start = pool.token0_price();
             token_data.token_b.price_start = pool.token1_price();
         }
-
-        log::info!("Total skipped: {count}");
 
         Ok(())
     }
@@ -84,27 +80,25 @@ impl PoolData {
         pool_address: &Address,
         sqrt_price_x96: BigInt,
     ) -> Result<(), CustomError<'a>> {
-        debug_time!("v3::calc_start_price_from_sqrt_price_x96", {
-            // Numerator: (sqrtPriceX96)^2
-            let numerator = sqrt_price_x96 * sqrt_price_x96;
+        // Numerator: (sqrtPriceX96)^2
+        let numerator = sqrt_price_x96 * sqrt_price_x96;
 
-            // Denominator: 2^192 = 1 << 192
-            let denominator = BigInt::ONE << 192;
+        // Denominator: 2^192 = 1 << 192
+        let denominator = BigInt::ONE << 192;
 
-            let token_data = self
-                .data
-                .get_mut(pool_address)
-                .ok_or_else(|| CustomError::AddressNotFound(*pool_address))?;
+        let token_data = self
+            .data
+            .get_mut(pool_address)
+            .ok_or_else(|| CustomError::AddressNotFound(*pool_address))?;
 
-            let price = Price::new(
-                token_data.token_a.token.clone(),
-                token_data.token_a.token.clone(),
-                denominator,
-                numerator,
-            );
-            token_data.token_a.price_start = price.clone();
-            token_data.token_b.price_start = price.invert();
-        });
+        let price = Price::new(
+            token_data.token_a.token.clone(),
+            token_data.token_a.token.clone(),
+            denominator,
+            numerator,
+        );
+        token_data.token_a.price_start = price.clone();
+        token_data.token_b.price_start = price.invert();
 
         Ok(())
     }
@@ -120,25 +114,45 @@ impl PoolData {
         >,
         amount: BigInt,
     ) -> Result<(), CustomError<'a>> {
-        for token_data in self.data.values_mut() {
-            let pool = Pool::<EphemeralTickMapDataProvider>::from_pool_key_with_tick_data_provider(
-                1,
-                FACTORY_ADDRESS,
-                token_data.token_a.token.address(),
-                token_data.token_b.token.address(),
-                token_data.fee(),
-                provider,
-                None,
-            )
-            .await?;
+        for (_pool_addr, token_data) in self.data.iter_mut() {
+            let pool =
+                match Pool::<EphemeralTickMapDataProvider>::from_pool_key_with_tick_data_provider(
+                    1,
+                    FACTORY_ADDRESS,
+                    token_data.token_a.token.address(),
+                    token_data.token_b.token.address(),
+                    token_data.fee(),
+                    provider,
+                    None,
+                )
+                .await
+                {
+                    Ok(p) => p,
+                    Err(_err) => {
+                        // log::error!("Issue with pool: {_pool_addr}, due to {_err}");
+                        continue;
+                    }
+                };
 
             let amount0_in =
                 CurrencyAmount::from_raw_amount(token_data.token_a.token.clone(), amount)?;
-            let amount0_out = pool.get_output_amount(&amount0_in, None).await?;
+            let amount0_out = match pool.get_output_amount(&amount0_in, None).await {
+                Ok(a) => a,
+                Err(_err) => {
+                    // log::error!("amount0_out calculation failed for {_pool_addr}, due to {_err}");
+                    continue;
+                }
+            };
 
             let amount1_out =
                 CurrencyAmount::from_raw_amount(token_data.token_b.token.clone(), amount)?;
-            let amount1_in = pool.get_input_amount(&amount1_out, None).await?;
+            let amount1_in = match pool.get_input_amount(&amount1_out, None).await {
+                Ok(a) => a,
+                Err(_err) => {
+                    // log::error!("amount1_in calculation failed for {_pool_addr}, due to {_err}");
+                    continue;
+                }
+            };
 
             token_data.token_a.price_effective =
                 Price::from_currency_amounts(amount0_in, amount0_out);

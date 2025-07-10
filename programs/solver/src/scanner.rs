@@ -22,36 +22,38 @@ async fn calculate_path<'a>(
 ) -> Result<(), CustomError<'a>> {
     let amount_in = input_data.amount_in.to_big_int();
 
-    debug_time!("scanner::calculate_path::calc_effective_price()", {
+    debug_time!("calculate_path::calc_effective_price()", {
         pool_data_v2.calc_effective_price(amount_in)?;
     });
 
-    debug_time!("scanner::calculate_path::calc_slippage_v2()", {
+    debug_time!("calculate_path::calc_slippage_v2()", {
         pool_data_v2.calc_slippage()?;
     });
 
-    debug_time!("scanner::calculate_path::calc_effective_price_v3()", {
+    debug_time!("calculate_path::calc_effective_price_v3()", {
         pool_data_v3
             .calc_effective_price(provider, amount_in)
             .await?;
     });
 
-    debug_time!("scanner::calculate_path::calc_slippage_v3()", {
+    debug_time!("calculate_path::calc_slippage_v3()", {
         pool_data_v3.calc_slippage()?;
     });
 
     let mut graph: SwapGraph =
         HashMap::with_capacity((pool_data_v2.data.len() + pool_data_v2.data.len()) * 2);
 
-    debug_time!("scanner::calculate_path::into_v2_swap_graph()", {
+    debug_time!("calculate_path::into_v2_swap_graph()", {
         pool_data_v2.to_swap_graph(&mut graph);
     });
 
-    debug_time!("scanner::calculate_path::into_v3_swap_graph()", {
+    debug_time!("calculate_path::into_v3_swap_graph()", {
         pool_data_v3.to_swap_graph(&mut graph);
     });
 
-    let path = debug_time!("scanner::calculate_path::best_path()", {
+    log::info!("Total {} nodes collected!", graph.len());
+
+    let path = debug_time!("calculate_path::best_path()", {
         best_path(&graph, &input_data.token_a, &input_data.token_b)
     });
 
@@ -148,17 +150,21 @@ pub async fn scan<'a>(
             scanner.update_sync(sync, decoded.inner.address);
 
             // Update reserves based on the event
-            update_reserve_abs(scanner, &mut *pool_data_v2.lock().await)?;
+            debug_time!("v2::calc_slippage::update_reserve_abs()", {
+                update_reserve_abs(scanner, &mut *pool_data_v2.lock().await)?;
+            });
         } else if let Ok(decoded) = log.log_decode() {
             log::info!("v3 swap captured!");
             let swap: IUniswapV3Pool::Swap = decoded.inner.data;
             let pool_data = &mut pool_data_v3.lock().await;
 
             // Update start price
-            pool_data.calc_start_price_from_sqrt_price_x96(
-                &decoded.inner.address,
-                swap.sqrtPriceX96.to_big_int(),
-            )?;
+            debug_time!("v3::calc_start_price_from_sqrt_price_x96", {
+                pool_data.calc_start_price_from_sqrt_price_x96(
+                    &decoded.inner.address,
+                    swap.sqrtPriceX96.to_big_int(),
+                )?;
+            });
         }
     }
 

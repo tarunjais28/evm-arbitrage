@@ -46,5 +46,12 @@ pub fn calc_slippage<'a>(
     let base_currency = WETH9::on_chain(1).ok_or_else(|| CustomError::NotFound("weth"))?;
     let percent = Price::new(base_currency.clone(), base_currency, 1, 1000000);
 
-    Ok((((end_price - start_price.clone()) * percent) / start_price).quotient())
+    let slippage = if start_price.numerator.gt(&BigInt::ZERO) {
+        (((end_price - start_price.clone()) * percent) / start_price).quotient()
+    } else {
+        percent.quotient()
+    };
+
+    // TODO: Handle negative slippage
+    Ok(slippage.abs())
 }

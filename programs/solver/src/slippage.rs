@@ -4,12 +4,10 @@ pub fn update_reserve_abs<'a>(
     scanner: ScanData,
     pool_data: &mut v2::PoolData,
 ) -> Result<(), CustomError<'a>> {
-    debug_time!("v2::calc_slippage::update_reserve_abs()", {
-        pool_data
-            .data
-            .entry(scanner.pool_address)
-            .and_modify(|data| data.update_reserves(Reserves::from(scanner)))
-    });
+    pool_data
+        .data
+        .entry(scanner.pool_address)
+        .and_modify(|data| data.update_reserves(Reserves::from(scanner)));
 
     Ok(())
 }
