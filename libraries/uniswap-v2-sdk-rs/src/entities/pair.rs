@@ -1,7 +1,7 @@
 use crate::prelude::{Error, *};
 use alloc::string::ToString;
-use alloy_primitives::keccak256;
-use alloy_sol_types::SolValue;
+use alloy::primitives::keccak256;
+use alloy::sol_types::SolValue;
 use num_integer::Roots;
 use uniswap_sdk_core::{prelude::*, token};
 

@@ -1,5 +1,5 @@
 use crate::prelude::{Error, Pair};
-use alloy_primitives::ChainId;
+use alloy::primitives::ChainId;
 use uniswap_sdk_core::prelude::*;
 
 /// Represents a list of pairs through which a swap can occur

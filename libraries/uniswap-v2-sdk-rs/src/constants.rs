@@ -1,4 +1,4 @@
-use alloy_primitives::{b256, Address, B256};
+use alloy::primitives::{b256, Address, B256};
 use once_cell::sync::Lazy;
 use uniswap_sdk_core::prelude::{
     BigInt, HashMap, Percent, V2_FACTORY_ADDRESS, V2_FACTORY_ADDRESSES,

@@ -2,9 +2,8 @@
 //! Represents the Uniswap V2 Router, and has static methods for helping execute trades.
 
 use crate::prelude::{Error, *};
-use alloy_primitives::{Bytes, U256};
-use alloy_sol_types::{sol, SolCall};
-// use num_bigint::{BigInt, Sign};
+use alloy::primitives::{Bytes, U256};
+use alloy::{sol_types::SolCall, sol};
 use uniswap_sdk_core::prelude::*;
 
 /// Options for producing the arguments to send call to the router.
@@ -254,7 +253,7 @@ sol! {
 mod tests {
     use super::*;
     use crate::tests::*;
-    use alloy_primitives::{address, hex, uint};
+    use alloy::primitives::{address, hex, uint};
 
     static TRADE_OPTIONS: Lazy<TradeOptions> = Lazy::new(|| TradeOptions {
         allowed_slippage: Percent::new(1, 100),
