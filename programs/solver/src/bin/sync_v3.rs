@@ -67,42 +67,21 @@ async fn main() {
     .await
     .unwrap();
 
-    let tick_data_provider = EphemeralTickMapDataProvider::new(
-        pool.address(None, Some(FACTORY_ADDRESS)),
-        provider,
-        None,
-        None,
-        None,
-    )
-    .await
-    .unwrap();
-
     let amount_in = CurrencyAmount::from_raw_amount(usdc.clone(), 10000000000000u128).unwrap();
     let zero_for_one = amount_in.currency.equals(&pool.token0);
-
-    // let (tick_next, initialized) = pool.tick_data_provider
-    //         .next_initialized_tick_within_one_word(pool.tick_current, zero_for_one, pool.tick_spacing())
-    //         .await.unwrap();
-
-    // println!("{}", pool.tick_current);
-    // println!("{tick_next}, {initialized}");
-
-    // let (tick_next, initialized) = pool.tick_data_provider
-    //         .next_initialized_tick_within_one_word(tick_next, zero_for_one, pool.tick_spacing())
-    //         .await.unwrap();
-    // println!("{tick_next}, {initialized}");
 
     let mut ticks_initialised = Vec::new();
     let mut ticks = Vec::new();
     let mut current_state = pool.tick_current;
     let mut count = 0;
     loop {
-        if let Ok((tick_next, initialized)) = tick_data_provider
+        if let Ok((tick_next, initialized)) = pool
+            .tick_data_provider
             .next_initialized_tick_within_one_word(current_state, zero_for_one, pool.tick_spacing())
             .await
         {
             ticks_initialised.push((tick_next, initialized));
-            if let Ok(tick) = tick_data_provider.get_tick(tick_next).await {
+            if let Ok(tick) = pool.tick_data_provider.get_tick(tick_next).await {
                 ticks.push(tick);
             } else {
                 ticks_initialised.pop();
@@ -120,7 +99,6 @@ async fn main() {
     }
     println!("{count}, {}, {}", ticks.len(), ticks_initialised.len());
 
-    // println!("{:#?}", ticks);
     let pool_1 = Pool::new(
         usdc.clone(),
         weth.clone(),
@@ -144,43 +122,20 @@ async fn main() {
         amount_out.numerator(),
         amount_out.denominator()
     );
-    // // Get the output amount from the pool
-    // let amount_in = CurrencyAmount::from_raw_amount(usdc.clone(), 100000000).unwrap();
-    // let amount_in_b =
-    //     CurrencyAmount::from_raw_amount(weth.clone(), 100000000000000000u128).unwrap();
-    // let local_amount_out = pool.get_output_amount(&amount_in, None).await.unwrap();
-    // let local_amount_out_b = pool.get_input_amount(&amount_in_b, None).await.unwrap();
 
-    // let price_usdc = pool.price_of(&usdc).unwrap().quotient();
-    // let price_weth = pool.price_of(&weth).unwrap().quotient();
-    // let sqrt = pool.sqrt_ratio_x96;
-    // let local_amount_out = local_amount_out.quotient();
-    // println!("Local amount out: {}", local_amount_out);
-    // println!("Local amount in: {}", local_amount_out_b.quotient());
-    // println!("Price USDC: {}", price_usdc);
-    // println!("Price WETH: {}", price_weth);
-    // println!("sqrt price: {}", sqrt);
-    // println!("price: {:?}", price_from_sqrt_price_x96(U256::from(sqrt)));
-    // println!(
-    //     "price: {} {}",
-    //     pool.token0_price().quotient(),
-    //     pool.token1_price().quotient()
-    // );
-    // println!("address: {}", pool.address(None, None));
-    // println!("address: {}", pool.address(None, None));
-    // println!("liquidity: {}", pool.tick_spacing());
-
-    // // Get the output amount from the quoter
-    // let route = Route::new(vec![pool], usdc, weth.clone());
-    // let params = quote_call_parameters(&route, &amount_in, TradeType::ExactInput, None);
-    // let tx = TransactionRequest::default()
-    //     .to(*QUOTER_ADDRESSES.get(&CHAIN_ID).unwrap())
-    //     .input(params.calldata.into());
-    // let res = provider.call(tx).await.unwrap();
-    // let amount_out =
-    //     IQuoter::quoteExactInputSingleCall::abi_decode_returns_validate(res.as_ref()).unwrap();
-    // println!("Quoter amount out: {}", amount_out);
-
-    // // Compare local calculation with on-chain quoter to ensure accuracy
-    // assert_eq!(U256::from_big_int(local_amount_out), amount_out);
+    let amount_out = CurrencyAmount::from_raw_amount(weth.clone(), 10000000000u128).unwrap();
+    let amount_in = pool_1
+        .get_input_amount_sync(&amount_out, None, &ticks_initialised, &ticks)
+        .unwrap();
+    println!(
+        "amount_in: {} / {}",
+        amount_in.numerator(),
+        amount_in.denominator()
+    );
+    let amount_in = pool.get_input_amount(&amount_out, None).await.unwrap();
+    println!(
+        "amount_in: {} / {}",
+        amount_in.numerator(),
+        amount_in.denominator()
+    );
 }
