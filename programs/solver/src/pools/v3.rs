@@ -41,36 +41,40 @@ impl PoolData {
             RootProvider,
         >,
     ) -> Result<(), CustomError<'a>> {
-        for (_pool_addr, token_data) in self.data.iter_mut() {
-            let pool =
-                match Pool::<EphemeralTickMapDataProvider>::from_pool_key_with_tick_data_provider(
-                    1,
-                    FACTORY_ADDRESS,
-                    token_data.token_a.token.address(),
-                    token_data.token_b.token.address(),
-                    token_data.fee(),
-                    provider,
-                    None,
-                )
-                .await
-                {
-                    Ok(p) => p,
-                    Err(_err) => {
-                        // log::error!(
-                        //     "token0: {}, token1: {}, pool: {}, fee: {}, err: {}",
-                        //     token_data.token_a.token.address(),
-                        //     token_data.token_b.token.address(),
-                        //     _pool_addr,
-                        //     token_data.fee,
-                        //     err
-                        // );
-                        continue;
-                    }
-                };
-
-            token_data.token_a.price_start = pool.token0_price();
-            token_data.token_b.price_start = pool.token1_price();
+        let mut futures = Vec::new();
+        for (pool_addr, token_data) in self.data.iter() {
+            let pool_addr = pool_addr.clone();
+            let fut = async move {
+                let pool =
+                    Pool::<EphemeralTickMapDataProvider>::from_pool_key_with_tick_data_provider(
+                        1,
+                        FACTORY_ADDRESS,
+                        token_data.token_a.token.address(),
+                        token_data.token_b.token.address(),
+                        token_data.fee(),
+                        provider,
+                        None,
+                    )
+                    .await?;
+                Ok((pool_addr, pool.token0_price(), pool.token1_price()))
+            };
+            futures.push(fut);
         }
+
+        let results: Vec<Result<(Address, PriceData, PriceData), CustomError<'a>>> =
+            futures::stream::iter(futures)
+                .buffer_unordered(50)
+                .collect::<Vec<_>>()
+                .await;
+
+        results.into_iter().for_each(|res| {
+            if let Ok((pool_addr, price0, price1)) = res {
+                self.data.entry(pool_addr).and_modify(|token_data| {
+                    token_data.token_a.price_start = price0;
+                    token_data.token_b.price_start = price1;
+                });
+            }
+        });
 
         Ok(())
     }
