@@ -61,17 +61,36 @@ async fn main() -> Result<(), anyhow::Error> {
     let token1 = WETH9::on_chain(1).unwrap();
 
     let reserves = get_reserves_v2(&provider, &pool_address).await?;
-    let token_amount_a = CurrencyAmount::from_raw_amount(token0, reserves.reserve0).unwrap();
-    let token_amount_b = CurrencyAmount::from_raw_amount(token1, reserves.reserve1).unwrap();
+    let token_amount_a = CurrencyAmount::from_raw_amount(token0.clone(), reserves.reserve0)?;
+    let token_amount_b = CurrencyAmount::from_raw_amount(token1.clone(), reserves.reserve1)?;
     let pair = Pair::new(token_amount_a.clone(), token_amount_b.clone())?;
 
     println!("pair address: {}", pair.address());
-    println!("token0 price: {}", pair.token0_price().quotient());
-    println!("reserve0: {}", reserves.reserve0);
-    println!("reserve0: {}", pair.reserve0().quotient());
-    println!("token1 price: {}", pair.token1_price().quotient());
-    println!("reserve1: {}", reserves.reserve1);
-    println!("reserve1: {}", pair.reserve1().quotient());
+    println!(
+        "reserve0: {} / {}",
+        pair.reserve0().numerator(),
+        pair.reserve0().denominator()
+    );
+    println!(
+        "reserve1: {} / {}",
+        pair.reserve1().numerator(),
+        pair.reserve1().denominator()
+    );
+    let amount_in = CurrencyAmount::from_raw_amount(token0, 100000)?;
+    let (amount_out, _) = pair.get_output_amount(&amount_in, false)?;
+    println!(
+        "amount_out: {} / {}",
+        amount_out.numerator(),
+        amount_out.denominator()
+    );
+
+    let amount_out = CurrencyAmount::from_raw_amount(token1, 10000000000u128)?;
+    let (amount_in, _) = pair.get_input_amount(&amount_out, false)?;
+    println!(
+        "amount_in: {} / {}",
+        amount_in.numerator(),
+        amount_in.denominator()
+    );
 
     let res = get_reserves_v2(
         &provider,

@@ -1,5 +1,5 @@
 use crate::prelude::{Error, *};
-use alloy_primitives::{ChainId, B256, I256, U160};
+use alloy_primitives::{aliases::I24, ChainId, B256, I256, U160};
 use uniswap_sdk_core::prelude::*;
 
 /// Represents a V3 pool
@@ -271,6 +271,26 @@ impl<TP: TickDataProvider> Pool<TP> {
         .await
     }
 
+    fn _swap_simulation(
+        &self,
+        zero_for_one: bool,
+        amount_specified: I256,
+        sqrt_price_limit_x96: Option<U160>,
+        ticks_initialised: &[(I24, bool)],
+        ticks: &[Tick<I24>],
+    ) -> Result<SwapState<I24>, Error> {
+        v3_swap_simulation(
+            self.fee.into(),
+            self.sqrt_ratio_x96,
+            self.liquidity,
+            zero_for_one,
+            amount_specified,
+            sqrt_price_limit_x96,
+            ticks_initialised,
+            ticks,
+        )
+    }
+
     /// Given an input amount of a token, return the computed output amount
     ///
     /// ## Arguments
@@ -302,6 +322,53 @@ impl<TP: TickDataProvider> Pool<TP> {
                 sqrt_price_limit_x96,
             )
             .await?;
+
+        if !amount_specified_remaining.is_zero() && sqrt_price_limit_x96.is_none() {
+            return Err(Error::InsufficientLiquidity);
+        }
+
+        let output_token = if zero_for_one {
+            &self.token1
+        } else {
+            &self.token0
+        };
+        CurrencyAmount::from_raw_amount(output_token.clone(), -output_amount.to_big_int())
+            .map_err(Error::Core)
+    }
+
+    /// Given an input amount of a token, return the computed output amount synchronously
+    ///
+    /// ## Arguments
+    ///
+    /// * `input_amount`: The input amount for which to quote the output amount
+    /// * `sqrt_price_limit_x96`: The Q64.96 sqrt price limit
+    ///
+    /// returns: The output amount
+    #[inline]
+    pub fn get_output_amount_sync(
+        &self,
+        input_amount: &CurrencyAmount<impl BaseCurrency>,
+        sqrt_price_limit_x96: Option<U160>,
+        ticks_initialised: &[(I24, bool)],
+        ticks: &[Tick<I24>],
+    ) -> Result<CurrencyAmount<Token>, Error> {
+        if !self.involves_token(&input_amount.currency) {
+            return Err(Error::InvalidToken);
+        }
+
+        let zero_for_one = input_amount.currency.equals(&self.token0);
+
+        let SwapState {
+            amount_specified_remaining,
+            amount_calculated: output_amount,
+            ..
+        } = self._swap_simulation(
+            zero_for_one,
+            I256::from_big_int(input_amount.quotient()),
+            sqrt_price_limit_x96,
+            ticks_initialised,
+            ticks,
+        )?;
 
         if !amount_specified_remaining.is_zero() && sqrt_price_limit_x96.is_none() {
             return Err(Error::InsufficientLiquidity);
@@ -400,6 +467,55 @@ impl<TP: TickDataProvider> Pool<TP> {
                 sqrt_price_limit_x96,
             )
             .await?;
+
+        if !amount_specified_remaining.is_zero() && sqrt_price_limit_x96.is_none() {
+            return Err(Error::InsufficientLiquidity);
+        }
+
+        let input_token = if zero_for_one {
+            &self.token0
+        } else {
+            &self.token1
+        };
+        CurrencyAmount::from_raw_amount(input_token.clone(), input_amount.to_big_int())
+            .map_err(Error::Core)
+    }
+
+    /// Given a desired output amount of a token, return the computed input amount synchronously
+    ///
+    /// ## Arguments
+    ///
+    /// * `output_amount`: the output amount for which to quote the input amount
+    /// * `sqrt_price_limit_x96`: The Q64.96 sqrt price limit. If zero for one, the price cannot be
+    ///   less than this value after the swap. If one for zero, the price cannot be greater than
+    ///   this value after the swap
+    ///
+    /// returns: The input amount
+    #[inline]
+    pub fn get_input_amount_sync(
+        &self,
+        output_amount: &CurrencyAmount<impl BaseCurrency>,
+        sqrt_price_limit_x96: Option<U160>,
+        ticks_initialised: &[(I24, bool)],
+        ticks: &[Tick<I24>],
+    ) -> Result<CurrencyAmount<Token>, Error> {
+        if !self.involves_token(&output_amount.currency) {
+            return Err(Error::InvalidToken);
+        }
+
+        let zero_for_one = output_amount.currency.equals(&self.token1);
+
+        let SwapState {
+            amount_specified_remaining,
+            amount_calculated: input_amount,
+            ..
+        } = self._swap_simulation(
+            zero_for_one,
+            I256::from_big_int(-output_amount.quotient()),
+            sqrt_price_limit_x96,
+            ticks_initialised,
+            ticks,
+        )?;
 
         if !amount_specified_remaining.is_zero() && sqrt_price_limit_x96.is_none() {
             return Err(Error::InsufficientLiquidity);

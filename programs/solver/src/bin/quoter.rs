@@ -90,6 +90,7 @@ async fn main() {
     );
     println!("address: {}", pool.address(None, None));
     println!("address: {}", pool.address(None, None));
+    println!("liquidity: {}", pool.tick_spacing());
 
     // Get the output amount from the quoter
     let route = Route::new(vec![pool], usdc, weth.clone());
@@ -104,24 +105,4 @@ async fn main() {
 
     // Compare local calculation with on-chain quoter to ensure accuracy
     assert_eq!(U256::from_big_int(local_amount_out), amount_out);
-
-    let wbtc = token!(CHAIN_ID, "0x95ed629b028cf6aadd1408bb988c6d1daabe4767", 8);
-
-    let paxg = token!(CHAIN_ID, "0x45804880de22913dafe09f4980848ece6ecbaf78", 18);
-
-    // Create a pool with a tick map data provider
-    let pool = match Pool::<EphemeralTickMapDataProvider>::from_pool_key_with_tick_data_provider(
-        CHAIN_ID,
-        FACTORY_ADDRESS,
-        wbtc.address(),
-        paxg.address(),
-        FeeAmount::LOWEST,
-        provider.clone(),
-        None,
-    )
-    .await
-    {
-        Ok(p) => p,
-        Err(err) => panic!("{}", err),
-    };
 }

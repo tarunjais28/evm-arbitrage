@@ -1,5 +1,8 @@
 use crate::prelude::*;
-use alloy_primitives::{aliases::U24, Uint, I256, U160, U256};
+use alloy_primitives::{
+    aliases::{I24, U24},
+    Uint, I256, U160, U256,
+};
 
 #[derive(Clone, Copy, Debug, Default)]
 pub struct SwapState<I = i32> {
@@ -274,6 +277,125 @@ pub async fn v3_swap<TP: TickDataProvider>(
             state.tick_current =
                 TP::Index::from_i24(state.sqrt_price_x96.get_tick_at_sqrt_ratio()?);
         }
+    }
+
+    Ok(state)
+}
+
+#[inline]
+#[allow(clippy::too_many_arguments)]
+pub fn v3_swap_simulation(
+    fee: U24,
+    sqrt_price_x96: U160,
+    liquidity: u128,
+    zero_for_one: bool,
+    amount_specified: I256,
+    sqrt_price_limit_x96: Option<U160>,
+    ticks_initialised: &[(I24, bool)],
+    ticks: &[Tick<I24>],
+) -> Result<SwapState<I24>, Error> {
+    let sqrt_price_limit_x96 = sqrt_price_limit_x96.unwrap_or(if zero_for_one {
+        MIN_SQRT_RATIO + ONE
+    } else {
+        MAX_SQRT_RATIO - ONE
+    });
+
+    if zero_for_one {
+        if sqrt_price_limit_x96 <= MIN_SQRT_RATIO {
+            return Err(Error::LesserThanMinimumSqrtRatio);
+        }
+        if sqrt_price_limit_x96 >= sqrt_price_x96 {
+            return Err(Error::SqrtLimitGT);
+        }
+    } else {
+        if sqrt_price_limit_x96 >= MAX_SQRT_RATIO {
+            return Err(Error::GreaterThanMaximumSqrtRatio);
+        }
+        if sqrt_price_limit_x96 <= sqrt_price_x96 {
+            return Err(Error::SqrtLimitLT);
+        }
+    }
+
+    let exact_input = amount_specified >= I256::ZERO;
+
+    let mut index = 0;
+
+    // keep track of swap state
+    let mut state = SwapState {
+        amount_specified_remaining: amount_specified,
+        amount_calculated: I256::ZERO,
+        sqrt_price_x96,
+        tick_current: ticks_initialised[index].0,
+        liquidity,
+    };
+
+    // start swap while loop
+    while !state.amount_specified_remaining.is_zero()
+        && state.sqrt_price_x96 != sqrt_price_limit_x96
+        && index < ticks.len()
+    {
+        let mut step = StepComputations {
+            sqrt_price_start_x96: state.sqrt_price_x96,
+            ..Default::default()
+        };
+
+        // because each iteration of the while loop rounds, we can't optimize this code
+        // (relative to the smart contract) by simply traversing to the next available tick, we
+        // instead need to exactly replicate
+        (step.tick_next, step.initialized) = ticks_initialised[index];
+
+        step.tick_next = I24::from_i24(step.tick_next.to_i24().clamp(MIN_TICK, MAX_TICK));
+        step.sqrt_price_next_x96 = get_sqrt_ratio_at_tick(step.tick_next.to_i24())?;
+
+        (
+            state.sqrt_price_x96,
+            step.amount_in,
+            step.amount_out,
+            step.fee_amount,
+        ) = compute_swap_step(
+            state.sqrt_price_x96,
+            if zero_for_one {
+                step.sqrt_price_next_x96.max(sqrt_price_limit_x96)
+            } else {
+                step.sqrt_price_next_x96.min(sqrt_price_limit_x96)
+            },
+            state.liquidity,
+            state.amount_specified_remaining,
+            fee,
+        )?;
+
+        if exact_input {
+            state.amount_specified_remaining = I256::from_raw(
+                state.amount_specified_remaining.into_raw() - step.amount_in - step.fee_amount,
+            );
+            state.amount_calculated =
+                I256::from_raw(state.amount_calculated.into_raw() - step.amount_out);
+        } else {
+            state.amount_specified_remaining =
+                I256::from_raw(state.amount_specified_remaining.into_raw() + step.amount_out);
+            state.amount_calculated = I256::from_raw(
+                state.amount_calculated.into_raw() + step.amount_in + step.fee_amount,
+            );
+        }
+
+        if state.sqrt_price_x96 == step.sqrt_price_next_x96 {
+            // if the tick is initialized, run the tick transition
+            if step.initialized {
+                let mut liquidity_net = ticks[index].liquidity_net;
+
+                // if we're moving leftward, we interpret liquidityNet as the opposite sign
+                // safe because liquidityNet cannot be type(int128).min
+                if zero_for_one {
+                    liquidity_net = -liquidity_net;
+                }
+                state.liquidity = add_delta(state.liquidity, liquidity_net)?;
+            }
+        } else if state.sqrt_price_x96 != step.sqrt_price_start_x96 {
+            // recompute unless we're on a lower tick boundary (i.e. already transitioned
+            // ticks), and haven't moved
+            state.tick_current = I24::from_i24(state.sqrt_price_x96.get_tick_at_sqrt_ratio()?);
+        }
+        index += 1;
     }
 
     Ok(state)
