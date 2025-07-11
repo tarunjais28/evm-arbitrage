@@ -89,7 +89,12 @@ pub fn build_bidirectional_graph(
     graph
 }
 
-pub fn best_path(graph: &SwapGraph, start: &Address, end: &Address) -> ShortestPath {
+pub fn best_path(
+    graph: &SwapGraph,
+    start: &Address,
+    end: &Address,
+    slippage_adj: BigInt,
+) -> ShortestPath {
     let mut heap = BinaryHeap::new();
     let mut best_cost = HashMap::new();
 
@@ -119,7 +124,7 @@ pub fn best_path(graph: &SwapGraph, start: &Address, end: &Address) -> ShortestP
 
         if let Some(neighbors) = graph.get(&token) {
             for edge in neighbors {
-                let new_cost = cost + edge.slippage;
+                let new_cost = cost + edge.slippage + slippage_adj;
                 if new_cost < *best_cost.get(&edge.to).unwrap_or(&BigInt::MAX) {
                     let mut new_paths = paths.clone();
                     new_paths.push(edge.to);
@@ -180,7 +185,7 @@ mod tests {
         let graph = create_graph();
         let a = address!("000000000000000000000000000000000000000A");
         let b = address!("000000000000000000000000000000000000000B");
-        let path = best_path(&graph, &a, &b);
+        let path = best_path(&graph, &a, &b, BigInt::ZERO);
         assert_eq!(path.paths, vec![a, b]);
         assert_eq!(path.cost, BigInt::from(10));
     }
@@ -191,7 +196,7 @@ mod tests {
         let a = address!("000000000000000000000000000000000000000A");
         let b = address!("000000000000000000000000000000000000000B");
         let d = address!("000000000000000000000000000000000000000D");
-        let path = best_path(&graph, &a, &d);
+        let path = best_path(&graph, &a, &d, BigInt::ZERO);
         assert_eq!(path.paths, vec![a, b, d]);
         assert_eq!(path.cost, BigInt::from(15));
     }
@@ -201,7 +206,7 @@ mod tests {
         let graph = create_graph();
         let a = address!("000000000000000000000000000000000000000A");
         let e = address!("000000000000000000000000000000000000000E");
-        let path = best_path(&graph, &a, &e);
+        let path = best_path(&graph, &a, &e, BigInt::ZERO);
         assert!(path.paths.is_empty());
         assert_eq!(path.cost, BigInt::ZERO);
     }
@@ -224,7 +229,7 @@ mod tests {
             ],
         );
         graph.insert(c, vec![SwapEdge::new(d, p_c_d, BigInt::from(5), 0)]);
-        let path = best_path(&graph, &a, &d);
+        let path = best_path(&graph, &a, &d, BigInt::ZERO);
         assert_eq!(path.paths, vec![a, c, d]);
         assert_eq!(path.cost, BigInt::from(10));
     }
@@ -248,12 +253,12 @@ mod tests {
         let graph = build_bidirectional_graph(&edges);
 
         // Test forward path
-        let path_forward = best_path(&graph, &a, &d);
+        let path_forward = best_path(&graph, &a, &d, BigInt::ZERO);
         assert_eq!(path_forward.paths, vec![a, b, d]);
         assert_eq!(path_forward.cost, BigInt::from(15));
 
         // Test reverse path
-        let path_reverse = best_path(&graph, &d, &a);
+        let path_reverse = best_path(&graph, &d, &a, BigInt::ZERO);
         assert_eq!(path_reverse.paths, vec![d, b, a]);
         assert_eq!(path_reverse.cost, BigInt::from(15));
     }
@@ -285,14 +290,14 @@ mod tests {
         // A -> C -> D -> E : 5 + 5 + 8 = 18
         // A -> B -> E : 10 + 2 = 12
         // A -> B -> D -> E : 10 + 5 + 8 = 23
-        let path_forward = best_path(&graph, &a, &e);
+        let path_forward = best_path(&graph, &a, &e, BigInt::ZERO);
         assert_eq!(path_forward.paths, vec![a, b, e]);
         assert_eq!(path_forward.cost, BigInt::from(12));
 
         // Test reverse path E -> A
         // E -> B -> A : 2 + 10 = 12
         // E -> D -> C -> A : 8 + 5 + 5 = 18
-        let path_reverse = best_path(&graph, &e, &a);
+        let path_reverse = best_path(&graph, &e, &a, BigInt::ZERO);
         assert_eq!(path_reverse.paths, vec![e, b, a]);
         assert_eq!(path_reverse.cost, BigInt::from(12));
     }

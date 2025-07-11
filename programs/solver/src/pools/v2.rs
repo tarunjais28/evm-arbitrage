@@ -115,16 +115,21 @@ impl PoolData {
         Ok(())
     }
 
-    pub fn calc_slippage<'a>(&mut self) -> Result<(), CustomError<'a>> {
+    pub fn calc_slippage<'a>(
+        &mut self,
+        mut slippage_adj: &mut BigInt,
+    ) -> Result<(), CustomError<'a>> {
         for token_data in self.data.values_mut() {
             token_data.token0.slippage = calc_slippage(
                 token_data.token0.price_start.clone(),
                 token_data.token0.price_effective.clone(),
+                &mut slippage_adj,
             )?;
 
             token_data.token1.slippage = calc_slippage(
                 token_data.token1.price_start.clone(),
                 token_data.token1.price_effective.clone(),
+                &mut slippage_adj,
             )?;
         }
 
@@ -282,8 +287,10 @@ mod tests {
         let amount = BigInt::from(100_000_000_000_000_000_000u128); // 100 tokens (10% of reserve)
         pool_data.calc_effective_price(amount).unwrap();
 
+        let mut slippage_adj = BigInt::MIN;
+
         // Calculate slippage
-        pool_data.calc_slippage().unwrap();
+        pool_data.calc_slippage(&mut slippage_adj).unwrap();
 
         // Verify slippage values
         for data in pool_data.data.values() {
@@ -328,8 +335,10 @@ mod tests {
         let amount = BigInt::from(500_000_000_000_000_000_000u128); // 500 tokens (50% of reserve)
         pool_data.calc_effective_price(amount).unwrap();
 
+        let mut slippage_adj = BigInt::MIN;
+
         // Calculate slippage
-        pool_data.calc_slippage().unwrap();
+        pool_data.calc_slippage(&mut slippage_adj).unwrap();
 
         // Verify slippage values
         for data in pool_data.data.values() {

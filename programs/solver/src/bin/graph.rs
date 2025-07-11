@@ -62,7 +62,12 @@ pub struct SwapEdge {
     pub fee: u16,
 }
 
-pub fn best_path(graph: &SwapGraph, start: &Address, end: &Address) -> ShortestPath {
+pub fn best_path(
+    graph: &SwapGraph,
+    start: &Address,
+    end: &Address,
+    slippage_adj: i64,
+) -> ShortestPath {
     let mut heap = BinaryHeap::new();
     let mut best_cost = HashMap::new();
 
@@ -92,7 +97,7 @@ pub fn best_path(graph: &SwapGraph, start: &Address, end: &Address) -> ShortestP
 
         if let Some(neighbors) = graph.get(&token) {
             for edge in neighbors {
-                let new_cost = cost + edge.slippage;
+                let new_cost = cost + edge.slippage + slippage_adj;
                 if new_cost < *best_cost.get(&edge.to).unwrap_or(&i64::MAX) {
                     let mut new_paths = paths.clone();
                     new_paths.push(edge.to);
@@ -136,20 +141,25 @@ async fn main() -> Result<(), anyhow::Error> {
         .map(|d| (d.address, d.swap_edge.clone()))
         .collect();
 
+    let mut slippage_adj = i64::MAX;
     graph.iter_mut().for_each(|(_, data)| {
         data.iter_mut().for_each(|d| {
-            d.slippage = d.slippage.abs();
+            slippage_adj = slippage_adj.min(d.slippage);
         })
     });
-    println!("Successfully loaded graph with {} tokens", graph.len());
-    println!("{:#?}", graph);
 
-    let path = best_path(
+    slippage_adj = slippage_adj.abs() + 1;
+    println!("Successfully loaded graph with {} tokens", graph.len());
+    // println!("{:#?}", graph);
+
+    let mut path = best_path(
         &graph,
-        &address!("0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"),
-        &address!("0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2"),
+        &address!("0xdac17f958d2ee523a2206206994597c13d831ec7"),
+        &address!("0x4d4574f50dd8b9dbe623cf329dcc78d76935e610"),
+        slippage_adj,
     );
 
+    path.cost -= slippage_adj * path.pools.len() as i64;
     println!("{:#?}", path);
 
     Ok(())

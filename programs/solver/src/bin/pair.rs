@@ -6,16 +6,8 @@ use alloy::{
     },
     sol,
 };
-use futures::future::join_all;
-use serde::{Deserialize, Serialize};
-use serde_json::from_reader;
-use std::{
-    fs::File,
-    io::{BufReader, Write},
-};
 use uniswap_sdk_core::{prelude::*, token};
 use uniswap_v2_sdk::prelude::*;
-use uniswap_v3_sdk::prelude::*;
 use utils::{CustomError, EnvParser};
 
 sol!(

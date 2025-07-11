@@ -20,6 +20,7 @@ async fn calculate_path<'a>(
     pool_data_v3: &mut v3::PoolData,
     input_data: InputData,
 ) -> Result<(), CustomError<'a>> {
+    let mut slippage_adj = BigInt::MAX;
     let amount_in = input_data.amount_in.to_big_int();
 
     debug_time!("calculate_path::calc_effective_price()", {
@@ -27,7 +28,7 @@ async fn calculate_path<'a>(
     });
 
     debug_time!("calculate_path::calc_slippage_v2()", {
-        pool_data_v2.calc_slippage()?;
+        pool_data_v2.calc_slippage(&mut slippage_adj)?;
     });
 
     debug_time!("calculate_path::calc_effective_price_v3()", {
@@ -37,7 +38,7 @@ async fn calculate_path<'a>(
     });
 
     debug_time!("calculate_path::calc_slippage_v3()", {
-        pool_data_v3.calc_slippage()?;
+        pool_data_v3.calc_slippage(&mut slippage_adj)?;
     });
 
     let mut graph: SwapGraph =
@@ -53,9 +54,16 @@ async fn calculate_path<'a>(
 
     log::info!("Total {} nodes collected!", graph.len());
 
-    let path = debug_time!("calculate_path::best_path()", {
-        best_path(&graph, &input_data.token_a, &input_data.token_b)
+    slippage_adj = slippage_adj.abs() + BigInt::ONE;
+    let mut path = debug_time!("calculate_path::best_path()", {
+        best_path(
+            &graph,
+            &input_data.token_a,
+            &input_data.token_b,
+            slippage_adj,
+        )
     });
+    path.cost -= slippage_adj * BigInt::from(path.pools.len());
 
     println!(
         "Optimal path for input {:#?}:

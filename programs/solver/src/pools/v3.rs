@@ -163,16 +163,21 @@ impl PoolData {
         Ok(())
     }
 
-    pub fn calc_slippage<'a>(&mut self) -> Result<(), CustomError<'a>> {
+    pub fn calc_slippage<'a>(
+        &mut self,
+        mut slippage_adj: &mut BigInt,
+    ) -> Result<(), CustomError<'a>> {
         for token_data in self.data.values_mut() {
             token_data.token_a.slippage = calc_slippage(
                 token_data.token_a.price_start.clone(),
                 token_data.token_a.price_effective.clone(),
+                &mut slippage_adj,
             )?;
 
             token_data.token_b.slippage = calc_slippage(
                 token_data.token_b.price_start.clone(),
                 token_data.token_b.price_effective.clone(),
+                &mut slippage_adj,
             )?;
         }
 

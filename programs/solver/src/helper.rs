@@ -1,3 +1,5 @@
+use std::cmp::min;
+
 use super::*;
 
 /// Calculate slippage
@@ -42,6 +44,7 @@ pub fn calc_individual_slippage(
 pub fn calc_slippage<'a>(
     start_price: PriceData,
     end_price: PriceData,
+    slippage_adj: &mut BigInt,
 ) -> Result<BigInt, CustomError<'a>> {
     let base_currency = WETH9::on_chain(1).ok_or_else(|| CustomError::NotFound("weth"))?;
     let percent = Price::new(base_currency.clone(), base_currency, 1, 1000000);
@@ -52,6 +55,7 @@ pub fn calc_slippage<'a>(
         percent.quotient()
     };
 
-    // TODO: Handle negative slippage
-    Ok(slippage.abs())
+    *slippage_adj = BigInt::min(slippage, *slippage_adj);
+
+    Ok(slippage)
 }
