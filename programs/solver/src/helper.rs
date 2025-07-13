@@ -1,5 +1,3 @@
-use std::cmp::min;
-
 use super::*;
 
 /// Calculate slippage
@@ -48,6 +46,7 @@ pub fn calc_slippage<'a>(
 ) -> Result<BigInt, CustomError<'a>> {
     let percent = BigInt::from(1000000);
 
+    // TODO: Consider decimal scale
     let slippage = if start_price.numerator.gt(&BigInt::ZERO) {
         let slippage_fract = (end_price - start_price.clone()) / start_price;
         slippage_fract

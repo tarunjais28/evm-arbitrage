@@ -320,12 +320,17 @@ pub fn v3_swap_simulation(
 
     let mut index = 0;
 
+    let tick_current = ticks_initialised
+        .get(0)
+        .ok_or_else(|| Error::NoTickDataError)?
+        .0;
+
     // keep track of swap state
     let mut state = SwapState {
         amount_specified_remaining: amount_specified,
         amount_calculated: I256::ZERO,
         sqrt_price_x96,
-        tick_current: ticks_initialised[index].0,
+        tick_current,
         liquidity,
     };
 

@@ -4,6 +4,12 @@ pub struct PoolData {
     pub data: HashMap<Address, TokenData>,
 }
 
+#[derive(Debug, Default, Clone)]
+pub struct TickData {
+    initialised_ticks: Vec<(I24, bool)>,
+    ticks: Vec<Tick<I24>>,
+}
+
 impl PoolData {
     pub fn new<'a>(
         serialised_v3_pool: &[Pools],
@@ -56,22 +62,36 @@ impl PoolData {
                         None,
                     )
                     .await?;
-                Ok((pool_addr, pool.token0_price(), pool.token1_price()))
+
+                let tick_data = get_tick_data(&pool).await?;
+
+                Ok((
+                    pool_addr,
+                    pool.token0_price(),
+                    pool.token1_price(),
+                    tick_data,
+                    pool.liquidity,
+                    pool.sqrt_ratio_x96,
+                ))
             };
             futures.push(fut);
         }
 
-        let results: Vec<Result<(Address, PriceData, PriceData), CustomError<'a>>> =
-            futures::stream::iter(futures)
-                .buffer_unordered(50)
-                .collect::<Vec<_>>()
-                .await;
+        let results: Vec<
+            Result<(Address, PriceData, PriceData, TickData, u128, U160), CustomError<'a>>,
+        > = futures::stream::iter(futures)
+            .buffer_unordered(50)
+            .collect::<Vec<_>>()
+            .await;
 
         results.into_iter().for_each(|res| {
-            if let Ok((pool_addr, price0, price1)) = res {
+            if let Ok((pool_addr, price0, price1, tick_data, liquidity, sqrt_ratio_x96)) = res {
                 self.data.entry(pool_addr).and_modify(|token_data| {
                     token_data.token_a.price_start = price0;
                     token_data.token_b.price_start = price1;
+                    token_data.tick_data = tick_data;
+                    token_data.liquidity = liquidity;
+                    token_data.sqrt_price_x96 = sqrt_ratio_x96;
                 });
             }
         });
@@ -79,35 +99,7 @@ impl PoolData {
         Ok(())
     }
 
-    pub fn calc_start_price_from_sqrt_price_x96<'a>(
-        &mut self,
-        pool_address: &Address,
-        sqrt_price_x96: BigInt,
-    ) -> Result<(), CustomError<'a>> {
-        // Numerator: (sqrtPriceX96)^2
-        let numerator = sqrt_price_x96 * sqrt_price_x96;
-
-        // Denominator: 2^192 = 1 << 192
-        let denominator = BigInt::ONE << 192;
-
-        let token_data = self
-            .data
-            .get_mut(pool_address)
-            .ok_or_else(|| CustomError::AddressNotFound(*pool_address))?;
-
-        let price = Price::new(
-            token_data.token_a.token.clone(),
-            token_data.token_a.token.clone(),
-            denominator,
-            numerator,
-        );
-        token_data.token_a.price_start = price.clone();
-        token_data.token_b.price_start = price.invert();
-
-        Ok(())
-    }
-
-    pub async fn calc_effective_price<'a>(
+    pub async fn calc_start_price_from_sqrt_price_x96<'a>(
         &mut self,
         provider: &FillProvider<
             JoinFill<
@@ -116,54 +108,84 @@ impl PoolData {
             >,
             RootProvider,
         >,
+        pool_address: &Address,
+    ) -> Result<(), CustomError<'a>> {
+        let token_data = self
+            .data
+            .get_mut(pool_address)
+            .ok_or_else(|| CustomError::AddressNotFound(*pool_address))?;
+
+        if let Ok(pool) =
+            Pool::<EphemeralTickMapDataProvider>::from_pool_key_with_tick_data_provider(
+                1,
+                FACTORY_ADDRESS,
+                token_data.token_a.token.address(),
+                token_data.token_b.token.address(),
+                token_data.fee(),
+                provider,
+                None,
+            )
+            .await
+        {
+            let tick_data = get_tick_data(&pool).await?;
+            token_data.token_a.price_start = pool.token0_price();
+            token_data.token_b.price_start = pool.token1_price();
+            token_data.tick_data = tick_data;
+            token_data.liquidity = pool.liquidity;
+            token_data.sqrt_price_x96 = pool.sqrt_ratio_x96;
+        }
+
+        Ok(())
+    }
+
+    pub async fn calc_effective_price<'a>(
+        &mut self,
         amount: BigInt,
     ) -> Result<(), CustomError<'a>> {
         for (_pool_addr, token_data) in self.data.iter_mut() {
-            let pool =
-                match Pool::<EphemeralTickMapDataProvider>::from_pool_key_with_tick_data_provider(
-                    1,
-                    FACTORY_ADDRESS,
-                    token_data.token_a.token.address(),
-                    token_data.token_b.token.address(),
-                    token_data.fee(),
-                    provider,
+            if let Ok(pool) = Pool::new(
+                token_data.token_a.token.clone(),
+                token_data.token_b.token.clone(),
+                token_data.fee(),
+                token_data.sqrt_price_x96,
+                token_data.liquidity,
+            ) {
+                let amount0_in =
+                    CurrencyAmount::from_raw_amount(token_data.token_a.token.clone(), amount)?;
+                let amount0_out = match pool.get_output_amount_sync(
+                    &amount0_in,
                     None,
-                )
-                .await
-                {
-                    Ok(p) => p,
+                    &token_data.tick_data.initialised_ticks,
+                    &token_data.tick_data.ticks,
+                ) {
+                    Ok(a) => a,
                     Err(_err) => {
-                        // log::error!("Issue with pool: {_pool_addr}, due to {_err}");
+                        // log::error!("amount0_out calculation failed for {_pool_addr}, due to {_err}");
                         continue;
                     }
                 };
 
-            let amount0_in =
-                CurrencyAmount::from_raw_amount(token_data.token_a.token.clone(), amount)?;
-            let amount0_out = match pool.get_output_amount(&amount0_in, None).await {
-                Ok(a) => a,
-                Err(_err) => {
-                    // log::error!("amount0_out calculation failed for {_pool_addr}, due to {_err}");
-                    continue;
-                }
-            };
+                let amount1_out =
+                    CurrencyAmount::from_raw_amount(token_data.token_b.token.clone(), amount)?;
+                let amount1_in = match pool.get_input_amount_sync(
+                    &amount1_out,
+                    None,
+                    &token_data.tick_data.initialised_ticks,
+                    &token_data.tick_data.ticks,
+                ) {
+                    Ok(a) => a,
+                    Err(_err) => {
+                        // log::error!("amount0_out calculation failed for {_pool_addr}, due to {_err}");
+                        continue;
+                    }
+                };
 
-            let amount1_out =
-                CurrencyAmount::from_raw_amount(token_data.token_b.token.clone(), amount)?;
-            let amount1_in = match pool.get_input_amount(&amount1_out, None).await {
-                Ok(a) => a,
-                Err(_err) => {
-                    // log::error!("amount1_in calculation failed for {_pool_addr}, due to {_err}");
-                    continue;
-                }
-            };
-
-            token_data.token_a.price_effective =
-                Price::from_currency_amounts(amount0_in, amount0_out);
-            token_data.token_b.price_effective =
-                Price::from_currency_amounts(amount1_out, amount1_in);
+                token_data.token_a.price_effective =
+                    Price::from_currency_amounts(amount0_in, amount0_out);
+                token_data.token_b.price_effective =
+                    Price::from_currency_amounts(amount1_out, amount1_in);
+            }
         }
-
         Ok(())
     }
 
@@ -214,6 +236,9 @@ pub struct TokenData {
     pub token_a: TokenDetails,
     pub token_b: TokenDetails,
     pub fee: u16,
+    pub tick_data: TickData,
+    pub liquidity: u128,
+    pub sqrt_price_x96: U160,
 }
 
 impl TokenData {
@@ -222,6 +247,9 @@ impl TokenData {
             token_a: TokenDetails::new(token_a),
             token_b: TokenDetails::new(token_b),
             fee,
+            tick_data: TickData::default(),
+            liquidity: u128::default(),
+            sqrt_price_x96: U160::default(),
         }
     }
 
@@ -236,4 +264,35 @@ impl TokenData {
             _ => CUSTOM(0),
         }
     }
+}
+
+async fn get_tick_data<'a>(
+    pool: &Pool<EphemeralTickMapDataProvider>,
+) -> Result<TickData, CustomError<'a>> {
+    let mut initialised_ticks = Vec::new();
+    let mut ticks = Vec::new();
+    let mut current_state = pool.tick_current;
+    loop {
+        if let Ok((tick_next, initialized)) = pool
+            .tick_data_provider
+            .next_initialized_tick_within_one_word(current_state, true, pool.tick_spacing())
+            .await
+        {
+            initialised_ticks.push((tick_next, initialized));
+            if let Ok(tick) = pool.tick_data_provider.get_tick(tick_next).await {
+                ticks.push(tick);
+            } else {
+                initialised_ticks.pop();
+                break;
+            }
+            current_state = tick_next - pool.tick_spacing();
+        } else {
+            break;
+        };
+    }
+
+    Ok(TickData {
+        initialised_ticks,
+        ticks,
+    })
 }

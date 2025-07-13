@@ -47,7 +47,7 @@ async fn main() {
     const CHAIN_ID: u64 = 1;
     let usdc = token!(
         CHAIN_ID,
-        "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "0x6b175474e89094c44da98b954eedeac495271d0f",
         18,
         "USDC"
     );
@@ -124,18 +124,19 @@ async fn main() {
     );
 
     let amount_out = CurrencyAmount::from_raw_amount(weth.clone(), 10000000000u128).unwrap();
-    let amount_in = pool_1
-        .get_input_amount_sync(&amount_out, None, &ticks_initialised, &ticks)
-        .unwrap();
-    println!(
-        "amount_in: {} / {}",
-        amount_in.numerator(),
-        amount_in.denominator()
-    );
     let amount_in = pool.get_input_amount(&amount_out, None).await.unwrap();
     println!(
         "amount_in: {} / {}",
         amount_in.numerator(),
         amount_in.denominator()
     );
+    println!("{}", "=".repeat(80));
+    // let amount_in = pool_1
+    //     .get_input_amount_sync(&amount_out, None, &ticks_initialised, &ticks)
+    //     .unwrap();
+    // println!(
+    //     "amount_in: {} / {}",
+    //     amount_in.numerator(),
+    //     amount_in.denominator()
+    // );
 }

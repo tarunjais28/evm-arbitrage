@@ -9,13 +9,6 @@ pub struct InputData {
 }
 
 async fn calculate_path<'a>(
-    provider: &FillProvider<
-        JoinFill<
-            Identity,
-            JoinFill<GasFiller, JoinFill<BlobGasFiller, JoinFill<NonceFiller, ChainIdFiller>>>,
-        >,
-        RootProvider,
-    >,
     pool_data_v2: &mut v2::PoolData,
     pool_data_v3: &mut v3::PoolData,
     input_data: InputData,
@@ -32,9 +25,7 @@ async fn calculate_path<'a>(
     });
 
     debug_time!("calculate_path::calc_effective_price_v3()", {
-        pool_data_v3
-            .calc_effective_price(provider, amount_in)
-            .await?;
+        pool_data_v3.calc_effective_price(amount_in).await?;
     });
 
     debug_time!("calculate_path::calc_slippage_v3()", {
@@ -127,7 +118,6 @@ pub async fn scan<'a>(
                 if let Ok(input_data) = serde_json::from_str::<InputData>(buffer) {
                     // Calculate path immediately after receiving amount
                     if let Err(e) = calculate_path(
-                        &provider,
                         &mut *pool_data_v2_clone.lock().await,
                         &mut *pool_data_v3_clone.lock().await,
                         input_data,
@@ -153,25 +143,26 @@ pub async fn scan<'a>(
         let mut scanner = ScanData::new(&log);
 
         if let Ok(decoded) = log.log_decode() {
-            log::info!("v2 swap captured!");
             let sync: IUniswapV2Pool::Sync = decoded.inner.data;
-            scanner.update_sync(sync, decoded.inner.address);
+            let pool_address = decoded.inner.address;
+            log::info!("v2 swap captured, pool: {pool_address}");
+            scanner.update_sync(sync, pool_address);
 
             // Update reserves based on the event
             debug_time!("v2::calc_slippage::update_reserve_abs()", {
                 update_reserve_abs(scanner, &mut *pool_data_v2.lock().await)?;
             });
         } else if let Ok(decoded) = log.log_decode() {
-            log::info!("v3 swap captured!");
-            let swap: IUniswapV3Pool::Swap = decoded.inner.data;
+            let _swap: IUniswapV3Pool::Swap = decoded.inner.data;
+            let pool_address = decoded.inner.address;
+            log::info!("v3 swap captured, pool: {pool_address}",);
             let pool_data = &mut pool_data_v3.lock().await;
 
             // Update start price
             debug_time!("v3::calc_start_price_from_sqrt_price_x96", {
-                pool_data.calc_start_price_from_sqrt_price_x96(
-                    &decoded.inner.address,
-                    swap.sqrtPriceX96.to_big_int(),
-                )?;
+                pool_data
+                    .calc_start_price_from_sqrt_price_x96(&provider, &pool_address)
+                    .await?;
             });
         }
     }

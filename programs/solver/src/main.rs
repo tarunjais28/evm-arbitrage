@@ -3,7 +3,11 @@ use crate::{
     slippage::*, structs::*,
 };
 use alloy::{
-    primitives::{address, Address, TxHash, U256},
+    primitives::{
+        address,
+        aliases::{I24, U160},
+        Address, TxHash, U256,
+    },
     providers::{
         fillers::{BlobGasFiller, ChainIdFiller, FillProvider, GasFiller, JoinFill, NonceFiller},
         Identity, Provider, ProviderBuilder, RootProvider, WsConnect,
@@ -25,9 +29,8 @@ use std::{
     io::BufReader,
     sync::Arc,
 };
-use uniswap_sdk_core::{prelude::*, token};
-
 use tokio::sync::{mpsc, Mutex};
+use uniswap_sdk_core::{prelude::*, token};
 use utils::CustomError;
 
 mod dijkstra;
