@@ -29,6 +29,8 @@ thiserror = "2.0.12"
 log = "0.4.27"
 env_logger = "0.11.8"
 uniswap-sdk-core = "5.1.0"
+reqwest = { version = "0.12.22", features = ["json"] }
+rayon = "1.10.0"
 uniswap-v2-sdk = { path = "libraries/uniswap-v2-sdk-rs" }
 uniswap-v3-sdk = { path = "libraries/uniswap-v3-sdk-rs", features = ["extensions", "std"] }
 utils = { path = "libraries/utils" }

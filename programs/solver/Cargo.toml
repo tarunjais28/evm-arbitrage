@@ -20,3 +20,5 @@ dotenv.workspace = true
 uniswap-v2-sdk.workspace = true
 uniswap-v3-sdk.workspace = true
 uniswap-sdk-core.workspace = true
+reqwest.workspace = true
+rayon.workspace = true
