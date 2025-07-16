@@ -1,3 +1,4 @@
+#[macro_export]
 macro_rules! debug_time {
     ($label:expr, $block:block) => {{
         use std::time::Instant;
@@ -7,7 +8,7 @@ macro_rules! debug_time {
         result
     }};
 }
-
+#[macro_export]
 macro_rules! info_time {
     ($label:expr, $block:block) => {{
         use std::time::Instant;

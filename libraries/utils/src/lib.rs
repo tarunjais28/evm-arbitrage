@@ -18,3 +18,5 @@ use web3::types::H160;
 mod errors;
 mod parser;
 mod util;
+#[macro_use]
+pub mod logger;
