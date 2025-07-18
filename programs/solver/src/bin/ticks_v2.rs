@@ -2,11 +2,13 @@ use alloy::{
     primitives::{address, aliases::I24, Address, U160, U256},
     providers::{
         fillers::{BlobGasFiller, ChainIdFiller, FillProvider, GasFiller, JoinFill, NonceFiller},
-        Identity, ProviderBuilder, RootProvider, WsConnect,
+        Identity, Provider, ProviderBuilder, RootProvider, WsConnect,
     },
     sol,
 };
 use futures::{stream, StreamExt};
+use rayon::iter::{IntoParallelIterator, ParallelIterator};
+use serde::{Deserialize, Serialize};
 use serde_json::from_reader;
 /// Step 1:  Calculate Words inside a pool: Max tickrange: +-887272. Divide
 /// 887272 by tick spacing for the pool. Divide again by 256 to get the number
@@ -112,6 +114,20 @@ async fn get_pool_data_old<'a>(
     (sqrt_price_x96, liquidity)
 }
 
+#[derive(Debug, Serialize, Deserialize)]
+pub struct TickDetails {
+    block: u64,
+    pool: Address,
+    ticks: Vec<Tick>,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct Tick {
+    pub index: i32,
+    pub liquidity_gross: u128,
+    pub liquidity_net: i128,
+}
+
 async fn get_pool_data<'a>(
     provider: FillProvider<
         JoinFill<
@@ -122,42 +138,68 @@ async fn get_pool_data<'a>(
     >,
     pools: Address,
 ) -> (U160, u128) {
-    let contract = IUniswapV3Pool::new(pools, provider);
-    let slot0 = contract.slot0().call().await.unwrap();
+    let contract = IUniswapV3Pool::new(pools, provider.clone());
+    let slot0 = contract.slot0();
+    let tick_spacing = contract.tickSpacing();
+    let liquidity = contract.liquidity();
+
+    let multicall = provider
+        .multicall()
+        .add(slot0)
+        .add(tick_spacing)
+        .add(liquidity);
+    let (slot0, tick_spacing, liquidity) = multicall.aggregate().await.unwrap();
     let sqrt_price_x96 = slot0.sqrtPriceX96;
-    let tick_spacing = contract.tickSpacing().call().await.unwrap();
-    let liquidity = contract.liquidity().call().await.unwrap();
 
     // Compute wordPosition = tick / 256
     // Convert Signed<24,1> to i32 using to_i32() method, then divide and cast to i16
     let mut tick_indices = Vec::new();
     let min_word: i16 = (MIN_TICK_I32 / 256) as i16 / tick_spacing.as_i16();
     let max_word: i16 = (MAX_TICK_I32 / 256) as i16 / tick_spacing.as_i16();
+    let mut count = 3;
     debug_time!("Calling scanner()", {
         for word_position in min_word..=max_word {
+            // let bitmap = contract.tickBitmap(word_position);
+            // multicall.with_cloned_provider().add(bitmap);
             let bitmap = contract.tickBitmap(word_position).call().await.unwrap();
+            count += 1;
+
+            // Create a vector to store tick indices for this word position
+            let mut current_tick_indices = Vec::new();
+            let mut multicall = provider.multicall().dynamic();
+            let mut has_ticks = false;
+
             for bit_pos in 0..256 {
                 if bitmap.bit(bit_pos) {
                     let tick_index = (word_position as i32) * 256 + bit_pos as i32;
+                    let tick_info = contract.ticks(I24::try_from(tick_index).unwrap());
+                    multicall = multicall.add_dynamic(tick_info);
+                    count += 1;
+                    current_tick_indices.push(tick_index);
+                    has_ticks = true;
+                }
+            }
 
-                    // Now fetch tick info
-                    let tick_info = contract
-                        .ticks(I24::try_from(tick_index).unwrap())
-                        .call()
-                        .await
-                        .unwrap();
-                    tick_indices.push(tick_index);
-                    println!(
-                        "Initialized tick {}: liquidityGross = {}",
-                        tick_index, tick_info.liquidityGross
-                    );
+            // Only execute multicall if we found any ticks in this word position
+            if has_ticks {
+                let ticks = multicall.aggregate3().await.unwrap();
+                for idx in 0..ticks.len() {
+                    if let Ok(tick) = ticks[idx].clone() {
+                        let tick_data = Tick {
+                            index: current_tick_indices[idx],
+                            liquidity_gross: tick.liquidityGross,
+                            liquidity_net: tick.liquidityNet,
+                        };
+                        tick_indices.push(tick_data);
+                    }
                 }
             }
         }
     });
-    tick_indices.sort();
+
     println!("{:#?}", tick_indices);
     println!("{}", tick_indices.len());
+    println!("rpc hit {count}",);
 
     (sqrt_price_x96, liquidity)
 }
@@ -275,9 +317,11 @@ async fn main() {
     let ws = WsConnect::new(env_parser.ws_address);
     let provider = ProviderBuilder::new().connect_ws(ws).await.unwrap();
 
-    let pool_addr = address!("0x477e1a178f308fb8c2967d3e56e157c4b8b6f5df");
+    let pool_addr = address!("0x5777d92f208679db4b9778590fa3cab3ac9e2168");
     let (sqrt_ratio_x96, liquidity) = get_pool_data(provider.clone(), pool_addr).await;
-    let x = fetch_all_initialized_ticks(&provider, &vec![pool_addr]).await;
+    // fetch_all_initialized_ticks(&provider, &vec![pool_addr])
+    //     .await
+    //     .unwrap();
 
     // let file = File::open("resources/pools_v3.json").unwrap();
     // let reader = BufReader::new(file);
