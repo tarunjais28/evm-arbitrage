@@ -8,7 +8,11 @@ use dashmap::DashMap;
 use rayon::iter::{IntoParallelRefIterator, ParallelIterator};
 use serde::{Deserialize, Serialize};
 use serde_json::from_reader;
-use std::{fs::File, io::{BufReader, Write}, sync::Arc};
+use std::{
+    fs::File,
+    io::{BufReader, Write},
+    sync::Arc,
+};
 use utils::{debug_time, EnvParser};
 
 sol!(
@@ -20,14 +24,14 @@ sol!(
 
 #[derive(Debug, Serialize, Deserialize)]
 struct TickData {
-    block: u64,
     tick_details: Vec<TickDetails>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct TickDetails {
-    pub pool: Address,
-    pub ticks: Vec<Tick>,
+    block: u64,
+    pool: Address,
+    ticks: Vec<Tick>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -55,14 +59,13 @@ impl Tick {
 }
 
 impl TickData {
-    fn new(block: u64, size: usize) -> Self {
+    fn new(size: usize) -> Self {
         Self {
-            block,
             tick_details: Vec::with_capacity(size),
         }
     }
 
-    fn insert(&mut self, tick_extract: TickExtract, amount: i128) {
+    fn insert(&mut self, tick_extract: TickExtract, amount: i128, block: u64) {
         let mut tick = Tick::from_extract(tick_extract, amount);
         if let Some(idx) = self
             .tick_details
@@ -74,6 +77,7 @@ impl TickData {
             self.tick_details.push(TickDetails {
                 pool: tick_extract.pool,
                 ticks: Tick::from_extract(tick_extract, amount),
+                block,
             });
         }
     }
@@ -117,60 +121,79 @@ async fn main() -> Result<(), anyhow::Error> {
     let pools: Vec<Address> = from_reader(reader).unwrap();
 
     // Uniswap v3 factory deployed at this block
-    let mut block_number = 12369621;
+    let block_number = 12369621;
     let limit = 100000;
-    let mut next_block = block_number + limit;
     let target_block = provider.get_block_number().await? + limit;
     let ticks: Arc<DashMap<TickExtract, i128>> = Arc::new(DashMap::new());
     let mut count = 1;
 
     let size = pools.len();
-    let filter = Filter::new()
-        .address(pools)
-        .from_block(block_number)
-        .to_block(next_block);
 
     let mut latest_block = 0;
-    debug_time!("Block scanning", {
-        while block_number <= target_block {
-            // Create a filter for the events.
-            let logs = provider.clone().get_logs(&filter).await?;
-            count += 1;
 
-            let ticks_clone = Arc::clone(&ticks);
-            logs.par_iter().for_each(move |log| {
-                if let Ok(decoded) = log.log_decode::<IUniswapV3Pool::Mint>() {
-                    let mint = decoded.inner.data;
-                    let amount = mint.amount as i128;
-                    let key =
-                        TickExtract::new(mint.tickLower, mint.tickUpper, decoded.inner.address);
-                    *ticks_clone.entry(key).or_insert(0) += amount;
-                } else if let Ok(decoded) = log.log_decode::<IUniswapV3Pool::Burn>() {
-                    let burn = decoded.inner.data;
-                    let amount = burn.amount as i128;
-                    let key =
-                        TickExtract::new(burn.tickLower, burn.tickUpper, decoded.inner.address);
-                    *ticks_clone.entry(key).or_insert(0) -= amount;
-                }
+    let mut start_block;
+    let mut next_block;
+    let mut name;
+    debug_time!("Block scanning", {
+        for idx in 11..pools.len() {
+            name = idx + 1;
+            start_block = block_number;
+            next_block = block_number + limit;
+            let mut tick_data = TickData::new(size);
+
+            log::info!("Processing pool {}", pools[idx]);
+
+            while start_block <= target_block {
+                // Create a filter for the events.
+                let logs = provider
+                    .clone()
+                    .get_logs(
+                        &Filter::new()
+                            .address(pools[idx].clone())
+                            .from_block(start_block)
+                            .to_block(next_block),
+                    )
+                    .await?;
+                count += 1;
+
+                latest_block = provider.get_block_number().await?;
+                count += 1;
+
+                let ticks_clone = Arc::clone(&ticks);
+                logs.par_iter().for_each(move |log| {
+                    if let Ok(decoded) = log.log_decode::<IUniswapV3Pool::Mint>() {
+                        let mint = decoded.inner.data;
+                        let amount = mint.amount as i128;
+                        let key =
+                            TickExtract::new(mint.tickLower, mint.tickUpper, decoded.inner.address);
+                        *ticks_clone.entry(key).or_insert(0) += amount;
+                    } else if let Ok(decoded) = log.log_decode::<IUniswapV3Pool::Burn>() {
+                        let burn = decoded.inner.data;
+                        let amount = burn.amount as i128;
+                        let key =
+                            TickExtract::new(burn.tickLower, burn.tickUpper, decoded.inner.address);
+                        *ticks_clone.entry(key).or_insert(0) -= amount;
+                    }
+                });
+
+                log::info!("Processed block {start_block} to {next_block}");
+
+                start_block = next_block;
+                next_block += limit;
+            }
+
+            ticks.iter().for_each(|map| {
+                let tick_extract = map.key();
+                let amount = map.value();
+                tick_data.insert(*tick_extract, *amount, latest_block);
             });
 
-            block_number = next_block;
-            next_block += limit;
-            latest_block = provider.get_block_number().await?
+            let mut file = File::create(format!("resources/ticks/{name}.json"))?;
+            file.write_all(serde_json::to_string_pretty(&tick_data)?.as_bytes())?;
+
+            log::info!("Rpc hits: {count}");
         }
     });
-
-    log::info!("Rpc hits: {count}");
-
-    let mut tick_data = TickData::new(latest_block, size);
-    ticks.iter().for_each(|map| {
-        let tick_extract = map.key();
-        let amount = map.value();
-        tick_data.insert(*tick_extract, *amount);
-    });
-
-    let mut file = File::create("resources/tick_map.json")?;
-    file.write_all(serde_json::to_string_pretty(&tick_data)?.as_bytes())?;
 
     Ok(())
 }
