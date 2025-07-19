@@ -22,3 +22,4 @@ uniswap-v3-sdk.workspace = true
 uniswap-sdk-core.workspace = true
 reqwest.workspace = true
 rayon.workspace = true
+dashmap.workspace = true

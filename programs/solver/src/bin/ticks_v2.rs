@@ -1,16 +1,3 @@
-use alloy::{
-    primitives::{address, aliases::I24, Address, U160, U256},
-    providers::{
-        fillers::{BlobGasFiller, ChainIdFiller, FillProvider, GasFiller, JoinFill, NonceFiller},
-        Identity, Provider, ProviderBuilder, RootProvider, WsConnect,
-    },
-    sol,
-};
-use futures::{future::join_all, stream, StreamExt};
-use rayon::iter::{IntoParallelIterator, ParallelIterator};
-use rayon::prelude::*;
-use serde::{Deserialize, Serialize};
-use serde_json::from_reader;
 /// Step 1:  Calculate Words inside a pool: Max tickrange: +-887272. Divide
 /// 887272 by tick spacing for the pool. Divide again by 256 to get the number
 /// of words on either side of 0. To calculate WordIndex Range, we use the
@@ -40,8 +27,24 @@ use serde_json::from_reader;
 /// pools.ticks(tickindex) - we can use multicall for this as well so that its 1RPC
 /// for all active ticks. We then the prefix sum the liquidity net in order to get
 /// the curve of the pool.
-use std::{fs::File, io::BufReader};
-use uniswap_sdk_core::{prelude::*, token};
+use alloy::{
+    primitives::{aliases::I24, Address, U256},
+    providers::{
+        fillers::{BlobGasFiller, ChainIdFiller, FillProvider, GasFiller, JoinFill, NonceFiller},
+        Identity, Provider, ProviderBuilder, RootProvider, WsConnect,
+    },
+    sol,
+};
+use futures::future::join_all;
+use rayon::prelude::*;
+use serde::{Deserialize, Serialize};
+use serde_json::from_reader;
+use std::{
+    fs::File,
+    io::{BufReader, Write},
+};
+use tokio::task::spawn_blocking;
+use uniswap_sdk_core::prelude::*;
 use uniswap_v3_sdk::prelude::*;
 use utils::{debug_time, EnvParser};
 
@@ -84,9 +87,6 @@ pub struct Tick {
 
 const MIN_WORD: i16 = (MIN_TICK_I32 / 256) as i16;
 const MAX_WORD: i16 = (MAX_TICK_I32 / 256) as i16;
-const MAX_CONCURRENT_BITMAP_CALLS: usize = 100;
-const MAX_CONCURRENT_TICK_CALLS: usize = 100;
-const MAX_CONCURRENT_POOLS: usize = 5;
 
 pub async fn get_pool_data<'a>(
     provider: &FillProvider<
@@ -97,94 +97,102 @@ pub async fn get_pool_data<'a>(
         RootProvider,
     >,
     pools: &[Address],
-) {
-    // Process each pool in parallel
-    let pool_results = pools.par_iter().map(|pool| {
-        let pool_clone = pool.clone();
-        let provider = provider.clone();
-        async move {
-            let contract = IUniswapV3Pool::new(pool_clone, provider.clone());
-            let slot0 = contract.slot0();
-            let tick_spacing = contract.tickSpacing();
-            let liquidity = contract.liquidity();
+) -> Vec<TickDetails> {
+    let provider = provider.clone();
+    let pools = pools.to_vec();
 
-            let multicall = provider
-                .multicall()
-                .add(slot0)
-                .add(tick_spacing)
-                .add(liquidity);
+    // Run entire Rayon logic inside a blocking thread using Tokio
+    let results: Vec<TickDetails> = spawn_blocking(move || {
+        pools
+            .par_iter()
+            .map(|pool| {
+                let pool = *pool;
+                let provider = provider.clone();
 
-            let (slot0, tick_spacing, liquidity) = multicall.aggregate().await.unwrap();
-            let sqrt_price_x96 = slot0.sqrtPriceX96;
+                // Create a local runtime inside each rayon thread
+                let rt = tokio::runtime::Runtime::new().unwrap();
+                rt.block_on(async move {
+                    let contract = IUniswapV3Pool::new(pool, provider.clone());
+                    let slot0 = contract.slot0();
+                    let tick_spacing = contract.tickSpacing();
+                    let liquidity = contract.liquidity();
 
-            let min_word: i16 = MIN_WORD / tick_spacing.as_i16();
-            let max_word: i16 = MAX_WORD / tick_spacing.as_i16();
+                    let multicall = provider
+                        .multicall()
+                        .add(slot0)
+                        .add(tick_spacing)
+                        .add(liquidity);
 
-            let mut count = 1;
+                    let (slot0, tick_spacing, _liquidity) = multicall.aggregate().await.unwrap();
 
-            let word_futures: Vec<_> = (min_word..=max_word)
-                .map(|word_position| {
-                    let contract = contract.clone();
-                    let provider = provider.clone();
+                    let min_word: i16 = MIN_WORD / tick_spacing.as_i16();
+                    let max_word: i16 = MAX_WORD / tick_spacing.as_i16();
 
-                    async move {
-                        let bitmap = match contract.tickBitmap(word_position).call().await {
-                            Ok(b) => b,
-                            Err(_) => return vec![], // Skip on failure
-                        };
+                    let word_futures: Vec<_> = (min_word..=max_word)
+                        .map(|word_position| {
+                            let contract = contract.clone();
+                            let provider = provider.clone();
 
-                        let mut current_tick_indices = Vec::new();
-                        let mut multicall = provider.multicall().dynamic();
+                            async move {
+                                let bitmap = match contract.tickBitmap(word_position).call().await {
+                                    Ok(b) => b,
+                                    Err(_) => return vec![],
+                                };
 
-                        for bit_pos in 0..256 {
-                            if bitmap.bit(bit_pos) {
-                                let tick_index = (word_position as i32) * 256 + bit_pos as i32;
-                                if let Ok(tick_index_i24) = I24::try_from(tick_index) {
-                                    multicall =
-                                        multicall.add_dynamic(contract.ticks(tick_index_i24));
-                                    current_tick_indices.push(tick_index);
-                                }
-                            }
-                        }
+                                let mut current_tick_indices = Vec::new();
+                                let mut multicall = provider.multicall().dynamic();
 
-                        let mut ticks_data = Vec::new();
-                        if !current_tick_indices.is_empty() {
-                            match multicall.aggregate3().await {
-                                Ok(ticks) => {
-                                    for (idx, tick_result) in ticks.into_iter().enumerate() {
-                                        if let Ok(tick) = tick_result {
-                                            ticks_data.push(Tick {
-                                                index: current_tick_indices[idx],
-                                                liquidity_gross: tick.liquidityGross,
-                                                liquidity_net: tick.liquidityNet,
-                                            });
+                                for bit_pos in 0..256 {
+                                    if bitmap.bit(bit_pos) {
+                                        let tick_index =
+                                            (word_position as i32) * 256 + bit_pos as i32;
+                                        if let Ok(tick_index_i24) = I24::try_from(tick_index) {
+                                            multicall = multicall
+                                                .add_dynamic(contract.ticks(tick_index_i24));
+                                            current_tick_indices.push(tick_index);
                                         }
                                     }
                                 }
-                                Err(_) => {} // Skip on multicall failure
-                            }
-                        }
 
-                        ticks_data
+                                let mut ticks_data = Vec::new();
+                                if !current_tick_indices.is_empty() {
+                                    if let Ok(ticks) = multicall.aggregate3().await {
+                                        for (idx, tick_result) in ticks.into_iter().enumerate() {
+                                            if let Ok(tick) = tick_result {
+                                                ticks_data.push(Tick {
+                                                    index: current_tick_indices[idx],
+                                                    liquidity_gross: tick.liquidityGross,
+                                                    liquidity_net: tick.liquidityNet,
+                                                });
+                                            }
+                                        }
+                                    }
+                                }
+
+                                ticks_data
+                            }
+                        })
+                        .collect();
+
+                    let all_ticks: Vec<Tick> =
+                        join_all(word_futures).await.into_iter().flatten().collect();
+
+                    let block = provider.get_block_number().await.unwrap();
+                    log::info!("Pool {pool} processed!");
+
+                    TickDetails {
+                        block,
+                        pool,
+                        ticks: all_ticks,
                     }
                 })
-                .collect();
+            })
+            .collect()
+    })
+    .await
+    .unwrap(); // wait for spawn_blocking to finish
 
-            let all_ticks: Vec<Tick> = join_all(word_futures).await.into_iter().flatten().collect();
-
-            println!("{:#?}", all_ticks);
-            println!("{}", all_ticks.len());
-            println!("rpc hit {}", count);
-
-            all_ticks
-        }
-    });
-
-    // Convert rayon parallel iterator to future-aware stream
-    let all_futures = pool_results
-        .map(|fut| tokio::spawn(fut))
-        .collect::<Vec<_>>();
-    let _ = join_all(all_futures).await;
+    results
 }
 
 #[tokio::main]
@@ -201,6 +209,13 @@ async fn main() {
     let ws = WsConnect::new(env_parser.ws_address);
     let provider = ProviderBuilder::new().connect_ws(ws).await.unwrap();
 
-    let pool_addr = address!("0x5777d92f208679db4b9778590fa3cab3ac9e2168");
-    get_pool_data(&provider, &vec![pool_addr]).await;
+    let file = File::open("resources/pools_v3.json").unwrap();
+    let reader = BufReader::new(file);
+    let pools: Vec<Address> = from_reader(reader).unwrap();
+
+    let tick_data = debug_time!("tick map:", { get_pool_data(&provider, &pools).await });
+
+    let mut file = File::create("resources/ticks.json").unwrap();
+    file.write_all(serde_json::to_string_pretty(&tick_data).unwrap().as_bytes())
+        .unwrap();
 }

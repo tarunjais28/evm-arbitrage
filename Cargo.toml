@@ -15,11 +15,10 @@ hex = "0.4.3"
 hex-literal = "1.0.0"
 colored = "3.0.0"
 tokio = "1.46.1"
-alloy = { version = "1.0.20", features = ["full"] }
+alloy = { version = "1.0.22", features = ["full"] }
 alloy-primitives = { version = "1.2.1", default-features = false }
-# alloy-sol-types = { version = "1.2.1", default-features = false }
 serde = { version = "1.0.219", features = ["derive"] }
-serde_json = "1.0.140"
+serde_json = "1.0.141"
 dotenv = "0.15.0"
 num-bigint = "0.4"
 num-traits = { version = "0.2.19", default-features = false }
@@ -31,6 +30,7 @@ env_logger = "0.11.8"
 uniswap-sdk-core = "5.1.0"
 reqwest = { version = "0.12.22", features = ["json"] }
 rayon = "1.10.0"
+dashmap = "6.1.0"
 uniswap-v2-sdk = { path = "libraries/uniswap-v2-sdk-rs" }
 uniswap-v3-sdk = { path = "libraries/uniswap-v3-sdk-rs", features = ["extensions", "std"] }
 utils = { path = "libraries/utils" }
