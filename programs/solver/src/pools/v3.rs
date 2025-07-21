@@ -72,6 +72,32 @@ impl PoolData {
             token_data.token_a.token.clone(),
             token_data.token_b.token.clone(),
             token_data.fee(),
+            token_data.sqrt_price_x96,
+            token_data.liquidity,
+        )?;
+
+        let amount0 = CurrencyAmount::from_raw_amount(
+            token_data.token_a.token.clone(),
+            swap.amount0.to_big_int(),
+        )?;
+
+        match pool.get_output_amount_sync(
+            &amount0,
+            None,
+            token_data.current_tick,
+            &token_data.ticks,
+        ) {
+            Ok(amount1) => {
+                log::info!("found: {}", swap.amount1);
+                log::info!("calculated: {}", amount1.quotient());
+            }
+            Err(err) => log::error!("{err}"),
+        };
+
+        let pool = Pool::new(
+            token_data.token_a.token.clone(),
+            token_data.token_b.token.clone(),
+            token_data.fee(),
             swap.sqrtPriceX96,
             swap.liquidity,
         )?;
