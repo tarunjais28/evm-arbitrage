@@ -108,14 +108,14 @@ async fn main() {
     )
     .unwrap();
 
-    let amount_out = pool_1
-        .get_output_amount_sync(&amount_in, None, &ticks_initialised, &ticks)
-        .unwrap();
-    println!(
-        "amount_out: {} / {}",
-        amount_out.numerator(),
-        amount_out.denominator()
-    );
+    // let amount_out = pool_1
+    //     .get_output_amount_sync(&amount_in, None, &ticks_initialised, &ticks)
+    //     .unwrap();
+    // println!(
+    //     "amount_out: {} / {}",
+    //     amount_out.numerator(),
+    //     amount_out.denominator()
+    // );
     let amount_out = pool.get_output_amount(&amount_in, None).await.unwrap();
     println!(
         "amount_out: {} / {}",

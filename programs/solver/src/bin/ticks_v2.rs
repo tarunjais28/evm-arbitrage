@@ -28,7 +28,7 @@
 /// for all active ticks. We then the prefix sum the liquidity net in order to get
 /// the curve of the pool.
 use alloy::{
-    primitives::{aliases::I24, Address, U256},
+    primitives::{aliases::I24, Address, U160, U256},
     providers::{
         fillers::{BlobGasFiller, ChainIdFiller, FillProvider, GasFiller, JoinFill, NonceFiller},
         Identity, Provider, ProviderBuilder, RootProvider, WsConnect,
@@ -45,7 +45,7 @@ use std::{
 };
 use tokio::task::spawn_blocking;
 use uniswap_sdk_core::prelude::*;
-use uniswap_v3_sdk::prelude::*;
+use uniswap_v3_sdk::prelude::{tick_sync::TickSync, *};
 use utils::{debug_time, EnvParser};
 
 /// Computes price = (sqrtPriceX96)^2 / 2^192
@@ -75,14 +75,11 @@ sol!(
 pub struct TickDetails {
     block: u64,
     pool: Address,
-    ticks: Vec<Tick>,
-}
-
-#[derive(Debug, Serialize, Deserialize)]
-pub struct Tick {
-    pub index: i32,
-    pub liquidity_gross: u128,
-    pub liquidity_net: i128,
+    tick_spacing: i32,
+    current_tick: I24,
+    sqrt_price_x96: U160,
+    liquidity: u128,
+    ticks: Vec<TickSync>,
 }
 
 const MIN_WORD: i16 = (MIN_TICK_I32 / 256) as i16;
@@ -123,8 +120,7 @@ pub async fn get_pool_data<'a>(
                         .add(tick_spacing)
                         .add(liquidity);
 
-                    let (slot0, tick_spacing, _liquidity) = multicall.aggregate().await.unwrap();
-
+                    let (slot0, tick_spacing, liquidity) = multicall.aggregate().await.unwrap();
                     let min_word: i16 = MIN_WORD / tick_spacing.as_i16();
                     let max_word: i16 = MAX_WORD / tick_spacing.as_i16();
 
@@ -159,10 +155,11 @@ pub async fn get_pool_data<'a>(
                                     if let Ok(ticks) = multicall.aggregate3().await {
                                         for (idx, tick_result) in ticks.into_iter().enumerate() {
                                             if let Ok(tick) = tick_result {
-                                                ticks_data.push(Tick {
+                                                ticks_data.push(TickSync {
                                                     index: current_tick_indices[idx],
                                                     liquidity_gross: tick.liquidityGross,
                                                     liquidity_net: tick.liquidityNet,
+                                                    is_init: tick.initialized,
                                                 });
                                             }
                                         }
@@ -174,23 +171,27 @@ pub async fn get_pool_data<'a>(
                         })
                         .collect();
 
-                    let all_ticks: Vec<Tick> =
+                    let mut all_ticks: Vec<TickSync> =
                         join_all(word_futures).await.into_iter().flatten().collect();
 
-                    let block = provider.get_block_number().await.unwrap();
+                    all_ticks.sort_by(|t1, t2| t1.index.cmp(&t2.index));
                     log::info!("Pool {pool} processed!");
 
                     TickDetails {
-                        block,
+                        block: provider.get_block_number().await.unwrap(),
                         pool,
+                        sqrt_price_x96: slot0.sqrtPriceX96,
+                        liquidity,
                         ticks: all_ticks,
+                        tick_spacing: tick_spacing.as_i32(),
+                        current_tick: slot0.tick,
                     }
                 })
             })
             .collect()
     })
     .await
-    .unwrap(); // wait for spawn_blocking to finish
+    .unwrap();
 
     results
 }
@@ -219,3 +220,5 @@ async fn main() {
     file.write_all(serde_json::to_string_pretty(&tick_data).unwrap().as_bytes())
         .unwrap();
 }
+
+// 20118

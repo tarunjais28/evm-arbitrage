@@ -7,16 +7,20 @@
 //! # Note
 //! This example uses mainnet block 17000000 for consistent results
 
+use std::{fs::File, io::BufReader};
+
 use alloy::{
-    primitives::U256,
+    primitives::{address, U160, U256},
     providers::{Provider, ProviderBuilder, WsConnect},
     rpc::types::TransactionRequest,
     sol_types::SolCall,
 };
 
 use alloy_primitives::aliases::I24;
+use serde::{Deserialize, Serialize};
+use serde_json::from_reader;
 use uniswap_sdk_core::{prelude::*, token};
-use uniswap_v3_sdk::prelude::*;
+use uniswap_v3_sdk::prelude::{tick_sync::TickSync, *};
 use utils::EnvParser;
 
 /// Computes price = (sqrtPriceX96)^2 / 2^192
@@ -33,6 +37,17 @@ pub fn price_from_sqrt_price_x96(sqrt_price_x96: U256) -> (U256, U256) {
     let price = numerator.checked_div(denominator).unwrap_or_default();
     let rec = U256::ONE.checked_div(price).unwrap_or_default();
     (price, rec)
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct TickDetails {
+    block: u64,
+    pool: Address,
+    tick_spacing: i32,
+    current_tick: I24,
+    sqrt_price_x96: U160,
+    liquidity: u128,
+    ticks: Vec<TickSync>,
 }
 
 #[tokio::main]
@@ -63,70 +78,52 @@ async fn main() {
 
     let weth = WETH9::on_chain(CHAIN_ID).unwrap();
 
-    // Create a pool with a tick map data provider
     let pool = Pool::<EphemeralTickMapDataProvider>::from_pool_key_with_tick_data_provider(
-        CHAIN_ID,
+        1,
         FACTORY_ADDRESS,
-        link.address(),
+        weth.address(),
         usdt.address(),
-        FeeAmount::LOWEST,
-        provider.clone(),
+        FeeAmount::HIGH,
+        provider,
         None,
     )
     .await
     .unwrap();
 
-    println!("{}", pool.sqrt_ratio_x96);
-    // let amount_in = CurrencyAmount::from_raw_amount(link.clone(), 1000000000000000000u128).unwrap();
-    // let zero_for_one = amount_in.currency.equals(&pool.token0);
+    let amount_in = CurrencyAmount::from_raw_amount(weth.clone(), 1000000000000000000u128).unwrap();
+    let amount_out = pool.get_output_amount(&amount_in, None).await.unwrap();
+    println!("{}", pool.tick_spacing());
+    println!("{}", amount_out.quotient());
+    println!("{}", pool.address(None, None));
 
-    // let mut ticks_initialised = Vec::new();
-    // let mut ticks = Vec::new();
-    // let mut current_state = pool.tick_current;
-    // let mut count = 0;
-    // loop {
-    //     if let Ok((tick_next, initialized)) = pool
-    //         .tick_data_provider
-    //         .next_initialized_tick_within_one_word(current_state, zero_for_one, pool.tick_spacing())
-    //         .await
-    //     {
-    //         ticks_initialised.push((tick_next, initialized));
-    //         if let Ok(tick) = pool.tick_data_provider.get_tick(tick_next).await {
-    //             ticks.push(tick);
-    //         } else {
-    //             ticks_initialised.pop();
-    //             break;
-    //         }
-    //         current_state = if zero_for_one {
-    //             tick_next - pool.tick_spacing()
-    //         } else {
-    //             tick_next
-    //         };
-    //     } else {
-    //         break;
-    //     };
-    //     count += 1;
-    // }
-    // println!("{count}, {}, {}", ticks.len(), ticks_initialised.len());
+    let file = File::open("resources/ticks.json").unwrap();
+    let reader = BufReader::new(file);
+    let tick_details: Vec<TickDetails> = from_reader(reader).unwrap();
+
+    let pool_addr = address!("0x48da0965ab2d2cbf1c17c09cfb5cbe67ad5b1406");
+
+    let td = tick_details.iter().find(|t| t.pool == pool_addr).unwrap();
 
     let pool_1: Pool = Pool::new(
         link.clone(),
         usdt.clone(),
         FeeAmount::LOWEST,
-        pool.sqrt_ratio_x96,
-        pool.liquidity,
+        td.sqrt_price_x96,
+        td.liquidity,
     )
     .unwrap();
     println!("{}", pool_1.sqrt_ratio_x96);
 
-    // let amount_out = pool_1
-    //     .get_output_amount_sync(&amount_in, None, &ticks_initialised, &ticks)
-    //     .unwrap();
-    // println!(
-    //     "amount_out: {} / {}",
-    //     amount_out.numerator(),
-    //     amount_out.denominator()
-    // );
+    let amount_in = CurrencyAmount::from_raw_amount(link.clone(), 1000000000000000000u128).unwrap();
+
+    let amount_out = pool_1
+        .get_output_amount_sync(&amount_in, None, td.current_tick, &td.ticks )
+        .unwrap();
+    println!(
+        "amount_out: {} / {}",
+        amount_out.numerator(),
+        amount_out.denominator()
+    );
     // let amount_out = pool.get_output_amount(&amount_in, None).await.unwrap();
     // println!(
     //     "amount_out: {} / {}",

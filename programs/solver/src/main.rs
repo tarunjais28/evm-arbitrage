@@ -31,14 +31,14 @@ use std::{
 };
 use tokio::sync::{mpsc, Mutex};
 use uniswap_sdk_core::{prelude::*, token};
-use utils::{CustomError, info_time, debug_time};
+use utils::{debug_time, info_time, CustomError};
 
+mod contracts;
 mod dijkstra;
 mod enums;
 mod fetch;
-mod parser;
-mod contracts;
 mod helper;
+mod parser;
 mod pools;
 mod scanner;
 mod slippage;
