@@ -4,6 +4,7 @@ pub mod route;
 pub mod tick;
 pub mod tick_data_provider;
 pub mod tick_list_data_provider;
+pub mod tick_sync;
 pub mod trade;
 
 pub use pool::Pool;

@@ -1,4 +1,4 @@
-use crate::prelude::{Error, *};
+use crate::prelude::{tick_sync::TickSync, Error, *};
 use alloy_primitives::{aliases::I24, ChainId, B256, I256, U160};
 use uniswap_sdk_core::prelude::*;
 
@@ -276,8 +276,8 @@ impl<TP: TickDataProvider> Pool<TP> {
         zero_for_one: bool,
         amount_specified: I256,
         sqrt_price_limit_x96: Option<U160>,
-        ticks_initialised: &[(I24, bool)],
-        ticks: &[Tick<I24>],
+        current_tick: I24,
+        ticks: &[TickSync],
     ) -> Result<SwapState<I24>, Error> {
         v3_swap_simulation(
             self.fee.into(),
@@ -286,7 +286,7 @@ impl<TP: TickDataProvider> Pool<TP> {
             zero_for_one,
             amount_specified,
             sqrt_price_limit_x96,
-            ticks_initialised,
+            current_tick,
             ticks,
         )
     }
@@ -349,8 +349,8 @@ impl<TP: TickDataProvider> Pool<TP> {
         &self,
         input_amount: &CurrencyAmount<impl BaseCurrency>,
         sqrt_price_limit_x96: Option<U160>,
-        ticks_initialised: &[(I24, bool)],
-        ticks: &[Tick<I24>],
+        current_tick: I24,
+        ticks: &[TickSync],
     ) -> Result<CurrencyAmount<Token>, Error> {
         if !self.involves_token(&input_amount.currency) {
             return Err(Error::InvalidToken);
@@ -366,7 +366,7 @@ impl<TP: TickDataProvider> Pool<TP> {
             zero_for_one,
             I256::from_big_int(input_amount.quotient()),
             sqrt_price_limit_x96,
-            ticks_initialised,
+            current_tick,
             ticks,
         )?;
 
@@ -496,8 +496,8 @@ impl<TP: TickDataProvider> Pool<TP> {
         &self,
         output_amount: &CurrencyAmount<impl BaseCurrency>,
         sqrt_price_limit_x96: Option<U160>,
-        ticks_initialised: &[(I24, bool)],
-        ticks: &[Tick<I24>],
+        current_tick: I24,
+        ticks: &[TickSync],
     ) -> Result<CurrencyAmount<Token>, Error> {
         if !self.involves_token(&output_amount.currency) {
             return Err(Error::InvalidToken);
@@ -513,7 +513,7 @@ impl<TP: TickDataProvider> Pool<TP> {
             zero_for_one,
             I256::from_big_int(-output_amount.quotient()),
             sqrt_price_limit_x96,
-            ticks_initialised,
+            current_tick,
             ticks,
         )?;
 
