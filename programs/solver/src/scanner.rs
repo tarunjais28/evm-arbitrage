@@ -153,16 +153,14 @@ pub async fn scan<'a>(
                 update_reserve_abs(scanner, &mut *pool_data_v2.lock().await)?;
             });
         } else if let Ok(decoded) = log.log_decode() {
-            let _swap: IUniswapV3Pool::Swap = decoded.inner.data;
+            let swap: IUniswapV3Pool::Swap = decoded.inner.data;
             let pool_address = decoded.inner.address;
             log::info!("v3 swap captured, pool: {pool_address}",);
             let pool_data = &mut pool_data_v3.lock().await;
 
             // Update start price
             debug_time!("v3::calc_start_price_from_sqrt_price_x96", {
-                pool_data
-                    .calc_start_price_from_sqrt_price_x96(&provider, &pool_address)
-                    .await?;
+                pool_data.calc_start_price_from_sqrt_price_x96(&pool_address, swap)?;
             });
         }
     }

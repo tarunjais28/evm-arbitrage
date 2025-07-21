@@ -76,7 +76,6 @@ pub struct TickDetails {
     block: u64,
     pool: Address,
     tick_spacing: i32,
-    current_tick: I24,
     sqrt_price_x96: U160,
     liquidity: u128,
     ticks: Vec<TickSync>,
@@ -184,7 +183,6 @@ pub async fn get_pool_data<'a>(
                         liquidity,
                         ticks: all_ticks,
                         tick_spacing: tick_spacing.as_i32(),
-                        current_tick: slot0.tick,
                     }
                 })
             })

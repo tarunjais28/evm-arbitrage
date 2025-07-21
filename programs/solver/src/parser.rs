@@ -1,5 +1,7 @@
 use super::*;
 
+pub type TickMap = HashMap<Address, TickData>;
+
 #[derive(Debug, Serialize, Deserialize)]
 pub struct PoolAddress {
     pub v2: Vec<Address>,
@@ -12,12 +14,44 @@ impl PoolAddress {
     }
 }
 
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct TickDataReader {
+    block: u64,
+    pool: Address,
+    current_tick: I24,
+    sqrt_price_x96: U160,
+    liquidity: u128,
+    ticks: Vec<TickSync>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct TickData {
+    pub block: u64,
+    pub current_tick: I24,
+    pub sqrt_price_x96: U160,
+    pub liquidity: u128,
+    pub ticks: Vec<TickSync>,
+}
+
+impl From<TickDataReader> for TickData {
+    fn from(tdr: TickDataReader) -> Self {
+        Self {
+            block: tdr.block,
+            current_tick: tdr.current_tick,
+            sqrt_price_x96: tdr.sqrt_price_x96,
+            liquidity: tdr.liquidity,
+            ticks: tdr.ticks,
+        }
+    }
+}
+
 pub struct EnvParser {
     pub ws_address: String,
     pub pool_address: PoolAddress,
     pub token_metadata: Vec<TokenMetadata>,
     pub pools_v2: Vec<Pools>,
     pub pools_v3: Vec<Pools>,
+    pub tick_map: TickMap,
 }
 
 impl<'a> EnvParser {
@@ -40,12 +74,21 @@ impl<'a> EnvParser {
         let pools_v3_file = File::open(env::var("POOLS_V3_PATH")?)?;
         let pools_v3_reader = BufReader::new(pools_v3_file);
 
+        // Open ticks file
+        let ticks_file = File::open(env::var("TICKS_PATH")?)?;
+        let ticks_reader = BufReader::new(ticks_file);
+        let tick_data_reader: Vec<TickDataReader> = from_reader(ticks_reader)?;
+
         Ok(Self {
             ws_address: env::var("WEBSOCKET_ENDPOINT")?,
             pool_address: from_reader(pool_reader)?,
             pools_v2: from_reader(pools_v2_reader)?,
             token_metadata: from_reader(metadata_reader)?,
             pools_v3: from_reader(pools_v3_reader)?,
+            tick_map: tick_data_reader
+                .iter()
+                .map(|tdr| (tdr.pool, TickData::from(tdr.clone())))
+                .collect(),
         })
     }
 }

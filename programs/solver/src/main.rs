@@ -31,6 +31,7 @@ use std::{
 };
 use tokio::sync::{mpsc, Mutex};
 use uniswap_sdk_core::{prelude::*, token};
+use uniswap_v3_sdk::prelude::tick_sync::TickSync;
 use utils::{debug_time, info_time, CustomError};
 
 mod contracts;
@@ -82,7 +83,7 @@ async fn main() -> Result<(), anyhow::Error> {
         });
 
         debug_time!("calulate_start_price_v3()", {
-            pool_data_v3.calc_start_price(&provider).await?
+            pool_data_v3.calc_start_price(&env_parser.tick_map)?
         });
 
         // Scanning the ethereum blockchain for events

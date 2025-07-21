@@ -117,7 +117,7 @@ async fn main() {
     let amount_in = CurrencyAmount::from_raw_amount(link.clone(), 1000000000000000000u128).unwrap();
 
     let amount_out = pool_1
-        .get_output_amount_sync(&amount_in, None, td.current_tick, &td.ticks )
+        .get_output_amount_sync(&amount_in, None, td.current_tick, &td.ticks)
         .unwrap();
     println!(
         "amount_out: {} / {}",

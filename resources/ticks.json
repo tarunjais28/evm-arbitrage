@@ -2,7 +2,6 @@
   {
     "block": 22967780,
     "pool": "0x5777d92f208679db4b9778590fa3cab3ac9e2168",
-    "tick_spacing": 1,
     "current_tick": "-276324",
     "sqrt_price_x96": "0x10c71477d8cc8525e168",
     "liquidity": 286023857392589876110697,
@@ -330,7 +329,6 @@
   {
     "block": 22967789,
     "pool": "0x48da0965ab2d2cbf1c17c09cfb5cbe67ad5b1406",
-    "tick_spacing": 1,
     "current_tick": "-276328",
     "sqrt_price_x96": "0x10c63ae50c5cbe4bc7c9",
     "liquidity": 2643013092251871578802,
@@ -628,7 +626,6 @@
   {
     "block": 22967795,
     "pool": "0xd8dec118e1215f02e10db846dcbbfe27d477ac19",
-    "tick_spacing": 1,
     "current_tick": "-74028",
     "sqrt_price_x96": "0x652504d3aff4f2252791098",
     "liquidity": 5407362545736161987,
@@ -722,7 +719,6 @@
   {
     "block": 22967801,
     "pool": "0x4ea16ae82145731390d77485db5cfb616a9582a6",
-    "tick_spacing": 1,
     "current_tick": "-49008",
     "sqrt_price_x96": "0x16160750d081f4fc746cb49f",
     "liquidity": 0,
@@ -731,7 +727,6 @@
   {
     "block": 22967801,
     "pool": "0x2bedb3f68d12e4b2ee72f3de7227e51246353fcb",
-    "tick_spacing": 1,
     "current_tick": "-195635",
     "sqrt_price_x96": "0x3b3ebd480994c39c062f7",
     "liquidity": 0,
@@ -740,7 +735,6 @@
   {
     "block": 22967801,
     "pool": "0xa0d9fef6843337828a5ee8aa71f241811e52ad9d",
-    "tick_spacing": 1,
     "current_tick": "265053",
     "sqrt_price_x96": "0x8af82c8f011b59edbb95a5574a686",
     "liquidity": 0,
@@ -749,7 +743,6 @@
   {
     "block": 22967780,
     "pool": "0x026babd2ae9379525030fc2574e39bc156c10583",
-    "tick_spacing": 1,
     "current_tick": "70675",
     "sqrt_price_x96": "0x223f70b97a02555dbcbaf3ba62",
     "liquidity": 0,
@@ -758,7 +751,6 @@
   {
     "block": 22967787,
     "pool": "0xe0554a476a092703abdb3ef35c80e0d76d32939f",
-    "tick_spacing": 1,
     "current_tick": "193934",
     "sqrt_price_x96": "0x3f8033390d21ae87e498bf0bbdb5",
     "liquidity": 491774980868495840,
@@ -2742,7 +2734,6 @@
   {
     "block": 22967793,
     "pool": "0x3416cf6c708da44db2624d63ea0aaef7113527c6",
-    "tick_spacing": 1,
     "current_tick": "-5",
     "sqrt_price_x96": "0xfff1a08bdc9873e9815b8edf",
     "liquidity": 38620917552010436,
@@ -3424,7 +3415,6 @@
   {
     "block": 22967789,
     "pool": "0xf98cf0d979cfbb780774f318e3da4f7317af50d7",
-    "tick_spacing": 1,
     "current_tick": "70718",
     "sqrt_price_x96": "0x22521b95bfcf59a324404feddb",
     "liquidity": 1005807,
@@ -3452,7 +3442,6 @@
   {
     "block": 22967791,
     "pool": "0xc7bbec68d12a0d1830360f8ec58fa599ba1b0e9b",
-    "tick_spacing": 1,
     "current_tick": "-193938",
     "sqrt_price_x96": "0x407e8f6615b3c94aa10f9",
     "liquidity": 701636767883157765,
@@ -5340,7 +5329,6 @@
   {
     "block": 22967801,
     "pool": "0xe6ff8b9a37b0fab776134636d9981aa778c4e718",
-    "tick_spacing": 1,
     "current_tick": "264603",
     "sqrt_price_x96": "0x87dfc3b1a94199d3e817ffbd39f07",
     "liquidity": 904032011251,
@@ -5434,7 +5422,6 @@
   {
     "block": 22967780,
     "pool": "0x3209c64bf470fafecb8b87db3d8ac1baa3ecf629",
-    "tick_spacing": 10,
     "current_tick": "38049",
     "sqrt_price_x96": "0x6b3b5c90cec5cf55c703e25d8",
     "liquidity": 0,
@@ -5474,7 +5461,6 @@
   {
     "block": 22967787,
     "pool": "0x6c6bc977e13df9b0de53b251522280bb72383700",
-    "tick_spacing": 10,
     "current_tick": "-276323",
     "sqrt_price_x96": "0x10c73389f96a644cb9e8",
     "liquidity": 10310141883758006900526,
@@ -5814,7 +5800,6 @@
   {
     "block": 22967793,
     "pool": "0x6f48eca74b38d2936b02ab603ff4e36a6c0e3a77",
-    "tick_spacing": 10,
     "current_tick": "-276326",
     "sqrt_price_x96": "0x10c68b38a012859f6e41",
     "liquidity": 43771825155557120858,
@@ -5998,7 +5983,6 @@
   {
     "block": 22967793,
     "pool": "0xa93eb5b410b651514a18724872306f5ce9928dde",
-    "tick_spacing": 10,
     "current_tick": "332959",
     "sqrt_price_x96": "0x102fef787fca4e39bd73f6ccf808738",
     "liquidity": 0,
@@ -6007,7 +5991,6 @@
   {
     "block": 22967801,
     "pool": "0x60594a405d53811d3bc4766596efd80fd545a270",
-    "tick_spacing": 10,
     "current_tick": "-82377",
     "sqrt_price_x96": "0x42a0db90dd11db3c71b8c8a",
     "liquidity": 41963617074345712497727,
@@ -7067,7 +7050,6 @@
   {
     "block": 22967801,
     "pool": "0x55ec9256077a311256b2daf81f70c0992d9fbd66",
-    "tick_spacing": 10,
     "current_tick": "-247418",
     "sqrt_price_x96": "0x472eda57c0f55c7e08bd",
     "liquidity": 0,
@@ -7076,7 +7058,6 @@
   {
     "block": 22967780,
     "pool": "0x5d4f3c6fa16908609bac31ff148bd002aa6b8c83",
-    "tick_spacing": 10,
     "current_tick": "-52535",
     "sqrt_price_x96": "0x1283bf7c900911bfae45fb31",
     "liquidity": 417107473171704809311,
@@ -7206,7 +7187,6 @@
   {
     "block": 22967780,
     "pool": "0x22fe40544ac2b387f9a68c6c53b9a8e34e4dd40e",
-    "tick_spacing": 10,
     "current_tick": "-248463",
     "sqrt_price_x96": "0x438fe89c41d9c5beaec7",
     "liquidity": 0,
@@ -7215,7 +7195,6 @@
   {
     "block": 22967784,
     "pool": "0x19053608fa7472a4fee2ad11992652cc91e67972",
-    "tick_spacing": 10,
     "current_tick": "3650",
     "sqrt_price_x96": "0x1334084539b81f1fafd4178fc",
     "liquidity": 0,
@@ -7224,7 +7203,6 @@
   {
     "block": 22967780,
     "pool": "0x5ae13baaef0620fdae1d355495dc51a17adb4082",
-    "tick_spacing": 10,
     "current_tick": "-195051",
     "sqrt_price_x96": "0x3d0051e1db332bfb65ea1",
     "liquidity": 523890118663852310,
@@ -7840,7 +7818,6 @@
   {
     "block": 22967787,
     "pool": "0x7cb85f75e61226060453a997a7733f76707df337",
-    "tick_spacing": 10,
     "current_tick": "-196754",
     "sqrt_price_x96": "0x3805def67118158b768be",
     "liquidity": 0,
@@ -7849,7 +7826,6 @@
   {
     "block": 22967793,
     "pool": "0xbbc43895c8e9d58c537e437611303a5681613662",
-    "tick_spacing": 10,
     "current_tick": "264538",
     "sqrt_price_x96": "0x876f99d1649a174f82e1e9fa7807d",
     "liquidity": 0,
@@ -7858,7 +7834,6 @@
   {
     "block": 22967780,
     "pool": "0x9a772018fbd77fcd2d25657e5c547baff3fd7d16",
-    "tick_spacing": 10,
     "current_tick": "70725",
     "sqrt_price_x96": "0x2255527468e0b4617dbe1b0303",
     "liquidity": 869422830090,
@@ -8798,7 +8773,6 @@
   {
     "block": 22967789,
     "pool": "0x88e6a0c2ddd26feeb64f039a2c41296fcb3f5640",
-    "tick_spacing": 10,
     "current_tick": "193928",
     "sqrt_price_x96": "0x3f7b425b1de47ca4e8a183952711",
     "liquidity": 4312479144095625888,
@@ -16992,7 +16966,6 @@
   {
     "block": 22967795,
     "pool": "0x7858e59e0c01ea06df3af3d20ac7b0003275d4bf",
-    "tick_spacing": 10,
     "current_tick": "-8",
     "sqrt_price_x96": "0xffe90d1036ab79af55e7f609",
     "liquidity": 622443404612674,
@@ -17296,7 +17269,6 @@
   {
     "block": 22967801,
     "pool": "0x56534741cd8b152df6d48adf7ac51f75169a83b2",
-    "tick_spacing": 10,
     "current_tick": "70724",
     "sqrt_price_x96": "0x2254949d643478089a019b518f",
     "liquidity": 1100935782052,
@@ -17762,7 +17734,6 @@
   {
     "block": 22967802,
     "pool": "0x11b815efb8f581194ae79006d24e0d814b7697f6",
-    "tick_spacing": 10,
     "current_tick": "-193940",
     "sqrt_price_x96": "0x407c36e9250fa7b3d9887",
     "liquidity": 3267141652994724182,
@@ -20622,7 +20593,6 @@
   {
     "block": 22967802,
     "pool": "0x4585fe77225b41b697c938b018e2ac67ac5a20c0",
-    "tick_spacing": 10,
     "current_tick": "264670",
     "sqrt_price_x96": "0x8855135d8b379affe547a67c16438",
     "liquidity": 7053537805477155,
@@ -23050,7 +23020,6 @@
   {
     "block": 22967802,
     "pool": "0x477e1a178f308fb8c2967d3e56e157c4b8b6f5df",
-    "tick_spacing": 60,
     "current_tick": "81254",
     "sqrt_price_x96": "0x3a1eec944119211ce1a52a8bc5",
     "liquidity": 63644182813312066,
@@ -23066,7 +23035,6 @@
   {
     "block": 22967802,
     "pool": "0x689b322bf5056487eec7f9b2577cd43a37eb6302",
-    "tick_spacing": 60,
     "current_tick": "50548",
     "sqrt_price_x96": "0xc8500c2301cb28c389188f3fd",
     "liquidity": 3003075022095,
@@ -23112,7 +23080,6 @@
   {
     "block": 22967802,
     "pool": "0x091c0158ab410bd73ca1541409d5a22e90146a04",
-    "tick_spacing": 60,
     "current_tick": "29697",
     "sqrt_price_x96": "0x469fee04ad8cfc04f6e6de2a8",
     "liquidity": 72204048375680382702,
@@ -23218,7 +23185,6 @@
   {
     "block": 22967802,
     "pool": "0xa63b490aa077f541c9d64bfc1cc0db2a752157b5",
-    "tick_spacing": 60,
     "current_tick": "-276299",
     "sqrt_price_x96": "0x10cc5915185f28e0aee3",
     "liquidity": 10373484874050825,
@@ -23306,7 +23272,6 @@
   {
     "block": 22967802,
     "pool": "0x4773e2c1c0b400a16dfec4ca6e305141859a5542",
-    "tick_spacing": 60,
     "current_tick": "-276261",
     "sqrt_price_x96": "0x10d4b60bc1e4180c8239",
     "liquidity": 606590952538562,
@@ -23370,7 +23335,6 @@
   {
     "block": 22967803,
     "pool": "0x391e8501b626c623d39474afca6f9e46c2686649",
-    "tick_spacing": 60,
     "current_tick": "347096",
     "sqrt_price_x96": "0x20d186439bce864c9b293df3871b6b8",
     "liquidity": 3490509003902145,
@@ -23572,7 +23536,6 @@
   {
     "block": 22967801,
     "pool": "0xc2e9f25be6257c210d7adf0d4cd6e3e881ba25f8",
-    "tick_spacing": 60,
     "current_tick": "-82402",
     "sqrt_price_x96": "0x428b78b0c1339c7a6286c25",
     "liquidity": 159092249513770316215598,
@@ -26582,7 +26545,6 @@
   {
     "block": 22967802,
     "pool": "0x1415db6d7f91e79d1b03d179673fe63a6a6bc0b2",
-    "tick_spacing": 60,
     "current_tick": "-101089",
     "sqrt_price_x96": "0x1a24d8a3315908014f45089",
     "liquidity": 0,
@@ -26591,7 +26553,6 @@
   {
     "block": 22967802,
     "pool": "0xb1932ff4b443636f57a6fc96568905fc63b6bc20",
-    "tick_spacing": 60,
     "current_tick": "-238261",
     "sqrt_price_x96": "0x708508446d158ff2cef3",
     "liquidity": 0,
@@ -26600,7 +26561,6 @@
   {
     "block": 22967802,
     "pool": "0xc0c4a01dd88224e5d9833171294f606b27766333",
-    "tick_spacing": 60,
     "current_tick": "-887272",
     "sqrt_price_x96": "0x1000276a4",
     "liquidity": 0,
@@ -26609,7 +26569,6 @@
   {
     "block": 22967802,
     "pool": "0xa89a1cdf5fe93d754b6064b9f761747d03176c54",
-    "tick_spacing": 60,
     "current_tick": "-37140",
     "sqrt_price_x96": "0x27f9c39839a77a09564c2c9a",
     "liquidity": 442412540349468744,
@@ -26643,7 +26602,6 @@
   {
     "block": 22967803,
     "pool": "0xac5a2c404ebba22a869998089ac7893ff4e1f0a7",
-    "tick_spacing": 60,
     "current_tick": "-246511",
     "sqrt_price_x96": "0x4a7cfc7c1d4e43920b5d",
     "liquidity": 22692314857734307,
@@ -26911,7 +26869,6 @@
   {
     "block": 22967802,
     "pool": "0x618004783d422dfb792d07d742549d5a24648df2",
-    "tick_spacing": 60,
     "current_tick": "317766",
     "sqrt_price_x96": "0x792a8351d905ffe044f0e665c373fa",
     "liquidity": 113950042079,
@@ -26951,7 +26908,6 @@
   {
     "block": 22967803,
     "pool": "0xa6cc3c2531fdaa6ae1a3ca84c2855806728693e8",
-    "tick_spacing": 60,
     "current_tick": "-52533",
     "sqrt_price_x96": "0x1284400d6c360056566901e0",
     "liquidity": 333749540545354373631844,
@@ -29523,7 +29479,6 @@
   {
     "block": 22967803,
     "pool": "0xfad57d2039c21811c8f2b5d5b65308aa99d31559",
-    "tick_spacing": 60,
     "current_tick": "-246456",
     "sqrt_price_x96": "0x4ab0ed6dd0a28aa97aed",
     "liquidity": 205212634363401715,
@@ -30331,7 +30286,6 @@
   {
     "block": 22967802,
     "pool": "0x8a7e585048bda875e64024118c506b14f78166dd",
-    "tick_spacing": 60,
     "current_tick": "887271",
     "sqrt_price_x96": "0xfffd8963efd1fc6a506488495d951d5263988d25",
     "liquidity": 0,
@@ -30340,7 +30294,6 @@
   {
     "block": 22967803,
     "pool": "0xb431c70f800100d87554ac1142c4a94c5fe4c0c4",
-    "tick_spacing": 60,
     "current_tick": "-195069",
     "sqrt_price_x96": "0x3cf2563e9734a0770d2b2",
     "liquidity": 684502007353681819,
@@ -30878,7 +30831,6 @@
   {
     "block": 22967803,
     "pool": "0x123712f44b4fd26b36b8d4c81e2ed01ae6e9607a",
-    "tick_spacing": 60,
     "current_tick": "-195147",
     "sqrt_price_x96": "0x3cb59c47cf27839456e61",
     "liquidity": 568509079517995,
@@ -30930,7 +30882,6 @@
   {
     "block": 22967780,
     "pool": "0x5a2abdc02ecc86fa3d015f498ec2f2c190c11700",
-    "tick_spacing": 60,
     "current_tick": "264521",
     "sqrt_price_x96": "0x875235a7c6e5a8b4030c3d9a8eef2",
     "liquidity": 0,
@@ -30939,7 +30890,6 @@
   {
     "block": 22967787,
     "pool": "0x73a6a761fe483ba19debb8f56ac5bbf14c0cdad1",
-    "tick_spacing": 60,
     "current_tick": "-82249",
     "sqrt_price_x96": "0x430e9235fe5d956b77d4ef5",
     "liquidity": 100508545450395391982,
@@ -32497,7 +32447,6 @@
   {
     "block": 22967793,
     "pool": "0x206c9f6ad08a8f2a3cc05bd3939cd49287560096",
-    "tick_spacing": 60,
     "current_tick": "-887272",
     "sqrt_price_x96": "0x1000276a4",
     "liquidity": 0,
@@ -32531,7 +32480,6 @@
   {
     "block": 22967801,
     "pool": "0x8ad599c3a0ff1de082011efddc58f1908eb6e6d8",
-    "tick_spacing": 60,
     "current_tick": "193923",
     "sqrt_price_x96": "0x3f7738e86971af25ad63a34d656a",
     "liquidity": 1349959364939372710,
@@ -36705,7 +36653,6 @@
   {
     "block": 22967802,
     "pool": "0x99ac8ca7087fa4a2a1fb6357269965a2014abc35",
-    "tick_spacing": 60,
     "current_tick": "70748",
     "sqrt_price_x96": "0x225f426e8ba21e259a6198e98f",
     "liquidity": 18113112026093,
@@ -38509,7 +38456,6 @@
   {
     "block": 22967802,
     "pool": "0x3b330ea8ec7332f37cc5a7b03e05c6450329d6fb",
-    "tick_spacing": 60,
     "current_tick": "-81121",
     "sqrt_price_x96": "0x46f3153506c456ff12d5d4a",
     "liquidity": 0,
@@ -38555,7 +38501,6 @@
   {
     "block": 22967802,
     "pool": "0xee4cf3b78a74affa38c6a926282bcd8b5952818d",
-    "tick_spacing": 60,
     "current_tick": "1",
     "sqrt_price_x96": "0x10005b70f2fcdf0c73c7835e7",
     "liquidity": 56795218249306,
@@ -38697,7 +38642,6 @@
   {
     "block": 22967802,
     "pool": "0x9db9e0e53058c89e5b94e29621a205198648425b",
-    "tick_spacing": 60,
     "current_tick": "70744",
     "sqrt_price_x96": "0x225d99466925b2900f138b42c5",
     "liquidity": 2813612288522,
@@ -39703,7 +39647,6 @@
   {
     "block": 22967803,
     "pool": "0x4e68ccd3e89f51c3074ca5072bbac773960dfa36",
-    "tick_spacing": 60,
     "current_tick": "-193926",
     "sqrt_price_x96": "0x4087c46bca3fa31822a14",
     "liquidity": 7280966997899996250,
@@ -43007,7 +42950,6 @@
   {
     "block": 22967803,
     "pool": "0xcbcdf9626bc03e24f779434178a73a0b4bad62ed",
-    "tick_spacing": 60,
     "current_tick": "264649",
     "sqrt_price_x96": "0x882fca09755084e6a5d0fab26c662",
     "liquidity": 28153489877441058,
@@ -45783,7 +45725,6 @@
   {
     "block": 22967803,
     "pool": "0x986177ed873483bd746c6207edccc8488cc93a09",
-    "tick_spacing": 60,
     "current_tick": "-40260",
     "sqrt_price_x96": "0x2233af7cbdc81083d688622e",
     "liquidity": 0,
@@ -45792,7 +45733,6 @@
   {
     "block": 22967803,
     "pool": "0x3bb7c94ebe2b131c29351b964b066169c685394b",
-    "tick_spacing": 60,
     "current_tick": "-121621",
     "sqrt_price_x96": "0x95d9e9f3b91ff4bff1c473",
     "liquidity": 0,
@@ -45801,7 +45741,6 @@
   {
     "block": 22967801,
     "pool": "0x851c7e37f2c88cf4fa2a825a0e924dd0e9bc6a66",
-    "tick_spacing": 60,
     "current_tick": "87117",
     "sqrt_price_x96": "0x4deaa9aff294c0879a8139aae1",
     "liquidity": 0,
@@ -45823,7 +45762,6 @@
   {
     "block": 22967802,
     "pool": "0x17474e83216942d6d7bce129ef5957c94194c716",
-    "tick_spacing": 200,
     "current_tick": "253998",
     "sqrt_price_x96": "0x4ff5ef2ca7587f6b7aba282fcde7d",
     "liquidity": 17797613218730,
@@ -45869,7 +45807,6 @@
   {
     "block": 22967802,
     "pool": "0x0ecff5d9acdbd54274aed608ce6e39569854a3c1",
-    "tick_spacing": 200,
     "current_tick": "74717",
     "sqrt_price_x96": "0x29ea72e6af8435c8b24d6c4283",
     "liquidity": 0,
@@ -45878,7 +45815,6 @@
   {
     "block": 22967802,
     "pool": "0xb80946cd2b4b68bedd769a21ca2f096ead6e0ee8",
-    "tick_spacing": 200,
     "current_tick": "46999",
     "sqrt_price_x96": "0xa7bfd2394ecd497f1c79901de",
     "liquidity": 5784109000065219156,
@@ -45918,7 +45854,6 @@
   {
     "block": 22967802,
     "pool": "0x6958686b6348c3d6d5f2dca3106a5c09c156873a",
-    "tick_spacing": 200,
     "current_tick": "-276392",
     "sqrt_price_x96": "0x10b88d82dcb7b110b99d",
     "liquidity": 163620348564489,
@@ -45964,7 +45899,6 @@
   {
     "block": 22967802,
     "pool": "0x649caaf37f36e67d1129c0fd6c6539d390ca2b82",
-    "tick_spacing": 200,
     "current_tick": "344834",
     "sqrt_price_x96": "0x1d4f1a2be3ae44e63485706c8b270aa",
     "liquidity": 0,
@@ -45973,7 +45907,6 @@
   {
     "block": 22967802,
     "pool": "0xa80964c5bbd1a0e95777094420555fead1a26c1e",
-    "tick_spacing": 200,
     "current_tick": "-82466",
     "sqrt_price_x96": "0x42556bd75b53dc3bb57c539",
     "liquidity": 41640323438063367975,
@@ -46277,7 +46210,6 @@
   {
     "block": 22967802,
     "pool": "0x63bdfe1166c2d518879dfe42af6c3fa2c6a70619",
-    "tick_spacing": 200,
     "current_tick": "-322001",
     "sqrt_price_x96": "0x1b5b1118e6d1425add4",
     "liquidity": 0,
@@ -46286,7 +46218,6 @@
   {
     "block": 22967802,
     "pool": "0x44f9469d0d5393d3a01a0d4fa14fe7713c1ad1f7",
-    "tick_spacing": 200,
     "current_tick": "-114720",
     "sqrt_price_x96": "0xd3989a9be6df00c614d2e5",
     "liquidity": 1763887950441594907539,
@@ -46470,7 +46401,6 @@
   {
     "block": 22967802,
     "pool": "0x132a6e4fd04b862a83bf95127d23be2c3ab28502",
-    "tick_spacing": 200,
     "current_tick": "-887272",
     "sqrt_price_x96": "0x1000276a4",
     "liquidity": 0,
@@ -46479,7 +46409,6 @@
   {
     "block": 22967802,
     "pool": "0xffb2a30e51ec15cf6853912fba181ef0cc666199",
-    "tick_spacing": 200,
     "current_tick": "-234971",
     "sqrt_price_x96": "0x84a17f8766c51bb98291",
     "liquidity": 0,
@@ -46488,7 +46417,6 @@
   {
     "block": 22967803,
     "pool": "0xa7837df2fbf7de553aa23cdbfb81d2ca1a8a0a5a",
-    "tick_spacing": 200,
     "current_tick": "-228572",
     "sqrt_price_x96": "0xb6a33b6e182521c05a72",
     "liquidity": 0,
@@ -46497,7 +46425,6 @@
   {
     "block": 22967801,
     "pool": "0xbaec0e18c770993ffb1175fef493b5113cc6e32d",
-    "tick_spacing": 200,
     "current_tick": "-55598",
     "sqrt_price_x96": "0xfe2e9a8c0e89c577d35772f",
     "liquidity": 2520325644311685394349,
@@ -46759,7 +46686,6 @@
   {
     "block": 22967802,
     "pool": "0x106a1a525e9b404d02db8a21dbe4c30f4c807107",
-    "tick_spacing": 200,
     "current_tick": "-247520",
     "sqrt_price_x96": "0x46d2aa0015690f396b05",
     "liquidity": 0,
@@ -46768,7 +46694,6 @@
   {
     "block": 22967802,
     "pool": "0x3a0f221ea8b150f3d3d27de8928851ab5264bb65",
-    "tick_spacing": 200,
     "current_tick": "-52497",
     "sqrt_price_x96": "0x128cd106fff955a6454f9b42",
     "liquidity": 1041426331762253332450,
@@ -46934,7 +46859,6 @@
   {
     "block": 22967802,
     "pool": "0xd24b1542323096ccbf9cba3b13c5b9eb4a92c506",
-    "tick_spacing": 200,
     "current_tick": "-257916",
     "sqrt_price_x96": "0x2a1d88f8b031475bc30a",
     "liquidity": 0,
@@ -46943,7 +46867,6 @@
   {
     "block": 22967802,
     "pool": "0xcb1abb2731a48d8819f03808013c0a0e48d9b3d9",
-    "tick_spacing": 200,
     "current_tick": "-1171",
     "sqrt_price_x96": "0xf1718308a4a23d8c0875930c",
     "liquidity": 15029978381396468948,
@@ -47139,7 +47062,6 @@
   {
     "block": 22967803,
     "pool": "0x1d61fb4c87361f27bd3be39a06d1a19f0c5d696b",
-    "tick_spacing": 200,
     "current_tick": "-195116",
     "sqrt_price_x96": "0x3ccdd778cb9420c7566b9",
     "liquidity": 1319412678304848,
@@ -47161,7 +47083,6 @@
   {
     "block": 22967803,
     "pool": "0xeee645ef3736d63358852dec46be7cda61e5aeef",
-    "tick_spacing": 200,
     "current_tick": "69780",
     "sqrt_price_x96": "0x20bf61c4a80c2935d90e602344",
     "liquidity": 0,
@@ -47170,7 +47091,6 @@
   {
     "block": 22967803,
     "pool": "0xe0397c1c28e587b55ad18c126cdcc5cdeeaffe41",
-    "tick_spacing": 200,
     "current_tick": "-130566",
     "sqrt_price_x96": "0x5fcfeafdb3ade8b2ec37ad",
     "liquidity": 3515098414274502,
@@ -47192,7 +47112,6 @@
   {
     "block": 22967803,
     "pool": "0x184c33b7b1089747440057e46b4e2bb61f09bc8d",
-    "tick_spacing": 200,
     "current_tick": "-275750",
     "sqrt_price_x96": "0x11441439adab414175e8",
     "liquidity": 26007307862512,
@@ -47292,7 +47211,6 @@
   {
     "block": 22967803,
     "pool": "0x19e286157200418d6a1f7d1df834b82e65c920aa",
-    "tick_spacing": 200,
     "current_tick": "-85258",
     "sqrt_price_x96": "0x39b0c5ba365574500d2826c",
     "liquidity": 245630069020613832,
@@ -47356,7 +47274,6 @@
   {
     "block": 22967803,
     "pool": "0xefcf2a3680cc89956eb6c30acd48c04004f3bebf",
-    "tick_spacing": 200,
     "current_tick": "-236475",
     "sqrt_price_x96": "0x7b072e8781a689e60a9f",
     "liquidity": 0,
@@ -47365,7 +47282,6 @@
   {
     "block": 22967803,
     "pool": "0xcbfb0745b8489973bf7b334d54fdbd573df7ef3c",
-    "tick_spacing": 200,
     "current_tick": "70748",
     "sqrt_price_x96": "0x225f180ded2e11eb3fa6120fcc",
     "liquidity": 8330542402,
@@ -47507,7 +47423,6 @@
   {
     "block": 22967803,
     "pool": "0x7bea39867e4169dbe237d55c8242a8f2fcdcc387",
-    "tick_spacing": 200,
     "current_tick": "193900",
     "sqrt_price_x96": "0x3f64ab4e350a4c3250bc37dcbb46",
     "liquidity": 11918348410976735,
@@ -48267,7 +48182,6 @@
   {
     "block": 22967803,
     "pool": "0x500cb7defd8302f1f97e38ac628e8c2eaf7307b6",
-    "tick_spacing": 200,
     "current_tick": "-887272",
     "sqrt_price_x96": "0x1000276a4",
     "liquidity": 0,
@@ -48325,7 +48239,6 @@
   {
     "block": 22967803,
     "pool": "0xbb256c2f1b677e27118b0345fd2b3894d2e6d487",
-    "tick_spacing": 200,
     "current_tick": "58",
     "sqrt_price_x96": "0x100bfc4a837f4129f4ffbf951",
     "liquidity": 12109533123,
@@ -48389,7 +48302,6 @@
   {
     "block": 22967803,
     "pool": "0x105f7a72d9449d48e7094dae8d7102420c34bfc8",
-    "tick_spacing": 200,
     "current_tick": "-313801",
     "sqrt_price_x96": "0x29382119c32b9592226",
     "liquidity": 0,
@@ -48411,7 +48323,6 @@
   {
     "block": 22967803,
     "pool": "0x5a59e4e647a3acc42b01715f3a1d271c1f7e7aeb",
-    "tick_spacing": 200,
     "current_tick": "67350",
     "sqrt_price_x96": "0x1d0064730f0f11d4e7eccb4773",
     "liquidity": 0,
@@ -48420,7 +48331,6 @@
   {
     "block": 22967803,
     "pool": "0xc5af84701f98fa483ece78af83f11b6c38aca71d",
-    "tick_spacing": 200,
     "current_tick": "-193909",
     "sqrt_price_x96": "0x40966266ae956a8e3d461",
     "liquidity": 28501881533500967,
@@ -49042,7 +48952,6 @@
   {
     "block": 22967803,
     "pool": "0x6ab3bba2f41e7eaa262fa5a1a9b3932fa161526f",
-    "tick_spacing": 200,
     "current_tick": "264700",
     "sqrt_price_x96": "0x888a177a397dda134c06bcda03384",
     "liquidity": 57226501143050,
@@ -49328,7 +49237,6 @@
   {
     "block": 22967803,
     "pool": "0x5b60eed941aa99bb2d8ee6359872ed64e64280c8",
-    "tick_spacing": 200,
     "current_tick": "-62729",
     "sqrt_price_x96": "0xb1f25f8dd79ecc5806661fd",
     "liquidity": 194405073738286729,
@@ -49542,7 +49450,6 @@
   {
     "block": 22967803,
     "pool": "0x241fc1cdbf9f741933e5fa515c5b884da93b81b6",
-    "tick_spacing": 200,
     "current_tick": "-887272",
     "sqrt_price_x96": "0x1000276a4",
     "liquidity": 0,
@@ -49564,7 +49471,6 @@
   {
     "block": 22967803,
     "pool": "0xceb63a909d95c9222cdf5b08044f5dae72cd036e",
-    "tick_spacing": 200,
     "current_tick": "-112358",
     "sqrt_price_x96": "0xee1c97655c5780bc86c018",
     "liquidity": 3732192703547912513544,
@@ -49790,7 +49696,6 @@
   {
     "block": 22967803,
     "pool": "0x67a628809c4e7f357cb3900a57db3ade9f2bd570",
-    "tick_spacing": 200,
     "current_tick": "-887272",
     "sqrt_price_x96": "0x1000276a4",
     "liquidity": 0,
@@ -49812,7 +49717,6 @@
   {
     "block": 22967803,
     "pool": "0x47841ec00564a33402f16b876ed148b52dfbe188",
-    "tick_spacing": 200,
     "current_tick": "-887272",
     "sqrt_price_x96": "0x1000276a4",
     "liquidity": 0,
@@ -49906,7 +49810,6 @@
   {
     "block": 22967803,
     "pool": "0x89b1bae19f78cabc79ee6d2b8a1a5febee07a13e",
-    "tick_spacing": 200,
     "current_tick": "196155",
     "sqrt_price_x96": "0x46f523cf39983350167b580c667f",
     "liquidity": 0,
