@@ -89,7 +89,10 @@ impl PoolData {
         ) {
             Ok(amount1) => {
                 println!("{}", format!("     found: {}", swap.amount1).green());
-                println!("{}", format!("calculated: {}\n", amount1.quotient()).green());
+                println!(
+                    "{}",
+                    format!("calculated: {}\n", amount1.quotient()).green()
+                );
             }
             Err(err) => log::error!("{err}"),
         };

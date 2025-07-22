@@ -330,9 +330,12 @@ pub fn v3_swap_simulation(
         liquidity,
     };
 
+    let mut runs = 0;
+
     // start swap while loop
     while !state.amount_specified_remaining.is_zero()
         && state.sqrt_price_x96 != sqrt_price_limit_x96
+        && runs <= ticks.len()
     {
         let mut step = StepComputations {
             sqrt_price_start_x96: state.sqrt_price_x96,
@@ -402,6 +405,8 @@ pub fn v3_swap_simulation(
             // ticks), and haven't moved
             state.tick_current = I24::from_i24(state.sqrt_price_x96.get_tick_at_sqrt_ratio()?);
         }
+
+        runs += 1;
     }
 
     Ok(state)
