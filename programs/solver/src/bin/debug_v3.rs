@@ -43,7 +43,6 @@ pub fn price_from_sqrt_price_x96(sqrt_price_x96: U256) -> (U256, U256) {
 pub struct TickDetails {
     block: u64,
     pool: Address,
-    tick_spacing: i32,
     current_tick: I24,
     sqrt_price_x96: U160,
     liquidity: u128,
@@ -60,10 +59,10 @@ async fn main() {
     let provider = ProviderBuilder::new().connect_ws(ws).await.unwrap();
 
     const CHAIN_ID: u64 = 1;
-    let link = token!(
+    let usdc = token!(
         CHAIN_ID,
-        "0x6b175474e89094c44da98b954eedeac495271d0f",
-        18,
+        "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        6,
         "LINK",
         "ChainLink Token"
     );
@@ -78,43 +77,55 @@ async fn main() {
 
     let weth = WETH9::on_chain(CHAIN_ID).unwrap();
 
-    let pool = Pool::<EphemeralTickMapDataProvider>::from_pool_key_with_tick_data_provider(
-        1,
-        FACTORY_ADDRESS,
-        weth.address(),
-        usdt.address(),
-        FeeAmount::HIGH,
-        provider,
-        None,
-    )
-    .await
-    .unwrap();
+    // let pool = Pool::<EphemeralTickMapDataProvider>::from_pool_key_with_tick_data_provider(
+    //     1,
+    //     FACTORY_ADDRESS,
+    //     usdc.address,
+    //     weth.address,
+    //     FeeAmount::LOWEST,
+    //     provider,
+    //     None,
+    // )
+    // .await
+    // .unwrap();
 
-    let amount_in = CurrencyAmount::from_raw_amount(weth.clone(), 1000000000000000000u128).unwrap();
-    let amount_out = pool.get_output_amount(&amount_in, None).await.unwrap();
-    println!("{}", pool.tick_spacing());
-    println!("{}", amount_out.quotient());
-    println!("{}", pool.address(None, None));
+    let amount_in = CurrencyAmount::from_raw_amount(usdc.clone(), 1000000000000000000u128).unwrap();
+    // let zero_for_one = amount_in.currency.equals(&pool.token0);
+
+    // let (tick_next, initialized) = pool
+    //     .tick_data_provider
+    //     .next_initialized_tick_within_one_word(pool.tick_current, zero_for_one, pool.tick_spacing())
+    //     .await
+    //     .unwrap();
+
+    // println!("{}, {tick_next}", pool.tick_current); // 193934
+
+    // let amount_out = pool.get_output_amount(&amount_in, None).await.unwrap();
+    // println!("amount_out: {}", amount_out.quotient(),);
+
+    // let amount_in = CurrencyAmount::from_raw_amount(weth.clone(), 1000000000000000000u128).unwrap();
+    // let amount_out = pool.get_output_amount(&amount_in, None).await.unwrap();
+    // println!("{}", pool.tick_spacing());
+    // println!("{}", amount_out.quotient());
+    // println!("{}", pool.address(None, None));
 
     let file = File::open("resources/ticks.json").unwrap();
     let reader = BufReader::new(file);
     let tick_details: Vec<TickDetails> = from_reader(reader).unwrap();
 
-    let pool_addr = address!("0x48da0965ab2d2cbf1c17c09cfb5cbe67ad5b1406");
+    let pool_addr = address!("0xe0554a476a092703abdb3ef35c80e0d76d32939f");
 
     let td = tick_details.iter().find(|t| t.pool == pool_addr).unwrap();
 
     let pool_1: Pool = Pool::new(
-        link.clone(),
-        usdt.clone(),
+        usdc.clone(),
+        weth.clone(),
         FeeAmount::LOWEST,
         td.sqrt_price_x96,
         td.liquidity,
     )
     .unwrap();
     println!("{}", pool_1.sqrt_ratio_x96);
-
-    let amount_in = CurrencyAmount::from_raw_amount(link.clone(), 1000000000000000000u128).unwrap();
 
     let amount_out = pool_1
         .get_output_amount_sync(&amount_in, None, td.current_tick, &td.ticks)
@@ -124,6 +135,7 @@ async fn main() {
         amount_out.numerator(),
         amount_out.denominator()
     );
+
     // let amount_out = pool.get_output_amount(&amount_in, None).await.unwrap();
     // println!(
     //     "amount_out: {} / {}",
@@ -152,11 +164,3 @@ async fn main() {
     //     amount_in.denominator()
     // );
 }
-
-// expected: 335609224399286 / 1, 2980871771211812930840 / 1
-// found: 335609224399286 / 1, 999999999999997765 / 1
-// 0x6B175474E89094C44Da98b954EedeAC495271d0F, 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2, 0xC2e9F25Be6257c210d7Adf0D4Cd6E3E881ba25f8
-
-// expected: 336837542675735 / 1, 2970677075917217228468 / 1
-// found: 336837542675735 / 1, 999999999999998894 / 1
-// 0x6B175474E89094C44Da98b954EedeAC495271d0F, 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2, 0x60594a405d53811d3BC4766596EFD80fd545A270

@@ -88,8 +88,8 @@ impl PoolData {
             &token_data.ticks,
         ) {
             Ok(amount1) => {
-                log::info!("found: {}", swap.amount1);
-                log::info!("calculated: {}", amount1.quotient());
+                println!("{}", format!("     found: {}", swap.amount1).green());
+                println!("{}", format!("calculated: {}\n", amount1.quotient()).green());
             }
             Err(err) => log::error!("{err}"),
         };

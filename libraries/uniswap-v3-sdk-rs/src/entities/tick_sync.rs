@@ -23,11 +23,13 @@ pub fn get_next_initialized_tick(
     ticks: &[TickSync],
     zero_for_one: bool,
 ) -> Result<TickSync, Error> {
-    let idx = ticks
-        .binary_search_by_key(&current_tick, |t| t.index)
-        .map_err(|_| Error::NoTickDataError)?;
-
     if zero_for_one {
+        let idx = ticks
+            .iter()
+            .rev()
+            .position(|t| t.index.le(&current_tick))
+            .ok_or_else(|| Error::NoTickDataError)?;
+
         for i in (0..=idx).rev() {
             let tick = ticks[i];
             if tick.is_init {
@@ -35,6 +37,11 @@ pub fn get_next_initialized_tick(
             }
         }
     } else {
+        let idx = ticks
+            .iter()
+            .position(|t| t.index.gt(&current_tick))
+            .ok_or_else(|| Error::NoTickDataError)?;
+
         for i in idx..ticks.len() {
             let tick = ticks[i];
             if tick.is_init {
