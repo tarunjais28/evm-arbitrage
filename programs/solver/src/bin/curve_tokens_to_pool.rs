@@ -1,7 +1,8 @@
 use std::{
     collections::HashSet,
     fs::File,
-    io::{BufReader, Write}, sync::{Arc, Mutex},
+    io::{BufReader, Write},
+    sync::{Arc, Mutex},
 };
 
 use alloy::{

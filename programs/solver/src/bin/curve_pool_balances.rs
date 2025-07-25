@@ -1,6 +1,7 @@
 use std::{
     fs::File,
-    io::{BufReader, Write}, sync::Arc,
+    io::{BufReader, Write},
+    sync::Arc,
 };
 
 use alloy::{

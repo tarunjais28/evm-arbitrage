@@ -23,7 +23,7 @@ sol!(
     "../../resources/contracts/erc20_abi.json"
 );
 
-pub async fn get_pool_data<'a>(
+pub async fn get_pool_data(
     provider: &FillProvider<
         JoinFill<
             Identity,
@@ -34,10 +34,11 @@ pub async fn get_pool_data<'a>(
     pool: Address,
     n: usize,
 ) {
+    let pres = BigInt::from(100000000000000000u128);
     let contract = CurvePool::new(pool, provider.clone());
     let mut x = Vec::with_capacity(n);
     let mut precisions = Vec::with_capacity(n);
-    (0..n).into_iter().for_each(|_| {
+    (0..n).for_each(|_| {
         x.push(U256::ZERO);
     });
     let a;
@@ -65,67 +66,64 @@ pub async fn get_pool_data<'a>(
     }
 
     let xp = vec![
-        Fraction::new(x[0].to_big_int(), BigInt::from(precisions[0])),
-        Fraction::new(x[1].to_big_int(), BigInt::from(precisions[1])),
-        Fraction::new(x[2].to_big_int(), BigInt::from(precisions[2])),
+        x[0].to_big_int() * pres / BigInt::from(precisions[0]),
+        x[1].to_big_int() * pres / BigInt::from(precisions[1]),
+        x[2].to_big_int() * pres / BigInt::from(precisions[2]),
     ];
 
-    let s: Fraction = xp[0].clone() + xp[1].clone() + xp[2].clone();
+    let s: BigInt = xp.iter().sum();
     let ann = a * U256::from(n);
 
-    // let dp = get_dp(s.clone(), n, xp.clone());
     let d_new = get_d_new(ann, s, n, xp.clone());
+    println!("d_new: {}", d_new);
 
     let i = 1;
     let j = 0;
-    let amount_in = Fraction::new(1000000000, BigInt::from(precisions[i]));
-    let fee = Fraction::new(fee.to_big_int(), BigInt::from(10000000000u64));
-    let fract_one = Fraction::new(1, 1);
+    let amount_in = pres * BigInt::from(1000000000) / BigInt::from(precisions[i]);
+    let fee = fee.to_big_int() * pres / BigInt::from(10000000000u64);
+    let fract_one = BigInt::ONE;
     let amount = (fract_one - fee) * amount_in;
 
-    let xi_ = amount + xp[i].clone();
+    let xi_ = amount + xp[i];
     let mut xp_ = xp.clone();
-    xp_[i] = xi_.clone();
-    let mut s_j = Fraction::default();
+    xp_[i] = xi_;
+    println!("xp_: {}", x[0].to_big_int() / pres);
+    let mut s_j = BigInt::default();
 
     for k in 0..n {
         if k != j {
-            s_j = s_j + xp[k].clone();
+            s_j += xp[k];
         }
     }
 
     let y = get_y(i, j, d_new, xp_, xi_, ann, n);
-    // println!("{}", y.quotient());
-    let precision = Fraction::new(precisions[j], 1);
-    let amount_out = y * precision;
-    println!("{}", amount_out.quotient());
+    println!("{}", y);
 }
 
-fn get_d_new(ann: U256, s: Fraction, n: usize, xp: Vec<Fraction>) -> Fraction {
+fn get_d_new(ann: U256, s: BigInt, n: usize, xp: Vec<BigInt>) -> BigInt {
     let ann_org = ann;
-    let ann = Fraction::new(ann_org.to_big_int(), 1);
-    let ann_1 = Fraction::new((ann_org - U256::ONE).to_big_int(), 1);
-    let mut d = s.clone();
+    let ann = ann_org.to_big_int();
+    let ann_1 = (ann_org - U256::ONE).to_big_int();
+    let mut d = s;
     let n_org = n;
-    let n = Fraction::new(BigInt::from(n_org), 1);
-    let n_1 = Fraction::new(BigInt::from(n_org + 1), 1);
+    let n = BigInt::from(n_org);
+    let n_1 = BigInt::from(n_org + 1);
 
-    if s.numerator().is_zero() {
-        return Fraction::default();
+    if s.is_zero() {
+        return BigInt::default();
     }
 
     let mut d_prev;
     let mut count = 0;
     let mut d_p;
     for i in 0..255 {
-        d_p = d.clone();
+        d_p = d;
         for _x in xp.clone() {
-            d_p = d_p * d.clone() / (_x * n_1.clone());
+            d_p = d_p * d / (_x * n_1);
         }
-        println!("d_p = {}", d_p.quotient());
-        d_prev = d.clone();
-        d = (((ann.clone() * s.clone()) + (n.clone() * d_p.clone())) * d.clone())
-            / ((ann_1.clone() * d.clone()) + (n_1.clone() * d_p.clone()));
+        println!("d_p = {}", d_p);
+        d_prev = d;
+        d = (((ann * s) + (n * d_p)) * d) / ((ann_1 * d) + (n_1 * d_p));
 
         count = i + 1;
         if is_abs_le_0(&d, &d_prev) {
@@ -140,40 +138,39 @@ fn get_d_new(ann: U256, s: Fraction, n: usize, xp: Vec<Fraction>) -> Fraction {
 fn get_y(
     i: usize,
     j: usize,
-    d: Fraction,
-    xp_: Vec<Fraction>,
-    x_: Fraction,
+    d: BigInt,
+    xp_: Vec<BigInt>,
+    x_: BigInt,
     ann: U256,
     n: usize,
-) -> Fraction {
-    let mut c = d.clone();
-    let mut s_ = Fraction::default();
-    let ann = Fraction::new(ann.to_big_int(), 1);
-    let mut _x = Fraction::default();
-    let annn = Fraction::new(ann.numerator() * BigInt::from(n), ann.denominator());
+) -> BigInt {
+    let mut c = d;
+    let mut s_ = BigInt::default();
+    let ann = ann.to_big_int();
+    let mut _x = BigInt::default();
+    let annn = ann * BigInt::from(n);
 
     for _i in 0..n {
         if _i == i {
-            _x = x_.clone();
+            _x = x_;
         } else if _i != j {
-            _x = xp_[_i].clone();
+            _x = xp_[_i];
         } else {
             continue;
         }
-        s_ = s_ + _x;
-        c = c * d.clone() / (ann.clone() * Fraction::new(BigInt::from(n), 1));
+        s_ += _x;
+        c = c * d / (_x * BigInt::from(n));
     }
 
-    c = c * d.clone() / annn;
-    let b = (s_ + d.clone()) / ann;
+    c = c * d / annn;
+    let b = (s_ + d) / ann;
     let mut y_prev;
-    let mut y = d.clone();
+    let mut y = d;
 
     let mut count = 0;
     for _i in 0..255 {
-        y_prev = y.clone();
-        y = (y.clone() * y.clone() + c.clone())
-            / (y * Fraction::new(BigInt::from(2), 1) + b.clone() - d.clone());
+        y_prev = y;
+        y = ((y * y) + c) / ((y * BigInt::from(2)) + b - d);
         count = i + 1;
 
         if is_abs_le_0(&y_prev, &y) {
@@ -185,13 +182,15 @@ fn get_y(
     y
 }
 
-fn is_abs_le_0(n1: &Fraction, n2: &Fraction) -> bool {
+fn is_abs_le_0(n1: &BigInt, n2: &BigInt) -> bool {
     if n1 > n2 {
-        if n1.quotient() - n2.quotient() <= BigInt::ONE {
+        if n1 - n2 <= BigInt::ONE {
+            println!("{}", n1 - n2);
             return true;
         }
     } else {
-        if n2.quotient() - n1.quotient() <= BigInt::ONE {
+        if n2 - n1 <= BigInt::ONE {
+            println!("{}", n2 - n1);
             return true;
         }
     }
