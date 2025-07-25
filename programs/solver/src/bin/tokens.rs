@@ -94,14 +94,14 @@ async fn main() -> Result<(), anyhow::Error> {
     let ws = WsConnect::new(env_parser.ws_address);
     let provider = ProviderBuilder::new().connect_ws(ws).await?;
 
-    let file = File::open("resources/tokens.json")?;
+    let file = File::open("resources/curve_tokens.json")?;
     let reader = BufReader::new(file);
 
     // Parse and decode addresses
     let tokens: Vec<Address> = from_reader(reader)?;
     let token_data = get_token_metadata(&provider, &tokens).await?;
 
-    let mut file = File::create("resources/token_metadata.json")?;
+    let mut file = File::create("resources/curve_token_metadata.json")?;
     file.write_all(serde_json::to_string_pretty(&token_data)?.as_bytes())?;
 
     log::info!("{} tokens proessed!", token_data.len());
