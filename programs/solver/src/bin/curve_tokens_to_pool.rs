@@ -34,6 +34,7 @@ sol!(
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Pools {
     tokens: Vec<Address>,
+    balances: Vec<U256>,
     fee: U256,
     a: U256,
     address: Address,
@@ -77,6 +78,7 @@ pub async fn get_pool_data<'a>(
         }
 
         curve_pools.push(Pools {
+            balances: vec![U256::ZERO; tokens.len()],
             tokens,
             fee,
             a,

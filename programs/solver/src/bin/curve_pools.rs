@@ -9,8 +9,8 @@ use alloy::{
     sol,
 };
 use colored::Colorize;
-use utils::{debug_time, EnvParser};
 use std::collections::HashSet;
+use utils::{debug_time, EnvParser};
 
 sol!(
     #[sol(rpc)]
