@@ -33,7 +33,7 @@ impl<I: TickIndex> TickList for [Tick<I>] {
     type Index = I;
 
     #[inline]
-    fn validate_list(&self, tick_spacing: I) -> Result<(), Error> {
+    fn validate_list(&self, _tick_spacing: I) -> Result<(), Error> {
         // if tick_spacing <= I::ZERO {
         //     return Err(TickListError::Zero.into());
         // }

@@ -11,6 +11,7 @@ use alloy::{
     },
     sol,
 };
+use colored::Colorize;
 use serde::{Deserialize, Serialize};
 use serde_json::from_reader;
 use uniswap_sdk_core::prelude::*;
@@ -56,7 +57,17 @@ pub async fn get_balances<'a>(
         for i in 0..pool.tokens.len() {
             multicall = multicall.add_dynamic(contract.balances(U256::from(i)));
         }
-        pool.balances = multicall.aggregate().await.unwrap();
+        if let Ok(bals) = multicall.aggregate3().await {
+            for (i, bals_res) in bals.iter().enumerate() {
+                if let Ok(bal) = bals_res {
+                    pool.balances[i] = *bal;
+                } else {
+                    eprintln!("{}", format!("pool: {}, i: {i}", pool.address).red());
+                }
+            }
+        } else {
+            eprintln!("{}", format!("pool: {}", pool.address).red());
+        }
     }
 }
 
