@@ -113,7 +113,7 @@ fn get_d_new(ann: U256, s: Fraction, n: usize, xp: Vec<Fraction>) -> Fraction {
         return Fraction::default();
     }
 
-    let mut d_prev ;
+    let mut d_prev;
     let mut count = 0;
     let mut d_p;
     for i in 0..255 {

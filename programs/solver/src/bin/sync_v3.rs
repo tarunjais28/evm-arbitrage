@@ -9,12 +9,9 @@
 
 use alloy::{
     primitives::U256,
-    providers::{Provider, ProviderBuilder, WsConnect},
-    rpc::types::TransactionRequest,
-    sol_types::SolCall,
+    providers::{ProviderBuilder, WsConnect},
 };
 
-use alloy_primitives::aliases::I24;
 use uniswap_sdk_core::{prelude::*, token};
 use uniswap_v3_sdk::prelude::*;
 use utils::EnvParser;
