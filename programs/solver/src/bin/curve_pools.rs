@@ -9,8 +9,8 @@ use alloy::{
     sol,
 };
 use colored::Colorize;
-use serde::{Deserialize, Serialize};
 use utils::{debug_time, EnvParser};
+use std::collections::HashSet;
 
 sol!(
     #[sol(rpc)]
@@ -26,13 +26,6 @@ sol!(
     "../../resources/contracts/curve_pools.json"
 );
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct Pools {
-    tokens: Vec<Address>,
-    fee: u64,
-    address: Address,
-}
-
 pub async fn get_pools<'a>(
     provider: &FillProvider<
         JoinFill<
@@ -41,7 +34,7 @@ pub async fn get_pools<'a>(
         >,
         RootProvider,
     >,
-) -> Vec<Address> {
+) -> HashSet<Address> {
     let meta_addr = address!("0x0000000022D53366457F9d5E68Ec105046FC4383");
     let contract = MetaAddress::new(meta_addr, provider);
     let mut multicall = provider.multicall().dynamic();
@@ -52,7 +45,7 @@ pub async fn get_pools<'a>(
     let mut metapools = multicall.aggregate().await.unwrap();
     metapools.retain(|addr| addr != &address!());
 
-    let mut pools: Vec<Address> = Vec::with_capacity(3000);
+    let mut pools: HashSet<Address> = HashSet::with_capacity(3000);
     for meta in metapools {
         let contract = CurvePools::new(meta, provider);
         if let Ok(count) = contract.pool_count().call().await {
@@ -60,7 +53,7 @@ pub async fn get_pools<'a>(
             println!("{}", format!("Processing {n} pools...").blue());
             for i in 0..n {
                 if let Ok(addr) = contract.pool_list(U256::from(i)).call().await {
-                    pools.push(addr);
+                    pools.insert(addr);
                 } else {
                     eprintln!(
                         "{}",
