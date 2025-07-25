@@ -1,6 +1,6 @@
 use std::{
     fs::File,
-    io::{BufReader, Write},
+    io::{BufReader, Write}, sync::Arc,
 };
 
 use alloy::{
@@ -12,6 +12,7 @@ use alloy::{
     sol,
 };
 use colored::Colorize;
+use futures::{stream::FuturesUnordered, StreamExt};
 use serde::{Deserialize, Serialize};
 use serde_json::from_reader;
 use uniswap_sdk_core::prelude::*;
@@ -50,25 +51,38 @@ pub async fn get_balances<'a>(
     >,
     pools: &mut Vec<Pools>,
 ) {
-    for pool in pools.iter_mut() {
-        let contract = CurvePool::new(pool.address, provider.clone());
-        let mut multicall = provider.multicall().dynamic();
+    let provider = Arc::new(provider.clone());
 
-        for i in 0..pool.tokens.len() {
-            multicall = multicall.add_dynamic(contract.balances(U256::from(i)));
-        }
-        if let Ok(bals) = multicall.aggregate3().await {
-            for (i, bals_res) in bals.iter().enumerate() {
-                if let Ok(bal) = bals_res {
-                    pool.balances[i] = *bal;
-                } else {
-                    eprintln!("{}", format!("pool: {}, i: {i}", pool.address).red());
-                }
+    let mut tasks = FuturesUnordered::new();
+
+    for pool in pools.iter_mut() {
+        let provider = Arc::clone(&provider);
+        let pool_ptr: *mut Pools = pool;
+
+        tasks.push(async move {
+            let pool = unsafe { &mut *pool_ptr }; // Safe here because each task has a unique pool
+            let contract = CurvePool::new(pool.address, provider.as_ref().clone());
+            let mut multicall = provider.multicall().dynamic();
+
+            for i in 0..pool.tokens.len() {
+                multicall = multicall.add_dynamic(contract.balances(U256::from(i)));
             }
-        } else {
-            eprintln!("{}", format!("pool: {}", pool.address).red());
-        }
+
+            if let Ok(bals) = multicall.aggregate3().await {
+                for (i, bals_res) in bals.iter().enumerate() {
+                    if let Ok(bal) = bals_res {
+                        pool.balances[i] = *bal;
+                    } else {
+                        eprintln!("{}", format!("pool: {}, i: {i}", pool.address).red());
+                    }
+                }
+            } else {
+                eprintln!("{}", format!("pool: {}", pool.address).red());
+            }
+        });
     }
+
+    while tasks.next().await.is_some() {}
 }
 
 #[tokio::main]

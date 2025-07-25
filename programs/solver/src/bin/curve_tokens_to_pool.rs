@@ -53,7 +53,6 @@ pub async fn get_pool_data<'a>(
     let mut curve_pools = Vec::with_capacity(pools.len());
     let mut unique_tokens = HashSet::new();
     for pool in pools {
-        log::info!("Processing {pool}...........");
         let contract = CurvePool::new(pool, provider);
         let a = match contract.A().call().await {
             Ok(a) => a,
@@ -63,7 +62,13 @@ pub async fn get_pool_data<'a>(
             }
         };
 
-        let fee = contract.fee().call().await.unwrap_or_default();
+        let fee = match contract.A().call().await {
+            Ok(a) => a,
+            Err(err) => {
+                log::error!("pool: {pool}, f(): {err}");
+                U256::default()
+            }
+        };
 
         let mut count = U256::ZERO;
         let mut tokens: Vec<Address> = Vec::new();
