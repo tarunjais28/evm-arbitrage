@@ -82,7 +82,7 @@ pub async fn get_pool_data(
 
     let i = 1; // input index
     let j = 0; // output index
-    let amount_in = pres * BigInt::from(1000_000_000) / precisions[i];
+    let amount_in = pres * BigInt::from(1000) / precisions[i];
     let fee = fee.to_big_int() * pres / BigInt::from(10000000000u64);
     let fract_one = BigInt::ONE;
     let dx = (fract_one - fee) * amount_in;
