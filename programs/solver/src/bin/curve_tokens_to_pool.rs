@@ -1,7 +1,7 @@
 use std::{
     collections::HashSet,
     fs::File,
-    io::{BufReader, Write},
+    io::{BufReader, Write}, sync::{Arc, Mutex},
 };
 
 use alloy::{
@@ -12,6 +12,7 @@ use alloy::{
     },
     sol,
 };
+use futures::{stream::FuturesUnordered, StreamExt};
 use serde::{Deserialize, Serialize};
 use serde_json::from_reader;
 use uniswap_sdk_core::prelude::*;
@@ -50,48 +51,72 @@ pub async fn get_pool_data<'a>(
     >,
     pools: Vec<Address>,
 ) -> (Vec<Pools>, HashSet<Address>) {
-    let mut curve_pools = Vec::with_capacity(pools.len());
-    let mut unique_tokens = HashSet::new();
-    for pool in pools {
-        let contract = CurvePool::new(pool, provider);
-        let a = match contract.A().call().await {
-            Ok(a) => a,
-            Err(err) => {
-                log::error!("pool: {pool}, A(): {err}");
-                U256::default()
-            }
-        };
+    let unique_tokens = Arc::new(Mutex::new(HashSet::new()));
 
-        let fee = match contract.A().call().await {
-            Ok(a) => a,
-            Err(err) => {
-                log::error!("pool: {pool}, f(): {err}");
-                U256::default()
-            }
-        };
+    let tasks = pools.into_iter().map(|pool| {
+        let provider = provider.clone();
+        let unique_tokens = Arc::clone(&unique_tokens);
 
-        let mut count = U256::ZERO;
-        let mut tokens: Vec<Address> = Vec::new();
-        loop {
-            if let Ok(addr) = contract.coins(count).call().await {
-                unique_tokens.insert(addr);
-                tokens.push(addr);
-                count += U256::ONE;
-            } else {
-                break;
+        tokio::spawn(async move {
+            let contract = CurvePool::new(pool, provider);
+
+            let a = match contract.A().call().await {
+                Ok(val) => val,
+                Err(err) => {
+                    log::error!("pool: {pool}, A(): {err}");
+                    U256::default()
+                }
+            };
+
+            let fee = match contract.fee().call().await {
+                Ok(val) => val,
+                Err(err) => {
+                    log::error!("pool: {pool}, fee(): {err}");
+                    U256::default()
+                }
+            };
+
+            let mut count = U256::ZERO;
+            let mut tokens = Vec::new();
+            loop {
+                match contract.coins(count).call().await {
+                    Ok(token) => {
+                        {
+                            let mut set = unique_tokens.lock().unwrap();
+                            set.insert(token);
+                        }
+                        tokens.push(token);
+                        count += U256::ONE;
+                    }
+                    Err(_) => break,
+                }
             }
+
+            Pools {
+                balances: vec![U256::ZERO; tokens.len()],
+                tokens,
+                fee,
+                a,
+                address: pool,
+            }
+        })
+    });
+
+    let mut curve_pools = Vec::new();
+    let mut handles: FuturesUnordered<_> = tasks.collect();
+
+    while let Some(result) = handles.next().await {
+        if let Ok(pool) = result {
+            curve_pools.push(pool);
         }
-
-        curve_pools.push(Pools {
-            balances: vec![U256::ZERO; tokens.len()],
-            tokens,
-            fee,
-            a,
-            address: pool,
-        });
     }
 
-    (curve_pools, unique_tokens)
+    let tokens = Arc::try_unwrap(unique_tokens)
+        .unwrap_or_default()
+        .into_inner()
+        .unwrap_or_default();
+
+    (curve_pools, tokens)
 }
 
 #[tokio::main]
