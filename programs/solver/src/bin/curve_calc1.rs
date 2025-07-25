@@ -58,36 +58,52 @@ pub async fn get_pool_data(
         multicall = multicall.add_dynamic(contract.coins(U256::from(i)));
     }
 
+    let virtual_price = contract.get_virtual_price().call().await.unwrap();
+
+    // let erc20 = ERC20::new(pool, provider);
+    // let total_supply = erc20.totalSupply().call().await.unwrap();
+
     let coins = multicall.aggregate().await.unwrap();
     for coin in coins {
         let erc_20 = ERC20::new(coin, provider.clone());
         let p = erc_20.decimals().call().await.unwrap();
+        println!("{coin} : {p}");
         precisions.push(10u64.pow(u32::from(p)));
     }
 
+    println!("x[0] = {}", x[0]);
+    println!("x[1] = {}", x[1]);
+    println!("x[2] = {}", x[2]);
+
+    println!("{:#?}", precisions);
     let xp = vec![
         x[0].to_big_int() * pres / BigInt::from(precisions[0]),
         x[1].to_big_int() * pres / BigInt::from(precisions[1]),
         x[2].to_big_int() * pres / BigInt::from(precisions[2]),
     ];
 
+    println!("xp: {xp:#?}");
     let s: BigInt = xp.iter().sum();
     let ann = a * U256::from(n);
 
     let d_new = get_d_new(ann, s, n, xp.clone());
     println!("d_new: {}", d_new);
 
-    let i = 1;
-    let j = 0;
-    let amount_in = pres * BigInt::from(1000000000) / BigInt::from(precisions[i]);
+    // let e_d = virtual_price * total_supply;
+    // println!("e_d: {}", e_d);
+
+    let i = 1; // input index
+    let j = 0; // output index
+    let amount_in = pres * BigInt::from(1000) / BigInt::from(precisions[i]);
     let fee = fee.to_big_int() * pres / BigInt::from(10000000000u64);
     let fract_one = BigInt::ONE;
-    let amount = (fract_one - fee) * amount_in;
+    let dx = (fract_one - fee) * amount_in;
 
-    let xi_ = amount + xp[i];
+    let xi_ = dx + xp[i];
     let mut xp_ = xp.clone();
     xp_[i] = xi_;
-    println!("xp_: {}", x[0].to_big_int() / pres);
+    println!("xp_: {}", xi_.to_big_int() / pres);
+
     let mut s_j = BigInt::default();
 
     for k in 0..n {
@@ -98,6 +114,10 @@ pub async fn get_pool_data(
 
     let y = get_y(i, j, d_new, xp_, xi_, ann, n);
     println!("{}", y);
+    println!("dy: {}", xp[j] - y);
+
+    let y_normal = y * BigInt::from(precisions[j]) / pres.to_big_int();
+    println!("{y_normal}");
 }
 
 fn get_d_new(ann: U256, s: BigInt, n: usize, xp: Vec<BigInt>) -> BigInt {
