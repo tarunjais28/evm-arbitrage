@@ -34,7 +34,7 @@ pub async fn get_pool_data(
     pool: Address,
     n: usize,
 ) {
-    let pres = BigInt::from(100000000000000000u128);
+    let pres = BigInt::from(1000_000_000_000_000_000u128);
     let contract = CurvePool::new(pool, provider.clone());
     let mut x = Vec::with_capacity(n);
     let mut precisions = Vec::with_capacity(n);
@@ -58,28 +58,19 @@ pub async fn get_pool_data(
         multicall = multicall.add_dynamic(contract.coins(U256::from(i)));
     }
 
-    let virtual_price = contract.get_virtual_price().call().await.unwrap();
-
-    // let erc20 = ERC20::new(pool, provider);
-    // let total_supply = erc20.totalSupply().call().await.unwrap();
-
     let coins = multicall.aggregate().await.unwrap();
     for coin in coins {
         let erc_20 = ERC20::new(coin, provider.clone());
         let p = erc_20.decimals().call().await.unwrap();
-        println!("{coin} : {p}");
-        precisions.push(10u64.pow(u32::from(p)));
+        precisions.push(BigInt::from(10u64.pow(u32::from(p))));
     }
 
-    println!("x[0] = {}", x[0]);
-    println!("x[1] = {}", x[1]);
-    println!("x[2] = {}", x[2]);
+    println!("xi = {x:#?}");
 
-    println!("{:#?}", precisions);
     let xp = vec![
-        x[0].to_big_int() * pres / BigInt::from(precisions[0]),
-        x[1].to_big_int() * pres / BigInt::from(precisions[1]),
-        x[2].to_big_int() * pres / BigInt::from(precisions[2]),
+        x[0].to_big_int() * pres / precisions[0],
+        x[1].to_big_int() * pres / precisions[1],
+        x[2].to_big_int() * pres / precisions[2],
     ];
 
     println!("xp: {xp:#?}");
@@ -89,12 +80,9 @@ pub async fn get_pool_data(
     let d_new = get_d_new(ann, s, n, xp.clone());
     println!("d_new: {}", d_new);
 
-    // let e_d = virtual_price * total_supply;
-    // println!("e_d: {}", e_d);
-
     let i = 1; // input index
     let j = 0; // output index
-    let amount_in = pres * BigInt::from(1000) / BigInt::from(precisions[i]);
+    let amount_in = pres * BigInt::from(1000_000_000) / precisions[i];
     let fee = fee.to_big_int() * pres / BigInt::from(10000000000u64);
     let fract_one = BigInt::ONE;
     let dx = (fract_one - fee) * amount_in;
@@ -113,11 +101,11 @@ pub async fn get_pool_data(
     }
 
     let y = get_y(i, j, d_new, xp_, xi_, ann, n);
-    println!("{}", y);
+    println!("y: {}", y);
     println!("dy: {}", xp[j] - y);
 
-    let y_normal = y * BigInt::from(precisions[j]) / pres.to_big_int();
-    println!("{y_normal}");
+    let y_normal = y * precisions[j] / pres.to_big_int();
+    println!("y_normalise: {y_normal}");
 }
 
 fn get_d_new(ann: U256, s: BigInt, n: usize, xp: Vec<BigInt>) -> BigInt {
@@ -141,7 +129,6 @@ fn get_d_new(ann: U256, s: BigInt, n: usize, xp: Vec<BigInt>) -> BigInt {
         for _x in xp.clone() {
             d_p = d_p * d / (_x * n_1);
         }
-        println!("d_p = {}", d_p);
         d_prev = d;
         d = (((ann * s) + (n * d_p)) * d) / ((ann_1 * d) + (n_1 * d_p));
 
@@ -205,12 +192,10 @@ fn get_y(
 fn is_abs_le_0(n1: &BigInt, n2: &BigInt) -> bool {
     if n1 > n2 {
         if n1 - n2 <= BigInt::ONE {
-            println!("{}", n1 - n2);
             return true;
         }
     } else {
         if n2 - n1 <= BigInt::ONE {
-            println!("{}", n2 - n1);
             return true;
         }
     }
