@@ -23,6 +23,20 @@ sol!(
     "../../resources/contracts/erc20_abi.json"
 );
 
+// source: https://github.com/curvefi/curve-contract/blob/master/contracts/pools/3pool/StableSwap3Pool.vy
+
+fn count_digits(mut n: BigInt) -> u32 {
+    if n == BigInt::ZERO {
+        return 1;
+    }
+    let mut count = 0;
+    while n > BigInt::ZERO {
+        count += 1;
+        n /= BigInt::from(10);
+    }
+    count
+}
+
 pub async fn get_pool_data(
     provider: &FillProvider<
         JoinFill<
@@ -34,7 +48,8 @@ pub async fn get_pool_data(
     pool: Address,
     n: usize,
 ) {
-    let pres = BigInt::from(1000_000_000_000_000_000u128);
+    let precision = BigInt::from(1000_000_000_000_000_000u128);
+    let fee_denomination = BigInt::from(10_000_000_000u128);
     let contract = CurvePool::new(pool, provider.clone());
     let mut x = Vec::with_capacity(n);
     let mut precisions = Vec::with_capacity(n);
@@ -65,12 +80,21 @@ pub async fn get_pool_data(
         precisions.push(BigInt::from(10u64.pow(u32::from(p))));
     }
 
+    let rates = [
+        BigInt::from(1000000000000000000u128),
+        BigInt::from(1000000000000000000000000000000u128),
+        BigInt::from(1000000000000000000000000000000u128),
+    ];
+    for rate in rates {
+        println!("rate: {rate}, digits: {}", count_digits(rate));
+    }
+
     println!("xi = {x:#?}");
 
     let xp = vec![
-        x[0].to_big_int() * pres / precisions[0],
-        x[1].to_big_int() * pres / precisions[1],
-        x[2].to_big_int() * pres / precisions[2],
+        x[0].to_big_int() * rates[0] / precision,
+        x[1].to_big_int() * rates[1] / precision,
+        x[2].to_big_int() * rates[2] / precision,
     ];
 
     println!("xp: {xp:#?}");
@@ -82,40 +106,29 @@ pub async fn get_pool_data(
 
     let i = 1; // input index
     let j = 0; // output index
-    let amount_in = pres * BigInt::from(1000) / precisions[i];
-    let fee = fee.to_big_int() * pres / BigInt::from(10000000000u64);
-    let fract_one = BigInt::ONE;
-    let dx = (fract_one - fee) * amount_in;
+    let dx = BigInt::from(1000);
+    let x = xp[i] + (dx * rates[i] / precision);
 
-    let xi_ = dx + xp[i];
-    let mut xp_ = xp.clone();
-    xp_[i] = xi_;
-    println!("xp_: {}", xi_.to_big_int() / pres);
+    let y = get_y(i, j, d_new, xp.clone(), x, ann, n);
 
-    let mut s_j = BigInt::default();
+    let dy = (xp[j] - y - BigInt::ONE) * precision / rates[j];
 
-    for k in 0..n {
-        if k != j {
-            s_j += xp[k];
-        }
-    }
+    let _fee = fee.to_big_int() * dy / fee_denomination;
 
-    let y = get_y(i, j, d_new, xp_, xi_, ann, n);
-    println!("y: {}", y);
-    println!("dy: {}", xp[j] - y);
+    println!("dy: {}", dy - _fee);
 
-    let y_normal = y * precisions[j] / pres.to_big_int();
-    println!("y_normalise: {y_normal}");
+    let e_dy = BigInt::from(999844592181965u128);
+    println!("digits: {}", count_digits(e_dy));
+    let e_y = xp[j] - e_dy;
+    println!("{} - {e_dy} = {e_y}", xp[j]);
 }
 
 fn get_d_new(ann: U256, s: BigInt, n: usize, xp: Vec<BigInt>) -> BigInt {
-    let ann_org = ann;
-    let ann = ann_org.to_big_int();
-    let ann_1 = (ann_org - U256::ONE).to_big_int();
+    let ann = ann.to_big_int();
+    let ann_1 = ann - BigInt::ONE;
     let mut d = s;
-    let n_org = n;
-    let n = BigInt::from(n_org);
-    let n_1 = BigInt::from(n_org + 1);
+    let n = BigInt::from(n);
+    let n_1 = n + BigInt::ONE;
 
     if s.is_zero() {
         return BigInt::default();
@@ -127,7 +140,9 @@ fn get_d_new(ann: U256, s: BigInt, n: usize, xp: Vec<BigInt>) -> BigInt {
     for i in 0..255 {
         d_p = d;
         for _x in xp.clone() {
-            d_p = d_p * d / (_x * n_1);
+            // TODO: Handle divide by 0
+            // If division by 0, this will be borked: only withdrawal will work. And that is good
+            d_p = d_p * d / (_x * n);
         }
         d_prev = d;
         d = (((ann * s) + (n * d_p)) * d) / ((ann_1 * d) + (n_1 * d_p));

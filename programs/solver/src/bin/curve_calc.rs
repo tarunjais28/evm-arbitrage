@@ -78,7 +78,7 @@ pub async fn get_pool_data<'a>(
 
     let i = 1;
     let j = 0;
-    let amount_in = Fraction::new(1000000000, BigInt::from(precisions[i]));
+    let amount_in = Fraction::new(1000, BigInt::from(precisions[i]));
     let fee = Fraction::new(fee.to_big_int(), BigInt::from(10000000000u64));
     let fract_one = Fraction::new(1, 1);
     let amount = (fract_one - fee) * amount_in;
