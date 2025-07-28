@@ -27,7 +27,7 @@ sol!(
     #[sol(rpc)]
     #[derive(Debug)]
     CurveContract,
-    "../../resources/contracts/curve_contract.json"
+    "../../resources/contracts/curve_stable_lp_contract.json"
 );
 
 // source: https://github.com/curvefi/curve-contract/blob/master/contracts/pools/3pool/StableSwap3Pool.vy

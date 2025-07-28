@@ -29,6 +29,13 @@ sol!(
 sol!(
     #[sol(rpc)]
     #[derive(Debug)]
+    CurvePool1,
+    "../../resources/contracts/curve_pool_1.json"
+);
+
+sol!(
+    #[sol(rpc)]
+    #[derive(Debug)]
     ERC20,
     "../../resources/contracts/erc20_abi.json"
 );
@@ -56,10 +63,12 @@ pub async fn get_pool_data<'a>(
 
     let tasks = pools.into_iter().map(|pool| {
         let provider = provider.clone();
+        let provider_1 = provider.clone();
         let unique_tokens = Arc::clone(&unique_tokens);
 
         tokio::spawn(async move {
             let contract = CurvePool::new(pool, provider);
+            let contract_1 = CurvePool1::new(pool, provider_1);
 
             let a = match contract.A().call().await {
                 Ok(val) => val,
@@ -78,18 +87,25 @@ pub async fn get_pool_data<'a>(
             };
 
             let mut count = U256::ZERO;
+            let mut count_1 = 0;
             let mut tokens = Vec::new();
             loop {
-                match contract.coins(count).call().await {
-                    Ok(token) => {
-                        {
-                            let mut set = unique_tokens.lock().unwrap();
-                            set.insert(token);
-                        }
-                        tokens.push(token);
-                        count += U256::ONE;
+                if let Ok(token) = contract.coins(count).call().await {
+                    {
+                        let mut set = unique_tokens.lock().unwrap();
+                        set.insert(token);
                     }
-                    Err(_) => break,
+                    tokens.push(token);
+                    count += U256::ONE;
+                } else if let Ok(token) = contract_1.coins(count_1).call().await {
+                    {
+                        let mut set = unique_tokens.lock().unwrap();
+                        set.insert(token);
+                    }
+                    tokens.push(token);
+                    count_1 += 1;
+                } else {
+                    break;
                 }
             }
 
@@ -138,8 +154,9 @@ async fn main() {
     let reader = BufReader::new(file);
     let pools: Vec<Address> = from_reader(reader).unwrap();
 
-    let (curve_pools, tokens) =
-        debug_time!("get_pool_data()", { get_pool_data(&provider, pools).await });
+    let (curve_pools, tokens) = debug_time!("get_pool_data()", {
+        get_pool_data(&provider, pools).await
+    });
 
     let mut file = File::create("resources/curve_tokens_to_pool.json").unwrap();
     file.write_all(
@@ -149,7 +166,7 @@ async fn main() {
     )
     .unwrap();
 
-    let mut file = File::create("resources/curve_tokens.json").unwrap();
-    file.write_all(serde_json::to_string_pretty(&tokens).unwrap().as_bytes())
-        .unwrap();
+    // let mut file = File::create("resources/curve_tokens.json").unwrap();
+    // file.write_all(serde_json::to_string_pretty(&tokens).unwrap().as_bytes())
+    //     .unwrap();
 }

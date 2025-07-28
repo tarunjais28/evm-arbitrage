@@ -23,7 +23,7 @@ sol!(
     #[sol(rpc)]
     #[derive(Debug)]
     CurvePools,
-    "../../resources/contracts/curve_pools.json"
+    "../../resources/contracts/curve_registry_contract.json"
 );
 
 pub async fn get_pools<'a>(
