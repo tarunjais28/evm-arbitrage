@@ -32,7 +32,7 @@ sol!(
 
 // source: https://github.com/curvefi/curve-contract/blob/master/contracts/pools/3pool/StableSwap3Pool.vy
 
-fn count_digits(mut n: BigInt) -> u32 {
+pub fn count_digits(mut n: BigInt) -> u32 {
     if n == BigInt::ZERO {
         return 1;
     }
@@ -118,18 +118,13 @@ pub async fn get_pool_data(
 
     let y = get_y(i, j, d, xp.clone(), x, ann, n);
 
-    let dy = (xp[j] - y - BigInt::ONE) * precisions[j] /  precision;
+    let dy = (xp[j] - y - BigInt::ONE) * precisions[j] / precision;
 
     let _fee = fee.to_big_int() * dy / fee_denomination;
 
     println!("_fee: {}", _fee);
     println!("y: {}", y);
     println!("dy: {}", dy - _fee);
-
-    let e_dy = BigInt::from(999844592181965u128);
-    println!("digits: {}", count_digits(e_dy));
-    let e_y = xp[j] - e_dy;
-    println!("{} - {e_dy} = {e_y}", xp[j]);
 }
 
 fn get_d_new(ann: U256, s: BigInt, n: usize, xp: Vec<BigInt>) -> BigInt {

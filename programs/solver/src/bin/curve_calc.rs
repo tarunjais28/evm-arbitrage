@@ -34,6 +34,8 @@ pub async fn get_pool_data<'a>(
     pool: Address,
     n: usize,
 ) {
+    let precision = BigInt::from(1000_000_000_000_000_000u128);
+    let fee_denomination = 10_000_000_000u128;
     let contract = CurvePool::new(pool, provider.clone());
     let mut x = Vec::with_capacity(n);
     let mut precisions = Vec::with_capacity(n);
@@ -74,31 +76,20 @@ pub async fn get_pool_data<'a>(
     let ann = a * U256::from(n);
 
     // let dp = get_dp(s.clone(), n, xp.clone());
-    let d_new = get_d_new(ann, s, n, xp.clone());
+    let d = get_d_new(ann, s, n, xp.clone());
 
     let i = 1;
     let j = 0;
-    let amount_in = Fraction::new(1000, BigInt::from(precisions[i]));
-    let fee = Fraction::new(fee.to_big_int(), BigInt::from(10000000000u64));
-    let fract_one = Fraction::new(1, 1);
-    let amount = (fract_one - fee) * amount_in;
+    let dx = 1000;
+    let x = xp[i].clone() + Fraction::new(dx, precisions[i]);
+    let y = get_y(i, j, d, xp.clone(), x, ann, n);
+    let dy = (xp[j].clone() - y.clone() - Fraction::new(1, 1)) * Fraction::new(precisions[j], 1);
+    let _fee = Fraction::new(fee.to_big_int(), fee_denomination) * dy.clone();
 
-    let xi_ = amount + xp[i].clone();
-    let mut xp_ = xp.clone();
-    xp_[i] = xi_.clone();
-    let mut s_j = Fraction::default();
-
-    for k in 0..n {
-        if k != j {
-            s_j = s_j + xp[k].clone();
-        }
-    }
-
-    let y = get_y(i, j, d_new, xp_, xi_, ann, n);
-    // println!("{}", y.quotient());
-    let precision = Fraction::new(precisions[j], 1);
-    let amount_out = y * precision;
-    println!("{}", amount_out.quotient());
+    println!("_fee: {}", _fee.quotient());
+    println!("y: {}", y.numerator() * precision / y.denominator());
+    let dy = dy - _fee;
+    println!("dy: {}", dy.numerator() * precision / dy.denominator());
 }
 
 fn get_d_new(ann: U256, s: Fraction, n: usize, xp: Vec<Fraction>) -> Fraction {
@@ -165,7 +156,7 @@ fn get_y(
     }
 
     c = c * d.clone() / annn;
-    let b = (s_ + d.clone()) / ann;
+    let b = s_ + d.clone() / ann;
     let mut y_prev;
     let mut y = d.clone();
 
