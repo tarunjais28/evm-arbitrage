@@ -65,13 +65,7 @@ async fn calculate_path<'a>(
 }
 
 pub async fn scan<'a>(
-    provider: FillProvider<
-        JoinFill<
-            Identity,
-            JoinFill<GasFiller, JoinFill<BlobGasFiller, JoinFill<NonceFiller, ChainIdFiller>>>,
-        >,
-        RootProvider,
-    >,
+    provider: &SolverProvider,
     pool_addresses: Vec<Address>,
     pool_data_v2: v2::PoolData,
     pool_data_v3: v3::PoolData,

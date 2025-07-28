@@ -34,6 +34,14 @@ use uniswap_sdk_core::{prelude::*, token};
 use uniswap_v3_sdk::prelude::tick_sync::TickSync;
 use utils::{debug_time, info_time, CustomError};
 
+type SolverProvider = FillProvider<
+    JoinFill<
+        Identity,
+        JoinFill<GasFiller, JoinFill<BlobGasFiller, JoinFill<NonceFiller, ChainIdFiller>>>,
+    >,
+    RootProvider,
+>;
+
 mod constants;
 mod contracts;
 mod dijkstra;
@@ -90,7 +98,7 @@ async fn main() -> Result<(), anyhow::Error> {
         // Scanning the ethereum blockchain for events
         debug_time!("Calling scanner()", {
             scan(
-                provider.clone(),
+                &provider,
                 env_parser.pool_address.single(),
                 pool_data_v2,
                 pool_data_v3,

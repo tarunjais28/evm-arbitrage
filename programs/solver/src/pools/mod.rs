@@ -7,8 +7,6 @@ pub mod v2;
 pub mod v3;
 
 pub type TokenMap = HashMap<Address, Token>;
-pub type PriceData =
-    FractionLike<PriceMeta<CurrencyLike<false, TokenMeta>, CurrencyLike<false, TokenMeta>>>;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Pools {

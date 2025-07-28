@@ -32,18 +32,12 @@ impl PoolData {
 
     pub async fn update_reserves<'a>(
         &mut self,
-        provider: &FillProvider<
-            JoinFill<
-                Identity,
-                JoinFill<GasFiller, JoinFill<BlobGasFiller, JoinFill<NonceFiller, ChainIdFiller>>>,
-            >,
-            RootProvider,
-        >,
+        provider: &SolverProvider,
         pool_address: &[Address],
     ) -> Result<(), CustomError<'a>> {
         // Get all reserves in a single batch
         let reserves_map = debug_time!("update_reserves::get_reserves_v2()", {
-            get_reserves_v2(&provider, pool_address).await?
+            get_reserves_v2(provider, pool_address).await?
         });
 
         for (pool, data) in self.data.iter_mut() {
@@ -125,19 +119,19 @@ impl PoolData {
 
     pub fn calc_slippage<'a>(
         &mut self,
-        mut slippage_adj: &mut Option<BigInt>,
+        slippage_adj: &mut Option<BigInt>,
     ) -> Result<(), CustomError<'a>> {
         for token_data in self.data.values_mut() {
             token_data.token0.slippage = calc_slippage(
                 token_data.token0.price_start,
                 token_data.token0.price_effective,
-                &mut slippage_adj,
+                slippage_adj,
             );
 
             token_data.token1.slippage = calc_slippage(
                 token_data.token1.price_start,
                 token_data.token1.price_effective,
-                &mut slippage_adj,
+                slippage_adj,
             );
         }
 
