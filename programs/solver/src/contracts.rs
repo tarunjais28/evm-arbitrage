@@ -34,3 +34,17 @@ sol!(
     ERC20,
     "../../resources/contracts/erc20_abi.json"
 );
+
+sol!(
+    #[sol(rpc)]
+    #[derive(Debug)]
+    CurvePool,
+    "../../resources/contracts/curve_pool.json"
+);
+
+sol!(
+    #[sol(rpc)]
+    #[derive(Debug)]
+    CurvePool1,
+    "../../resources/contracts/curve_pool_1.json"
+);

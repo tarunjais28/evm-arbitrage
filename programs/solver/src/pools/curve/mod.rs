@@ -9,6 +9,46 @@ pub struct CurvePools {
     pub address: Address,
 }
 
+impl CurvePools {
+    pub async fn fetch_balances<'a>(provider: &SolverProvider, pools: &mut Vec<CurvePools>) {
+        let provider = Arc::new(provider.clone());
+
+        let mut tasks = FuturesUnordered::new();
+
+        for pool in pools.iter_mut() {
+            let provider = Arc::clone(&provider);
+            let pool_ptr: *mut CurvePools = pool;
+
+            tasks.push(async move {
+                let pool = unsafe { &mut *pool_ptr };
+                let contract = CurvePool::new(pool.address, provider.as_ref().clone());
+                let contract_1 = CurvePool1::new(pool.address, provider.as_ref().clone());
+                let mut multicall = provider.multicall().dynamic();
+
+                for i in 0..pool.tokens.len() {
+                    multicall = multicall.add_dynamic(contract.balances(U256::from(i)));
+                }
+
+                if let Ok(bals) = multicall.aggregate().await {
+                    pool.balances = bals;
+                } else {
+                    let mut multicall = provider.multicall().dynamic();
+
+                    for i in 0..pool.tokens.len() {
+                        multicall = multicall.add_dynamic(contract_1.balances(i as i128));
+                    }
+
+                    if let Ok(bals) = multicall.aggregate().await {
+                        pool.balances = bals;
+                    }
+                }
+            });
+        }
+
+        while tasks.next().await.is_some() {}
+    }
+}
+
 #[derive(Debug, Clone)]
 pub struct TokenData {
     pub tokens: Vec<Address>,
