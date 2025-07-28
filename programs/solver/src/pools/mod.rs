@@ -1,6 +1,8 @@
 use super::*;
+pub use curve::CurvePools;
 use uniswap_v3_sdk::prelude::*;
 
+pub mod curve;
 pub mod v2;
 pub mod v3;
 

@@ -1,6 +1,6 @@
 use crate::{
-    contracts::*, dijkstra::*, enums::*, fetch::*, helper::*, parser::*, pools::*, scanner::*,
-    slippage::*, structs::*,
+    constants::*, contracts::*, dijkstra::*, enums::*, fetch::*, helper::*, parser::*, pools::*,
+    scanner::*, slippage::*, structs::*,
 };
 use alloy::{
     primitives::{
@@ -34,6 +34,7 @@ use uniswap_sdk_core::{prelude::*, token};
 use uniswap_v3_sdk::prelude::tick_sync::TickSync;
 use utils::{debug_time, info_time, CustomError};
 
+mod constants;
 mod contracts;
 mod dijkstra;
 mod enums;

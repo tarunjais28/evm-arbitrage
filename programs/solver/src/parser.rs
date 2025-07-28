@@ -6,6 +6,7 @@ pub type TickMap = HashMap<Address, TickData>;
 pub struct PoolAddress {
     pub v2: Vec<Address>,
     pub v3: Vec<Address>,
+    pub curve: Vec<Address>,
 }
 
 impl PoolAddress {
@@ -51,6 +52,7 @@ pub struct EnvParser {
     pub token_metadata: Vec<TokenMetadata>,
     pub pools_v2: Vec<Pools>,
     pub pools_v3: Vec<Pools>,
+    pub curve_pools: Vec<CurvePools>,
     pub tick_map: TickMap,
 }
 
@@ -75,6 +77,10 @@ impl<'a> EnvParser {
         let pools_v3_reader = BufReader::new(pools_v3_file);
 
         // Open ticks file
+        let curve_pools_file = File::open(env::var("CURVE_TOKENS_PATH")?)?;
+        let curve_pools_reader = BufReader::new(curve_pools_file);
+
+        // Open ticks file
         let ticks_file = File::open(env::var("TICKS_PATH")?)?;
         let ticks_reader = BufReader::new(ticks_file);
         let tick_data_reader: Vec<TickDataReader> = from_reader(ticks_reader)?;
@@ -85,6 +91,7 @@ impl<'a> EnvParser {
             pools_v2: from_reader(pools_v2_reader)?,
             token_metadata: from_reader(metadata_reader)?,
             pools_v3: from_reader(pools_v3_reader)?,
+            curve_pools: from_reader(curve_pools_reader)?,
             tick_map: tick_data_reader
                 .iter()
                 .map(|tdr| (tdr.pool, TickData::from(tdr.clone())))

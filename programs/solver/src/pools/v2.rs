@@ -8,7 +8,7 @@ pub struct PoolData {
 
 impl PoolData {
     pub fn new<'a>(pools: &[Pools], tokens: &TokenMap) -> Result<PoolData, CustomError<'a>> {
-        let mut data = HashMap::with_capacity(tokens.len());
+        let mut data = HashMap::with_capacity(pools.len());
 
         for pool in pools {
             data.insert(

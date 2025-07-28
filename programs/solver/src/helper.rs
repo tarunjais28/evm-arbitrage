@@ -63,3 +63,17 @@ pub fn calc_slippage<'a>(
 
     Ok(slippage)
 }
+
+pub fn is_abs_le_1(n1: &BigInt, n2: &BigInt) -> bool {
+    if n1 > n2 {
+        if n1 - n2 <= BigInt::ONE {
+            return true;
+        }
+    } else {
+        if n2 - n1 <= BigInt::ONE {
+            return true;
+        }
+    }
+
+    false
+}

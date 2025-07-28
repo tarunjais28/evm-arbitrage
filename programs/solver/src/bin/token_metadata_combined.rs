@@ -20,8 +20,7 @@ async fn main() -> Result<(), anyhow::Error> {
     for fp in [
         "resources/token_metadata.json",
         "resources/curve_token_metadata.json",
-    ]
-    {
+    ] {
         let file = File::open(fp)?;
         let reader = BufReader::new(file);
 

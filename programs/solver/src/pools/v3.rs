@@ -5,13 +5,10 @@ pub struct PoolData {
 }
 
 impl PoolData {
-    pub fn new<'a>(
-        serialised_v3_pool: &[Pools],
-        tokens: &TokenMap,
-    ) -> Result<PoolData, CustomError<'a>> {
-        let mut data = HashMap::with_capacity(tokens.len());
+    pub fn new<'a>(pools: &[Pools], tokens: &TokenMap) -> Result<PoolData, CustomError<'a>> {
+        let mut data = HashMap::with_capacity(pools.len());
 
-        for pool in serialised_v3_pool {
+        for pool in pools {
             data.insert(
                 pool.address,
                 TokenData::new(
