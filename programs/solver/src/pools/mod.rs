@@ -42,19 +42,18 @@ pub fn token_metadata_to_tokens(token_metadata: &[TokenMetadata]) -> TokenMap {
 pub struct TokenDetails {
     pub token: Token,
     pub slippage: BigInt,
-    pub price_start: PriceData,
-    pub price_effective: PriceData,
+    pub price_start: BigInt,
+    pub price_effective: BigInt,
 }
 
 impl Default for TokenDetails {
     fn default() -> Self {
         let def_token = token!(1, address!(), 0);
-        let def_price = Price::new(def_token.clone(), def_token.clone(), 1, 0);
         Self {
             token: def_token.clone(),
             slippage: BigInt::ZERO,
-            price_start: def_price.clone(),
-            price_effective: def_price,
+            price_start: BigInt::ZERO,
+            price_effective: BigInt::ZERO,
         }
     }
 }
@@ -69,5 +68,9 @@ impl TokenDetails {
 
     fn precision(&self) -> BigInt {
         BigInt::from(10u128.pow(self.token.decimals() as u32))
+    }
+
+    fn scale(&self) -> BigInt {
+        BigInt::from(PRECISION)
     }
 }

@@ -68,8 +68,13 @@ impl PoolData {
 
             let pair = Pair::new(token0mount_a.clone(), token0mount_b.clone())?;
 
-            token_data.token0.price_start = pair.token0_price();
-            token_data.token1.price_start = pair.token1_price();
+            let mut price = pair.token0_price();
+            token_data.token0.price_start = (price.numerator() * token_data.token0.scale())
+                / (price.denominator() * token_data.token0.precision());
+
+            price = pair.token1_price();
+            token_data.token1.price_start = (price.numerator() * token_data.token1.scale())
+                / (price.denominator() * token_data.token1.precision());
         }
         Ok(())
     }
@@ -107,30 +112,33 @@ impl PoolData {
                 }
             };
 
-            token_data.token0.price_effective =
-                Price::from_currency_amounts(amount0_in, amount0_out);
-            token_data.token1.price_effective =
-                Price::from_currency_amounts(amount1_out, amount1_in);
+            let mut price = Price::from_currency_amounts(amount0_in, amount0_out);
+            token_data.token0.price_effective = (price.numerator() * token_data.token0.scale())
+                / (price.denominator() * token_data.token0.precision());
+
+            price = Price::from_currency_amounts(amount1_out, amount1_in);
+            token_data.token1.price_effective = (price.numerator() * token_data.token1.scale())
+                / (price.denominator() * token_data.token1.precision());
         }
         Ok(())
     }
 
     pub fn calc_slippage<'a>(
         &mut self,
-        mut slippage_adj: &mut BigInt,
+        mut slippage_adj: &mut Option<BigInt>,
     ) -> Result<(), CustomError<'a>> {
         for token_data in self.data.values_mut() {
             token_data.token0.slippage = calc_slippage(
-                token_data.token0.price_start.clone(),
-                token_data.token0.price_effective.clone(),
+                token_data.token0.price_start,
+                token_data.token0.price_effective,
                 &mut slippage_adj,
-            )?;
+            );
 
             token_data.token1.slippage = calc_slippage(
-                token_data.token1.price_start.clone(),
-                token_data.token1.price_effective.clone(),
+                token_data.token1.price_start,
+                token_data.token1.price_effective,
                 &mut slippage_adj,
-            )?;
+            );
         }
 
         Ok(())
@@ -196,8 +204,8 @@ mod tests {
     fn create_test_pool(
         token0: Token,
         token1: Token,
-        reserve0: u128,
-        reserve1: u128,
+        _reserve0: u128,
+        _reserve1: u128,
         fee: u16,
     ) -> (Pools, TokenMap) {
         let pool_address = address!("0x0000000000000000000000000000000000000001");
@@ -287,7 +295,7 @@ mod tests {
         let amount = BigInt::from(100_000_000_000_000_000_000u128); // 100 tokens (10% of reserve)
         pool_data.calc_effective_price(amount).unwrap();
 
-        let mut slippage_adj = BigInt::MIN;
+        let mut slippage_adj = Some(BigInt::MIN);
 
         // Calculate slippage
         pool_data.calc_slippage(&mut slippage_adj).unwrap();
@@ -335,7 +343,7 @@ mod tests {
         let amount = BigInt::from(500_000_000_000_000_000_000u128); // 500 tokens (50% of reserve)
         pool_data.calc_effective_price(amount).unwrap();
 
-        let mut slippage_adj = BigInt::MIN;
+        let mut slippage_adj = Some(BigInt::MIN);
 
         // Calculate slippage
         pool_data.calc_slippage(&mut slippage_adj).unwrap();

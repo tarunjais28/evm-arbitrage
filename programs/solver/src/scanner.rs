@@ -13,7 +13,7 @@ async fn calculate_path<'a>(
     pool_data_v3: &mut v3::PoolData,
     input_data: InputData,
 ) -> Result<(), CustomError<'a>> {
-    let mut slippage_adj = BigInt::MAX;
+    let mut slippage_adj = Some(BigInt::MAX);
     let amount_in = input_data.amount_in.to_big_int();
 
     debug_time!("calculate_path::calc_effective_price()", {
@@ -45,7 +45,7 @@ async fn calculate_path<'a>(
 
     log::info!("Total {} nodes collected!", graph.len());
 
-    slippage_adj = slippage_adj.abs() + BigInt::ONE;
+    let slippage_adj = slippage_adj.unwrap_or_default().abs() + BigInt::ONE;
     let mut path = debug_time!("calculate_path::best_path()", {
         best_path(
             &graph,

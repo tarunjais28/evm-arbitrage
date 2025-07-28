@@ -49,7 +49,7 @@ impl TokenData {
         let _fee = self.fee * dy / fee_denomination;
         let dy = dy - _fee;
 
-        self.slippage = vec![(dy - dx) * BigInt::from(100) / dy];
+        self.slippage = vec![calc_slippage(dx, dy, &mut None)];
     }
 
     fn get_d(&self) -> BigInt {

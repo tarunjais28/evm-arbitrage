@@ -43,8 +43,14 @@ impl PoolData {
                     tick_data.liquidity,
                 )?;
 
-                token_data.token_a.price_start = pool.token0_price();
-                token_data.token_b.price_start = pool.token1_price();
+                let mut price = pool.token0_price();
+                token_data.token_a.price_start = (price.numerator() * token_data.token_a.scale())
+                    / (price.denominator() * token_data.token_a.precision());
+
+                price = pool.token1_price();
+                token_data.token_b.price_start = (price.numerator() * token_data.token_b.scale())
+                    / (price.denominator() * token_data.token_b.precision());
+
                 token_data.liquidity = tick_data.liquidity;
                 token_data.sqrt_price_x96 = tick_data.sqrt_price_x96;
                 token_data.current_tick = tick_data.current_tick;
@@ -103,8 +109,14 @@ impl PoolData {
             swap.liquidity,
         )?;
 
-        token_data.token_a.price_start = pool.token0_price();
-        token_data.token_b.price_start = pool.token1_price();
+        let mut price = pool.token0_price();
+        token_data.token_a.price_start = (price.numerator() * token_data.token_a.scale())
+            / (price.denominator() * token_data.token_a.precision());
+
+        price = pool.token1_price();
+        token_data.token_b.price_start = (price.numerator() * token_data.token_b.scale())
+            / (price.denominator() * token_data.token_b.precision());
+
         token_data.liquidity = pool.liquidity;
         token_data.sqrt_price_x96 = pool.sqrt_ratio_x96;
         token_data.current_tick = swap.tick;
@@ -154,10 +166,15 @@ impl PoolData {
                     }
                 };
 
-                token_data.token_a.price_effective =
-                    Price::from_currency_amounts(amount0_in, amount0_out);
-                token_data.token_b.price_effective =
-                    Price::from_currency_amounts(amount1_out, amount1_in);
+                let mut price = Price::from_currency_amounts(amount0_in, amount0_out);
+                token_data.token_a.price_effective = (price.numerator()
+                    * token_data.token_a.scale())
+                    / (price.denominator() * token_data.token_a.precision());
+
+                price = Price::from_currency_amounts(amount1_out, amount1_in);
+                token_data.token_b.price_effective = (price.numerator()
+                    * token_data.token_b.scale())
+                    / (price.denominator() * token_data.token_b.precision());
             }
         }
         Ok(())
@@ -165,20 +182,20 @@ impl PoolData {
 
     pub fn calc_slippage<'a>(
         &mut self,
-        mut slippage_adj: &mut BigInt,
+        mut slippage_adj: &mut Option<BigInt>,
     ) -> Result<(), CustomError<'a>> {
         for token_data in self.data.values_mut() {
             token_data.token_a.slippage = calc_slippage(
-                token_data.token_a.price_start.clone(),
-                token_data.token_a.price_effective.clone(),
+                token_data.token_a.price_start,
+                token_data.token_a.price_effective,
                 &mut slippage_adj,
-            )?;
+            );
 
             token_data.token_b.slippage = calc_slippage(
-                token_data.token_b.price_start.clone(),
-                token_data.token_b.price_effective.clone(),
+                token_data.token_b.price_start,
+                token_data.token_b.price_effective,
                 &mut slippage_adj,
-            )?;
+            );
         }
 
         Ok(())
