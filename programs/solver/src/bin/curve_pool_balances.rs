@@ -29,8 +29,8 @@ sol!(
 sol!(
     #[sol(rpc)]
     #[derive(Debug)]
-    ERC20,
-    "../../resources/contracts/erc20_abi.json"
+    CurvePool1,
+    "../../resources/contracts/curve_pool_1.json"
 );
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -63,22 +63,27 @@ pub async fn get_balances<'a>(
         tasks.push(async move {
             let pool = unsafe { &mut *pool_ptr }; // Safe here because each task has a unique pool
             let contract = CurvePool::new(pool.address, provider.as_ref().clone());
+            let contract_1 = CurvePool1::new(pool.address, provider.as_ref().clone());
             let mut multicall = provider.multicall().dynamic();
 
             for i in 0..pool.tokens.len() {
                 multicall = multicall.add_dynamic(contract.balances(U256::from(i)));
             }
 
-            if let Ok(bals) = multicall.aggregate3().await {
-                for (i, bals_res) in bals.iter().enumerate() {
-                    if let Ok(bal) = bals_res {
-                        pool.balances[i] = *bal;
-                    } else {
-                        eprintln!("{}", format!("pool: {}, i: {i}", pool.address).red());
-                    }
-                }
+            if let Ok(bals) = multicall.aggregate().await {
+                pool.balances = bals;
             } else {
-                eprintln!("{}", format!("pool: {}", pool.address).red());
+                let mut multicall = provider.multicall().dynamic();
+
+                for i in 0..pool.tokens.len() {
+                    multicall = multicall.add_dynamic(contract_1.balances(i as i128));
+                }
+
+                if let Ok(bals) = multicall.aggregate().await {
+                    pool.balances = bals;
+                } else {
+                    eprintln!("{}", format!("pool: {}", pool.address).red());
+                }
             }
         });
     }

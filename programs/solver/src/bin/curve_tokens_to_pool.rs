@@ -154,9 +154,8 @@ async fn main() {
     let reader = BufReader::new(file);
     let pools: Vec<Address> = from_reader(reader).unwrap();
 
-    let (curve_pools, tokens) = debug_time!("get_pool_data()", {
-        get_pool_data(&provider, pools).await
-    });
+    let (curve_pools, tokens) =
+        debug_time!("get_pool_data()", { get_pool_data(&provider, pools).await });
 
     let mut file = File::create("resources/curve_tokens_to_pool.json").unwrap();
     file.write_all(
@@ -166,7 +165,7 @@ async fn main() {
     )
     .unwrap();
 
-    // let mut file = File::create("resources/curve_tokens.json").unwrap();
-    // file.write_all(serde_json::to_string_pretty(&tokens).unwrap().as_bytes())
-    //     .unwrap();
+    let mut file = File::create("resources/curve_tokens.json").unwrap();
+    file.write_all(serde_json::to_string_pretty(&tokens).unwrap().as_bytes())
+        .unwrap();
 }
