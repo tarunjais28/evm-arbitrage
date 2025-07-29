@@ -17,8 +17,8 @@ use alloy::{
 };
 use colored::Colorize;
 use dotenv::dotenv;
-use futures_util::stream::StreamExt;
 use futures::stream::FuturesUnordered;
+use futures_util::stream::StreamExt;
 use serde::{Deserialize, Serialize};
 use serde_json::from_reader;
 use std::{

@@ -146,7 +146,7 @@ fn get_d_new(ann: U256, s: BigInt, n: usize, xp: Vec<BigInt>) -> BigInt {
         for _x in xp.clone() {
             // TODO: Handle divide by 0
             // If division by 0, this will be borked: only withdrawal will work. And that is good
-            d_p = d_p * d / (_x * n);
+            d_p *= d / (_x * n);
         }
         d_prev = d;
         d = (((ann * s) + (n * d_p)) * d) / ((ann_1 * d) + (n_1 * d_p));
@@ -185,7 +185,7 @@ fn get_y(
             continue;
         }
         s_ += _x;
-        c = c * d / (_x * BigInt::from(n));
+        c *= d / (_x * BigInt::from(n));
     }
 
     c = c * d / (ann * n_big);

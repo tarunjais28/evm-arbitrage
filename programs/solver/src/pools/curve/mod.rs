@@ -73,23 +73,31 @@ impl TokenData {
             precisions,
             fee: cp.fee.to_big_int(),
             a: cp.a.to_big_int(),
-            slippage: vec![BigInt::ZERO; len],
+            slippage: Vec::default(),
         }
     }
 
-    fn calc_slippage(&mut self, i: usize, j: usize, amount: U256) {
+    fn calc_slippage(&mut self, amount: U256) {
         let fee_denomination = BigInt::from(10_000_000_000u128);
         let d = self.get_d();
 
         let dx = amount.to_big_int();
         let precision = BigInt::from(PRECISION);
-        let x = self.xp[i] + (dx * precision / self.precisions[i]);
-        let y = self.get_y(i, j, d, x);
-        let dy = (self.xp[j] - y - BigInt::ONE) * self.precisions[j] / precision;
-        let _fee = self.fee * dy / fee_denomination;
-        let dy = dy - _fee;
+        let n = self.tokens.len();
 
-        self.slippage = vec![calc_slippage(dx, dy, &mut None)];
+        for i in 0..n {
+            for j in 0..n {
+                if i != j {
+                    let x = self.xp[i] + (dx * precision / self.precisions[i]);
+                    let y = self.get_y(i, j, d, x);
+                    let dy = (self.xp[j] - y - BigInt::ONE) * self.precisions[j] / precision;
+                    let _fee = self.fee * dy / fee_denomination;
+                    let dy = dy - _fee;
+
+                    self.slippage.push(calc_slippage(dx, dy, &mut None));
+                }
+            }
+        }
     }
 
     fn get_d(&self) -> BigInt {
@@ -112,7 +120,7 @@ impl TokenData {
             for _x in self.xp.clone() {
                 // TODO: Handle divide by 0
                 // If division by 0, this will be borked: only withdrawal will work. And that is good
-                d_p = d_p * d / (_x * n);
+                d_p *= d / (_x * n);
             }
             d_prev = d;
             d = (((ann * s) + (n * d_p)) * d) / ((ann_1 * d) + (n_1 * d_p));
@@ -142,10 +150,10 @@ impl TokenData {
                 continue;
             }
             s_ += _x;
-            c = c * d / (_x * BigInt::from(n));
+            c *= d / (_x * BigInt::from(n));
         }
 
-        c = c * d / (ann * n_big);
+        c *= d / (ann * n_big);
         let b = s_ + d / ann;
         let mut y_prev;
         let mut y = d;
