@@ -13,7 +13,7 @@ sol!(
     #[sol(rpc)]
     #[derive(Debug)]
     CurvePool,
-    "../../resources/contracts/curve_pool.json"
+    "../../resources/contracts/curve_meta_contract.json"
 );
 
 sol!(
@@ -23,14 +23,7 @@ sol!(
     "../../resources/contracts/erc20_abi.json"
 );
 
-sol!(
-    #[sol(rpc)]
-    #[derive(Debug)]
-    CurveContract,
-    "../../resources/contracts/curve_stable_lp_contract.json"
-);
-
-// source: https://github.com/curvefi/curve-contract/blob/master/contracts/pools/3pool/StableSwap3Pool.vy
+// source: https://github.com/curvefi/curve-contract/blob/master/contracts/pools/dusd/StableSwapDUSD.vy
 
 pub fn count_digits(mut n: BigInt) -> u32 {
     if n == BigInt::ZERO {
@@ -58,22 +51,21 @@ pub async fn get_pool_data(
     let precision = BigInt::from(1000_000_000_000_000_000u128);
     let fee_denomination = BigInt::from(10_000_000_000u128);
     let contract = CurvePool::new(pool, provider.clone());
-    let mut x = Vec::with_capacity(n);
-    let mut precisions = Vec::with_capacity(n);
-    (0..n).for_each(|_| {
-        x.push(U256::ZERO);
-    });
+    let mut x = vec![U256::ZERO; n];
+    let mut rates = Vec::with_capacity(n);
     let a;
+    let a_precision = BigInt::from(1000);
+    let base_virtual_price;
     let fee;
     let multicall = provider
         .multicall()
         .add(contract.A())
         .add(contract.balances(U256::from(0)))
         .add(contract.balances(U256::from(1)))
-        .add(contract.balances(U256::from(2)))
+        .add(contract.base_virtual_price())
         .add(contract.fee());
 
-    (a, x[0], x[1], x[2], fee) = multicall.aggregate().await.unwrap();
+    (a, x[0], x[1], base_virtual_price, fee) = multicall.aggregate().await.unwrap();
 
     let mut multicall = provider.multicall().dynamic();
     for i in 0..n {
@@ -84,52 +76,46 @@ pub async fn get_pool_data(
     for coin in coins {
         let erc_20 = ERC20::new(coin, provider.clone());
         let p = erc_20.decimals().call().await.unwrap();
-        precisions.push(BigInt::from(10u64.pow(u32::from(p))));
+        rates.push(BigInt::from(10u128.pow(u32::from(36 - p))));
     }
 
-    let curve_lp_token = address!("0x6c3F90f043a72FA612cbac8115EE7e52BDe6E490");
-    let curve_contract = CurveContract::new(curve_lp_token, provider.clone());
-    let total_supply = curve_contract.totalSupply().call().await.unwrap();
-    let virtual_price = contract.get_virtual_price().call().await.unwrap();
+    println!("{rates:#?}");
 
+    rates[n - 1] = base_virtual_price.to_big_int();
     println!("xi = {x:#?}");
+    println!("precisions = {rates:#?}");
 
     let xp = vec![
-        x[0].to_big_int() * precision / precisions[0],
-        x[1].to_big_int() * precision / precisions[1],
-        x[2].to_big_int() * precision / precisions[2],
+        x[0].to_big_int() * rates[0] / precision,
+        x[1].to_big_int() * rates[1] / precision,
     ];
 
     println!("xp: {xp:#?}");
     let s: BigInt = xp.iter().sum();
     let ann = a * U256::from(n);
 
-    let d = get_d_new(ann, s, n, xp.clone());
+    let d = get_d(ann, a_precision, s, n, xp.clone());
     println!("d_new: {}", d);
 
-    let d_exp = virtual_price.to_big_int() * total_supply.to_big_int() / precision;
-    println!("d_exp: {d_exp}");
+    let i = 0; // input index
+    let j = 1; // output index
+    let dx = BigInt::from(1000000000000000000000u128);
+    let x = xp[i] + (dx * rates[i] / precision);
 
-    println!("diff: {}", d - d_exp);
-    let i = 1; // input index
-    let j = 0; // output index
-    let dx = BigInt::from(1000);
-    let x = xp[i] + (dx * precision / precisions[i]);
+    let y = get_y(i, j, d, xp.clone(), x, ann, a_precision, n);
 
-    let y = get_y(i, j, d, xp.clone(), x, ann, n);
-
-    let dy = (xp[j] - y - BigInt::ONE) * precisions[j] / precision;
+    let dy = xp[j] - y - BigInt::ONE;
 
     let _fee = fee.to_big_int() * dy / fee_denomination;
 
+    let dy = (dy - _fee) * precision / rates[j];
     println!("_fee: {}", _fee);
     println!("y: {}", y);
-    println!("dy: {}", dy - _fee);
+    println!("dy: {}", dy);
 }
 
-fn get_d_new(ann: U256, s: BigInt, n: usize, xp: Vec<BigInt>) -> BigInt {
+fn get_d(ann: U256, a_precision: BigInt, s: BigInt, n: usize, xp: Vec<BigInt>) -> BigInt {
     let ann = ann.to_big_int();
-    let ann_1 = ann - BigInt::ONE;
     let mut d = s;
     let n = BigInt::from(n);
     let n_1 = n + BigInt::ONE;
@@ -149,7 +135,8 @@ fn get_d_new(ann: U256, s: BigInt, n: usize, xp: Vec<BigInt>) -> BigInt {
             d_p *= d / (_x * n);
         }
         d_prev = d;
-        d = (((ann * s) + (n * d_p)) * d) / ((ann_1 * d) + (n_1 * d_p));
+        d = ((ann * s / a_precision + (n * d_p)) * d)
+            / ((ann - a_precision) * d / a_precision + n_1 * d_p);
 
         count = i + 1;
         if is_abs_le_1(&d, &d_prev) {
@@ -168,6 +155,7 @@ fn get_y(
     xp_: Vec<BigInt>,
     x: BigInt,
     ann: U256,
+    a_precision: BigInt,
     n: usize,
 ) -> BigInt {
     let mut c = d;
@@ -188,15 +176,15 @@ fn get_y(
         c *= d / (_x * BigInt::from(n));
     }
 
-    c = c * d / (ann * n_big);
-    let b = s_ + d / ann;
+    c *= d * a_precision / (ann * n_big);
+    let b = s_ + d * a_precision / ann;
     let mut y_prev;
     let mut y = d;
 
     let mut count = 0;
     for _i in 0..255 {
         y_prev = y;
-        y = ((y * y) + c) / ((y * BigInt::from(2)) + b - d);
+        y = (y * y + c) / (y * BigInt::from(2) + b - d);
         count = i + 1;
 
         if is_abs_le_1(&y_prev, &y) {
@@ -236,6 +224,6 @@ async fn main() {
     let ws = WsConnect::new(env_parser.ws_address);
     let provider = ProviderBuilder::new().connect_ws(ws).await.unwrap();
 
-    let pool = address!("0xbEbc44782C7dB0a1A60Cb6fe97d0b483032FF1C7");
-    get_pool_data(&provider, pool, 3).await;
+    let pool = address!("0x4f062658EaAF2C1ccf8C8e36D6824CDf41167956");
+    get_pool_data(&provider, pool, 2).await;
 }

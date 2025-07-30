@@ -204,14 +204,6 @@ async fn main() {
     let ws = WsConnect::new(env_parser.ws_address);
     let provider = ProviderBuilder::new().connect_ws(ws).await.unwrap();
 
-    // let file = File::open("resources/pools_v3.json").unwrap();
-    // let reader = BufReader::new(file);
-    // let pools: Vec<Address> = from_reader(reader).unwrap();
-
     let pool = address!("0xbEbc44782C7dB0a1A60Cb6fe97d0b483032FF1C7");
     get_pool_data(&provider, pool, 3).await;
-
-    // let mut file = File::create("resources/ticks.json").unwrap();
-    // file.write_all(serde_json::to_string_pretty(&tick_data).unwrap().as_bytes())
-    //     .unwrap();
 }
