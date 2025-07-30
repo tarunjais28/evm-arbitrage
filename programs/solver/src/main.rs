@@ -96,6 +96,16 @@ async fn main() -> Result<(), anyhow::Error> {
             pool_data_v3.calc_start_price(&env_parser.tick_map)?
         });
 
+        let mut curve_pools = env_parser.curve_pools;
+
+        debug_time!("fetch_balances()", {
+            CurvePools::fetch_balances(&provider, &mut curve_pools).await;
+        });
+
+        let curve_pool_data: curve::PoolData = debug_time!("cuve_data_pools()", {
+            curve::PoolData::new(&curve_pools, &token_map)?
+        });
+
         // Scanning the ethereum blockchain for events
         debug_time!("Calling scanner()", {
             scan(
@@ -103,6 +113,7 @@ async fn main() -> Result<(), anyhow::Error> {
                 env_parser.pool_address.single(),
                 pool_data_v2,
                 pool_data_v3,
+                curve_pool_data,
             )
             .await?
         });

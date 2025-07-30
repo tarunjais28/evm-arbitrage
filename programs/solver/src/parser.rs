@@ -79,7 +79,6 @@ impl<'a> EnvParser {
         // Open ticks file
         let curve_pools_file = File::open(env::var("CURVE_TOKENS_PATH")?)?;
         let curve_pools_reader = BufReader::new(curve_pools_file);
-
         // Open ticks file
         let ticks_file = File::open(env::var("TICKS_PATH")?)?;
         let ticks_reader = BufReader::new(ticks_file);

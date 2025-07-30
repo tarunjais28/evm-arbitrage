@@ -11,6 +11,7 @@ pub struct InputData {
 async fn calculate_path<'a>(
     pool_data_v2: &mut v2::PoolData,
     pool_data_v3: &mut v3::PoolData,
+    curve_pool_data: &mut curve::PoolData,
     input_data: InputData,
 ) -> Result<(), CustomError<'a>> {
     let mut slippage_adj = Some(BigInt::MAX);
@@ -32,6 +33,10 @@ async fn calculate_path<'a>(
         pool_data_v3.calc_slippage(&mut slippage_adj)?;
     });
 
+    debug_time!("calculate_path::calc_slippage_curve()", {
+        curve_pool_data.calc_slippage(amount_in);
+    });
+
     let mut graph: SwapGraph =
         HashMap::with_capacity((pool_data_v2.data.len() + pool_data_v2.data.len()) * 2);
 
@@ -41,6 +46,10 @@ async fn calculate_path<'a>(
 
     debug_time!("calculate_path::into_v3_swap_graph()", {
         pool_data_v3.to_swap_graph(&mut graph);
+    });
+
+    debug_time!("calculate_path::into_curve_swap_graph()", {
+        curve_pool_data.to_swap_graph(&mut graph);
     });
 
     log::info!("Total {} nodes collected!", graph.len());
@@ -69,6 +78,7 @@ pub async fn scan<'a>(
     pool_addresses: Vec<Address>,
     pool_data_v2: v2::PoolData,
     pool_data_v3: v3::PoolData,
+    curve_pool_data: curve::PoolData,
 ) -> Result<(), CustomError<'a>> {
     // Create a filter for the events.
     let filter = provider
@@ -84,11 +94,14 @@ pub async fn scan<'a>(
     // Create a shared state for the current amount
     let pool_data_v2 = Arc::new(Mutex::new(pool_data_v2));
     let pool_data_v3 = Arc::new(Mutex::new(pool_data_v3));
+    let curve_pool_data = Arc::new(Mutex::new(curve_pool_data));
 
     // Spawn a task to handle user input
     let input_handle = {
         let pool_data_v2_clone = Arc::clone(&pool_data_v2);
         let pool_data_v3_clone = Arc::clone(&pool_data_v3);
+        let curve_pool_data_clone = Arc::clone(&curve_pool_data);
+
         tokio::spawn(async move {
             let stdin = tokio::io::stdin();
             let mut reader = BufReader::new(stdin);
@@ -114,6 +127,7 @@ pub async fn scan<'a>(
                     if let Err(e) = calculate_path(
                         &mut *pool_data_v2_clone.lock().await,
                         &mut *pool_data_v3_clone.lock().await,
+                        &mut *curve_pool_data_clone.lock().await,
                         input_data,
                     )
                     .await

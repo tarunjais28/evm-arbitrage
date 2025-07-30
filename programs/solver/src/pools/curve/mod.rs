@@ -61,7 +61,6 @@ pub struct TokenData {
 
 impl TokenData {
     fn new(cp: CurvePools, precisions: Vec<BigInt>) -> Self {
-        let len = cp.tokens.len();
         Self {
             tokens: cp.tokens,
             xp: cp
@@ -77,11 +76,10 @@ impl TokenData {
         }
     }
 
-    fn calc_slippage(&mut self, amount: U256) {
+    fn calc_slippage(&mut self, dx: BigInt) {
         let fee_denomination = BigInt::from(10_000_000_000u128);
         let d = self.get_d();
 
-        let dx = amount.to_big_int();
         let precision = BigInt::from(PRECISION);
         let n = self.tokens.len();
 
@@ -196,5 +194,35 @@ impl PoolData {
         }
 
         Ok(PoolData { data })
+    }
+
+    pub fn calc_slippage(&mut self, amount: BigInt) {
+        for token_data in self.data.values_mut() {
+            token_data.calc_slippage(amount);
+        }
+    }
+
+    pub fn to_swap_graph(&self, graph: &mut SwapGraph) {
+        for (pool, token_data) in self.data.iter() {
+            let n = token_data.tokens.len();
+
+            let mut k = 0;
+            for i in 0..n {
+                for j in 0..n {
+                    if i != j {
+                        let from = token_data.tokens[i];
+                        let to = token_data.tokens[j];
+                        let slippage = token_data.slippage[k];
+
+                        graph
+                            .entry(from)
+                            .or_default()
+                            .push(SwapEdge::new(to, *pool, slippage, 0));
+
+                        k += 1;
+                    }
+                }
+            }
+        }
     }
 }
