@@ -54,18 +54,21 @@ pub async fn get_pool_data(
     let mut x = vec![U256::ZERO; n];
     let mut rates = Vec::with_capacity(n);
     let a;
-    let a_precision = BigInt::from(1000);
+    let a_precise;
     let base_virtual_price;
     let fee;
     let multicall = provider
         .multicall()
         .add(contract.A())
+        .add(contract.A_precise())
         .add(contract.balances(U256::from(0)))
         .add(contract.balances(U256::from(1)))
         .add(contract.base_virtual_price())
         .add(contract.fee());
 
-    (a, x[0], x[1], base_virtual_price, fee) = multicall.aggregate().await.unwrap();
+    (a, a_precise, x[0], x[1], base_virtual_price, fee) = multicall.aggregate().await.unwrap();
+
+    let a_precision = (a_precise / a).to_big_int();
 
     let mut multicall = provider.multicall().dynamic();
     for i in 0..n {
@@ -224,6 +227,7 @@ async fn main() {
     let ws = WsConnect::new(env_parser.ws_address);
     let provider = ProviderBuilder::new().connect_ws(ws).await.unwrap();
 
-    let pool = address!("0x4f062658EaAF2C1ccf8C8e36D6824CDf41167956");
+    // 0x8038C01A0390a8c547446a0b2c18fc9aEFEcc10c`
+    let pool = address!("0x3eF6A01A0f81D6046290f3e2A8c5b843e738E604");
     get_pool_data(&provider, pool, 2).await;
 }
