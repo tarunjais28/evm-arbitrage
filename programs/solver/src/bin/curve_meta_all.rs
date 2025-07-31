@@ -1,13 +1,18 @@
-use std::{fs::File, io::BufReader};
+use std::{
+    fs::File,
+    io::BufReader,
+    sync::{Arc, Mutex},
+};
 
 use alloy::{
-    primitives::{address, Address, U256},
+    primitives::{Address, U256},
     providers::{
         fillers::{BlobGasFiller, ChainIdFiller, FillProvider, GasFiller, JoinFill, NonceFiller},
         Identity, Provider, ProviderBuilder, RootProvider, WsConnect,
     },
     sol,
 };
+use futures::{stream::FuturesUnordered, StreamExt};
 use serde::{Deserialize, Serialize};
 use serde_json::from_reader;
 use uniswap_sdk_core::prelude::*;
@@ -71,76 +76,80 @@ async fn get_pool_data(
     n: usize,
 ) -> Output {
     let _dx = 1000000000000000000000u128;
-    let mut out = Output {
+    let out = Output {
         dx: _dx,
         data: Vec::with_capacity(pools.meta.len()),
     };
+
+    let precision = BigInt::from(1000_000_000_000_000_000u128);
+    let fee_denomination = BigInt::from(10_000_000_000u128);
+
+    let i = 0; // input index
+    let j = 1; // output index
+
+    let mut tasks = FuturesUnordered::new();
+    let out = Arc::new(Mutex::new(out));
     for pool in pools.meta {
-        let precision = BigInt::from(1000_000_000_000_000_000u128);
-        let fee_denomination = BigInt::from(10_000_000_000u128);
-        let contract = CurvePool::new(pool, provider.clone());
-        let mut x = vec![U256::ZERO; n];
-        let mut rates = Vec::with_capacity(n);
-        let a;
-        let a_precise;
-        let base_virtual_price;
-        let fee;
-        let multicall = provider
-            .multicall()
-            .add(contract.A())
-            .add(contract.A_precise())
-            .add(contract.balances(U256::from(0)))
-            .add(contract.balances(U256::from(1)))
-            .add(contract.base_virtual_price())
-            .add(contract.fee());
+        let provider = provider.clone();
+        let out = out.clone();
+        tasks.push(tokio::spawn(async move {
+            let contract = CurvePool::new(pool, provider.clone());
+            let mut x = vec![U256::ZERO; n];
+            let mut rates = Vec::with_capacity(n);
 
-        (a, a_precise, x[0], x[1], base_virtual_price, fee) = multicall.aggregate().await.unwrap();
+            let a = contract.A().call().await.unwrap();
+            let a_precise = contract.A_precise().call().await.unwrap();
+            x[0] = contract.balances(U256::from(0)).call().await.unwrap();
+            x[1] = contract.balances(U256::from(1)).call().await.unwrap();
+            let base_virtual_price = contract.base_virtual_price().call().await.unwrap();
+            let fee = contract.fee().call().await.unwrap();
 
-        let a_precision = (a_precise / a).to_big_int();
+            let a_precision = (a_precise / a).to_big_int();
 
-        let mut multicall = provider.multicall().dynamic();
-        for i in 0..n {
-            multicall = multicall.add_dynamic(contract.coins(U256::from(i)));
-        }
+            let mut multicall = provider.multicall().dynamic();
+            for i in 0..n {
+                multicall = multicall.add_dynamic(contract.coins(U256::from(i)));
+            }
 
-        let coins = multicall.aggregate().await.unwrap();
-        for coin in coins {
-            let erc_20 = ERC20::new(coin, provider.clone());
-            let p = erc_20.decimals().call().await.unwrap();
-            rates.push(BigInt::from(10u128.pow(u32::from(36 - p))));
-        }
+            let coins = multicall.aggregate().await.unwrap();
+            for coin in coins {
+                let erc_20 = ERC20::new(coin, provider.clone());
+                let p = erc_20.decimals().call().await.unwrap();
+                rates.push(BigInt::from(10u128.pow(u32::from(36 - p))));
+            }
 
-        rates[n - 1] = base_virtual_price.to_big_int();
+            rates[n - 1] = base_virtual_price.to_big_int();
 
-        let xp = vec![
-            x[0].to_big_int() * rates[0] / precision,
-            x[1].to_big_int() * rates[1] / precision,
-        ];
+            let xp = vec![
+                x[0].to_big_int() * rates[0] / precision,
+                x[1].to_big_int() * rates[1] / precision,
+            ];
 
-        let s: BigInt = xp.iter().sum();
-        let ann = a * U256::from(n);
+            let s: BigInt = xp.iter().sum();
+            let ann = a * U256::from(n);
 
-        let d = get_d(ann, a_precision, s, n, xp.clone());
+            let d = get_d(ann, a_precision, s, n, xp.clone());
 
-        let i = 0; // input index
-        let j = 1; // output index
-        let dx = BigInt::from(_dx);
-        let x = xp[i] + (dx * rates[i] / precision);
+            let dx = BigInt::from(_dx);
+            let x = xp[i] + (dx * rates[i] / precision);
 
-        let y = get_y(i, j, d, xp.clone(), x, ann, a_precision, n);
+            let y = get_y(i, j, d, xp.clone(), x, ann, a_precision, n);
 
-        let dy = xp[j] - y - BigInt::ONE;
+            let dy = xp[j] - y - BigInt::ONE;
 
-        let _fee = fee.to_big_int() * dy / fee_denomination;
+            let _fee = fee.to_big_int() * dy / fee_denomination;
 
-        let dy = (dy - _fee) * precision / rates[j];
-        out.data.push(PoolData {
-            pool,
-            dy: dy.to_string().parse().unwrap_or_default(),
-        });
+            let dy = (dy - _fee) * precision / rates[j];
+            out.lock().unwrap().data.push(PoolData {
+                pool,
+                dy: dy.to_string().parse().unwrap_or_default(),
+            });
+        }));
     }
 
-    out
+    while let Some(_) = tasks.next().await {}
+
+    Arc::try_unwrap(out).unwrap().into_inner().unwrap()
 }
 
 fn get_d(ann: U256, a_precision: BigInt, s: BigInt, n: usize, xp: Vec<BigInt>) -> BigInt {
@@ -155,7 +164,7 @@ fn get_d(ann: U256, a_precision: BigInt, s: BigInt, n: usize, xp: Vec<BigInt>) -
 
     let mut d_prev;
     let mut d_p;
-    for i in 0..255 {
+    for _ in 0..255 {
         d_p = d;
         for _x in xp.clone() {
             // TODO: Handle divide by 0
@@ -254,4 +263,5 @@ async fn main() {
     let pools: Pools = from_reader(reader).unwrap();
 
     let output = get_pool_data(&provider, pools, 2).await;
+    println!("{:#?}", output);
 }
