@@ -1,9 +1,3 @@
-use std::{
-    fs::File,
-    io::BufReader,
-    sync::{Arc, Mutex},
-};
-
 use alloy::{
     primitives::{Address, U256},
     providers::{
@@ -15,6 +9,11 @@ use alloy::{
 use futures::{stream::FuturesUnordered, StreamExt};
 use serde::{Deserialize, Serialize};
 use serde_json::from_reader;
+use std::{
+    fs::File,
+    io::{BufReader, Write},
+    sync::{Arc, Mutex},
+};
 use uniswap_sdk_core::prelude::*;
 use utils::EnvParser;
 
@@ -76,32 +75,51 @@ async fn get_pool_data(
     n: usize,
 ) -> Output {
     let _dx = 1000000000000000000000u128;
-    let out = Output {
-        dx: _dx,
-        data: Vec::with_capacity(pools.meta.len()),
-    };
 
     let precision = BigInt::from(1000_000_000_000_000_000u128);
     let fee_denomination = BigInt::from(10_000_000_000u128);
 
     let i = 0; // input index
     let j = 1; // output index
-
+    let out = Arc::new(Mutex::new(Output {
+        dx: _dx,
+        data: Vec::with_capacity(pools.meta.len()),
+    }));
+    let provider = Arc::new(provider);
     let mut tasks = FuturesUnordered::new();
-    let out = Arc::new(Mutex::new(out));
     for pool in pools.meta {
         let provider = provider.clone();
         let out = out.clone();
-        tasks.push(tokio::spawn(async move {
+        tasks.push(async move {
             let contract = CurvePool::new(pool, provider.clone());
             let mut x = vec![U256::ZERO; n];
             let mut rates = Vec::with_capacity(n);
 
             let a = contract.A().call().await.unwrap();
-            let a_precise = contract.A_precise().call().await.unwrap();
-            x[0] = contract.balances(U256::from(0)).call().await.unwrap();
+
+            let a_precise = if let Ok(a_p) = contract.A_precise().call().await {
+                a_p
+            } else {
+                eprintln!("pool: {pool} -> a_precise");
+                return;
+            };
+
+            x[0] = if let Ok(c) = contract.balances(U256::from(0)).call().await {
+                c
+            } else {
+                eprintln!("pool: {pool} -> balances_0");
+                return;
+            };
+
             x[1] = contract.balances(U256::from(1)).call().await.unwrap();
-            let base_virtual_price = contract.base_virtual_price().call().await.unwrap();
+
+            let base_virtual_price = if let Ok(vp) = contract.base_virtual_price().call().await {
+                vp
+            } else {
+                eprintln!("pool: {pool} -> base_virtual_price");
+                return;
+            };
+
             let fee = contract.fee().call().await.unwrap();
 
             let a_precision = (a_precise / a).to_big_int();
@@ -144,7 +162,7 @@ async fn get_pool_data(
                 pool,
                 dy: dy.to_string().parse().unwrap_or_default(),
             });
-        }));
+        });
     }
 
     while let Some(_) = tasks.next().await {}
@@ -262,6 +280,11 @@ async fn main() {
     // Parse and decode addresses
     let pools: Pools = from_reader(reader).unwrap();
 
+    let meta = pools.meta.len();
     let output = get_pool_data(&provider, pools, 2).await;
-    println!("{:#?}", output);
+    println!("Processed {} / {}", output.data.len(), meta);
+
+    let mut file = File::create("test-beds/curve_meta_pool_dy.json").unwrap();
+    file.write_all(serde_json::to_string_pretty(&output).unwrap().as_bytes())
+        .unwrap();
 }
