@@ -1,14 +1,7 @@
-use std::{
-    collections::HashSet,
-    fs::File,
-    io::BufReader,
-};
-
-use alloy::{
-    primitives::Address,
-};
+use alloy::primitives::Address;
 use serde::{Deserialize, Serialize};
 use serde_json::from_reader;
+use std::{collections::HashSet, fs::File, io::BufReader};
 use uniswap_sdk_core::prelude::*;
 
 #[derive(Debug, Deserialize, Serialize)]

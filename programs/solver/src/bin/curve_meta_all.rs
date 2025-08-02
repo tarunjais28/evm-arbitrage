@@ -120,9 +120,15 @@ async fn get_pool_data(
                 return;
             };
 
+            let virtual_price = contract.base_virtual_price().call().await.unwrap();
+            let total_supply = U256::from(43129203125034477038238u128);
+            let total_supply = U256::from(41998934196532768062883u128);
+
             let fee = contract.fee().call().await.unwrap();
 
             let a_precision = (a_precise / a).to_big_int();
+            println!("a: {a}, a_precise: {a_precise}");
+            let a = a_precise;
 
             let mut multicall = provider.multicall().dynamic();
             for i in 0..n {
@@ -133,25 +139,35 @@ async fn get_pool_data(
             for coin in coins {
                 let erc_20 = ERC20::new(coin, provider.clone());
                 let p = erc_20.decimals().call().await.unwrap();
+                println!("decimals: {p}");
                 rates.push(BigInt::from(10u128.pow(u32::from(36 - p))));
             }
 
+            println!("rates: {rates:#?}");
             rates[n - 1] = base_virtual_price.to_big_int();
+            println!("rates: {rates:#?}");
+            println!("x: {x:#?}");
 
             let xp = vec![
                 x[0].to_big_int() * rates[0] / precision,
                 x[1].to_big_int() * rates[1] / precision,
             ];
+            println!("xp: {xp:#?}");
 
             let s: BigInt = xp.iter().sum();
             let ann = a * U256::from(n);
 
             let d = get_d(ann, a_precision, s, n, xp.clone());
 
+            let d_exp = virtual_price.to_big_int() * total_supply.to_big_int()
+                / BigInt::from(1_000_000_000_000_000_000u128);
+            println!("d: {d}");
+            println!("d: {d_exp}");
             let dx = BigInt::from(_dx);
             let x = xp[i] + (dx * rates[i] / precision);
 
             let y = get_y(i, j, d, xp.clone(), x, ann, a_precision, n);
+            println!("y: {y}");
 
             let dy = xp[j] - y - BigInt::ONE;
 
@@ -182,6 +198,7 @@ fn get_d(ann: U256, a_precision: BigInt, s: BigInt, n: usize, xp: Vec<BigInt>) -
 
     let mut d_prev;
     let mut d_p;
+    println!("d: {d}");
     for _ in 0..255 {
         d_p = d;
         for _x in xp.clone() {
@@ -190,8 +207,9 @@ fn get_d(ann: U256, a_precision: BigInt, s: BigInt, n: usize, xp: Vec<BigInt>) -
             d_p *= d / (_x * n);
         }
         d_prev = d;
-        d = ((ann * s / a_precision + (n * d_p)) * d)
+        d = (ann * s / a_precision + d_p * n) * d
             / ((ann - a_precision) * d / a_precision + n_1 * d_p);
+        println!("d: {d}");
 
         if is_abs_le_1(&d, &d_prev) {
             break;
@@ -281,10 +299,20 @@ async fn main() {
     let pools: Pools = from_reader(reader).unwrap();
 
     let meta = pools.meta.len();
+    let pools = Pools {
+        meta: vec![alloy::primitives::address!(
+            "0xc18cc39da8b11da8c3541c598ee022258f9744da"
+        )],
+        unspecified: Vec::default(),
+    };
     let output = get_pool_data(&provider, pools, 2).await;
     println!("Processed {} / {}", output.data.len(), meta);
 
-    let mut file = File::create("test-beds/curve_meta_pool_dy.json").unwrap();
-    file.write_all(serde_json::to_string_pretty(&output).unwrap().as_bytes())
-        .unwrap();
+    println!("{output:#?}");
+    // let mut file = File::create("test-beds/curve_meta_pool_dy.json").unwrap();
+    // file.write_all(serde_json::to_string_pretty(&output).unwrap().as_bytes())
+    //     .unwrap();
 }
+
+// 1160145787531774573692175
+// 1160145787531774573692176
