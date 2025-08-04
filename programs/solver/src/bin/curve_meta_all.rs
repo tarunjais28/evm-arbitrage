@@ -13,9 +13,21 @@ use std::{
     fs::File,
     io::{BufReader, Write},
     sync::{Arc, Mutex},
+    time::Duration,
+    time::{SystemTime, UNIX_EPOCH},
 };
 use uniswap_sdk_core::prelude::*;
 use utils::EnvParser;
+
+type SolverProvider = FillProvider<
+    JoinFill<
+        Identity,
+        JoinFill<GasFiller, JoinFill<BlobGasFiller, JoinFill<NonceFiller, ChainIdFiller>>>,
+    >,
+    RootProvider,
+>;
+
+const BASE_CACHE_EXPIRES: u64 = 10 * 60; // 10 min
 
 sol!(
     #[sol(rpc)]
@@ -63,17 +75,26 @@ pub fn count_digits(mut n: BigInt) -> u32 {
     count
 }
 
-async fn get_pool_data(
-    provider: &FillProvider<
-        JoinFill<
-            Identity,
-            JoinFill<GasFiller, JoinFill<BlobGasFiller, JoinFill<NonceFiller, ChainIdFiller>>>,
-        >,
-        RootProvider,
-    >,
-    pools: Pools,
-    n: usize,
-) -> Output {
+async fn _vp_rate_ro(
+    provider: &SolverProvider,
+    contract: CurvePool::CurvePoolInstance<Arc<&SolverProvider>>,
+) -> U256 {
+    let now = SystemTime::now()
+        .duration_since(UNIX_EPOCH)
+        .unwrap()
+        .as_secs();
+
+    let base_cache_updated = contract.base_cache_updated().call().await.unwrap();
+    if U256::from(now) > base_cache_updated + U256::from(BASE_CACHE_EXPIRES) {
+        let base_pool = contract.base_pool().call().await.unwrap();
+        let contract = CurvePool::new(base_pool, provider);
+        contract.get_virtual_price().call().await.unwrap()
+    } else {
+        contract.base_virtual_price().call().await.unwrap()
+    }
+}
+
+async fn get_pool_data(provider: &SolverProvider, pools: Pools, n: usize) -> Output {
     let _dx = 1000000000000000000000u128;
 
     let precision = BigInt::from(1000_000_000_000_000_000u128);
@@ -91,7 +112,8 @@ async fn get_pool_data(
         let provider = provider.clone();
         let out = out.clone();
         tasks.push(async move {
-            let contract = CurvePool::new(pool, provider.clone());
+            let contract: CurvePool::CurvePoolInstance<Arc<&SolverProvider>> =
+                CurvePool::new(pool, provider.clone());
             let mut x = vec![U256::ZERO; n];
             let mut rates = Vec::with_capacity(n);
 
@@ -113,15 +135,12 @@ async fn get_pool_data(
 
             x[1] = contract.balances(U256::from(1)).call().await.unwrap();
 
-            let base_virtual_price = if let Ok(vp) = contract.base_virtual_price().call().await {
-                vp
-            } else {
+            if contract.base_virtual_price().call().await.is_err() {
                 eprintln!("pool: {pool} -> base_virtual_price");
                 return;
-            };
+            }
 
-            let virtual_price = contract.get_virtual_price().call().await.unwrap();
-            let total_supply = U256::from(43129203125034477038238u128);
+            let vp_rate = _vp_rate_ro(&provider, contract.clone()).await;
 
             let fee = contract.fee().call().await.unwrap();
 
@@ -143,8 +162,7 @@ async fn get_pool_data(
             }
 
             println!("rates: {rates:#?}");
-            rates[n - 1] =
-                base_virtual_price.to_big_int() * BigInt::from(10u64.pow(36 - 18)) / precision;
+            rates[n - 1] = vp_rate.to_big_int();
             println!("rates: {rates:#?}");
             println!("x: {x:#?}");
 
@@ -159,23 +177,19 @@ async fn get_pool_data(
 
             let d = get_d(ann, a_precision, s, n, xp.clone());
 
-            let d_exp = virtual_price.to_big_int() * total_supply.to_big_int()
-                / BigInt::from(1_000_000_000_000_000_000u128);
-
-            println!("\n\nd: {d}");
-            println!("d: {d_exp}");
+            println!("d: {d}");
 
             let dx = BigInt::from(_dx);
-            let x = xp[i] + (dx * rates[i] / precision);
+            let x = xp[i] + ((dx * rates[i]) / precision);
 
             let y = get_y(i, j, d, xp.clone(), x, ann, a_precision, n);
             println!("y: {y}");
 
             let dy = xp[j] - y - BigInt::ONE;
 
-            let _fee = fee.to_big_int() * dy / fee_denomination;
+            let _fee = (fee.to_big_int() * dy) / fee_denomination;
 
-            let dy = (dy - _fee) * precision / rates[j];
+            let dy = ((dy - _fee) * precision) / rates[j];
             out.lock().unwrap().data.push(PoolData {
                 pool,
                 dy: dy.to_string().parse().unwrap_or_default(),
@@ -200,18 +214,16 @@ fn get_d(ann: U256, a_precision: BigInt, s: BigInt, n: usize, xp: Vec<BigInt>) -
 
     let mut d_prev;
     let mut d_p;
-    println!("d: {d}");
     for _ in 0..255 {
         d_p = d;
         for _x in xp.clone() {
             // TODO: Handle divide by 0
             // If division by 0, this will be borked: only withdrawal will work. And that is good
-            d_p *= d / (_x * n);
+            d_p = (d_p * d) / (_x * n);
         }
         d_prev = d;
-        d = ((ann * s / a_precision) + (d_p * n)) * d
-            / (((ann - a_precision) * d / a_precision) + (n_1 * d_p));
-        println!("d: {d}");
+        d = (((ann * s) / a_precision) + (d_p * n)) * d
+            / ((((ann - a_precision) * d) / a_precision) + (n_1 * d_p));
 
         if is_abs_le_1(&d, &d_prev) {
             break;
@@ -301,20 +313,17 @@ async fn main() {
     let pools: Pools = from_reader(reader).unwrap();
 
     let meta = pools.meta.len();
-    let pools = Pools {
-        meta: vec![alloy::primitives::address!(
-            "0xc18cc39da8b11da8c3541c598ee022258f9744da"
-        )],
-        unspecified: Vec::default(),
-    };
+    // let pools = Pools {
+    //     meta: vec![alloy::primitives::address!(
+    //         "0xc18cc39da8b11da8c3541c598ee022258f9744da"
+    //     )],
+    //     unspecified: Vec::default(),
+    // };
     let output = get_pool_data(&provider, pools, 2).await;
     println!("Processed {} / {}", output.data.len(), meta);
 
     println!("{output:#?}");
-    // let mut file = File::create("test-beds/curve_meta_pool_dy.json").unwrap();
-    // file.write_all(serde_json::to_string_pretty(&output).unwrap().as_bytes())
-    //     .unwrap();
+    let mut file = File::create("test-beds/curve_meta_pool_dy.json").unwrap();
+    file.write_all(serde_json::to_string_pretty(&output).unwrap().as_bytes())
+        .unwrap();
 }
-
-// 836278926734185578264
-// 834235838973616469531

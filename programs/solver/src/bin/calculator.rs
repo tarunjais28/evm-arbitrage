@@ -41,7 +41,8 @@ pub fn count_digits(mut n: BigInt) -> u32 {
 }
 
 fn main() {
-    let a = BigInt::from(51077996821354792765u128);
-    let b = BigInt::from(51077893260361095046u128);
-    println!("{}", count_digits(a - b));
+    let a = BigInt::from(836278926734177605857u128);
+    let b = BigInt::from(836278926734790510310u128);
+    println!("{}", a - b);
+    println!("{}", count_digits((a - b).abs()));
 }
