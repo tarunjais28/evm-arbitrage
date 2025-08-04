@@ -86,10 +86,10 @@ impl TokenData {
         for i in 0..n {
             for j in 0..n {
                 if i != j {
-                    let x = self.xp[i] + (dx * precision / self.precisions[i]);
+                    let x = self.xp[i] + ((dx * precision) / self.precisions[i]);
                     let y = self.get_y(i, j, d, x);
-                    let dy = (self.xp[j] - y - BigInt::ONE) * self.precisions[j] / precision;
-                    let _fee = self.fee * dy / fee_denomination;
+                    let dy = ((self.xp[j] - y - BigInt::ONE) * self.precisions[j]) / precision;
+                    let _fee = (self.fee * dy) / fee_denomination;
                     let dy = dy - _fee;
 
                     self.slippage.push(calc_slippage(dx, dy, &mut None));
@@ -118,7 +118,7 @@ impl TokenData {
             for _x in self.xp.clone() {
                 // TODO: Handle divide by 0
                 // If division by 0, this will be borked: only withdrawal will work. And that is good
-                d_p *= d / (_x * n);
+                d_p = (d_p * d) / (_x * n);
             }
             d_prev = d;
             d = (((ann * s) + (n * d_p)) * d) / ((ann_1 * d) + (n_1 * d_p));
@@ -148,10 +148,10 @@ impl TokenData {
                 continue;
             }
             s_ += _x;
-            c *= d / (_x * BigInt::from(n));
+            c = (c * d) / (_x * BigInt::from(n));
         }
 
-        c *= d / (ann * n_big);
+        c = (c * d) / (ann * n_big);
         let b = s_ + d / ann;
         let mut y_prev;
         let mut y = d;
