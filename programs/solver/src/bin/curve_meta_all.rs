@@ -13,7 +13,6 @@ use std::{
     fs::File,
     io::{BufReader, Write},
     sync::{Arc, Mutex},
-    time::Duration,
     time::{SystemTime, UNIX_EPOCH},
 };
 use uniswap_sdk_core::prelude::*;
@@ -55,6 +54,8 @@ struct Pools {
 struct PoolData {
     pool: Address,
     dy: i128,
+    dy_exp: i128,
+    diff: i128,
 }
 
 #[derive(Debug, Deserialize, Serialize)]
@@ -140,6 +141,12 @@ async fn get_pool_data(provider: &SolverProvider, pools: Pools, n: usize) -> Out
                 return;
             }
 
+            let dy_exp = contract
+                .get_dy(i128::from(i as i8), i128::from(j as i8), U256::from(_dx))
+                .call()
+                .await
+                .unwrap();
+
             let vp_rate = _vp_rate_ro(&provider, contract.clone()).await;
 
             let fee = contract.fee().call().await.unwrap();
@@ -193,6 +200,9 @@ async fn get_pool_data(provider: &SolverProvider, pools: Pools, n: usize) -> Out
             out.lock().unwrap().data.push(PoolData {
                 pool,
                 dy: dy.to_string().parse().unwrap_or_default(),
+                dy_exp: dy_exp.to_string().parse().unwrap_or_default(),
+                diff: dy.to_string().parse::<i128>().unwrap_or_default()
+                    - dy_exp.to_string().parse::<i128>().unwrap_or_default(),
             });
         });
     }
