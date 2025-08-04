@@ -28,8 +28,20 @@ macro_rules! mult {
     };
 }
 
+pub fn count_digits(mut n: BigInt) -> u32 {
+    if n == BigInt::ZERO {
+        return 1;
+    }
+    let mut count = 0;
+    while n > BigInt::ZERO {
+        count += 1;
+        n /= BigInt::from(10);
+    }
+    count
+}
+
 fn main() {
-    let a = BigInt::from(1967961004141248372392u128);
-    let b = BigInt::from(945968064780900579039u128);
-    println!("{}", add!(a, b));
+    let a = BigInt::from(51077996821354792765u128);
+    let b = BigInt::from(51077893260361095046u128);
+    println!("{}", count_digits(a - b));
 }

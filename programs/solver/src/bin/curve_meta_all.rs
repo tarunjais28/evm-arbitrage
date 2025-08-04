@@ -120,9 +120,8 @@ async fn get_pool_data(
                 return;
             };
 
-            let virtual_price = contract.base_virtual_price().call().await.unwrap();
+            let virtual_price = contract.get_virtual_price().call().await.unwrap();
             let total_supply = U256::from(43129203125034477038238u128);
-            let total_supply = U256::from(41998934196532768062883u128);
 
             let fee = contract.fee().call().await.unwrap();
 
@@ -144,7 +143,8 @@ async fn get_pool_data(
             }
 
             println!("rates: {rates:#?}");
-            rates[n - 1] = base_virtual_price.to_big_int();
+            rates[n - 1] =
+                base_virtual_price.to_big_int() * BigInt::from(10u64.pow(36 - 18)) / precision;
             println!("rates: {rates:#?}");
             println!("x: {x:#?}");
 
@@ -161,8 +161,10 @@ async fn get_pool_data(
 
             let d_exp = virtual_price.to_big_int() * total_supply.to_big_int()
                 / BigInt::from(1_000_000_000_000_000_000u128);
-            println!("d: {d}");
+
+            println!("\n\nd: {d}");
             println!("d: {d_exp}");
+
             let dx = BigInt::from(_dx);
             let x = xp[i] + (dx * rates[i] / precision);
 
@@ -207,8 +209,8 @@ fn get_d(ann: U256, a_precision: BigInt, s: BigInt, n: usize, xp: Vec<BigInt>) -
             d_p *= d / (_x * n);
         }
         d_prev = d;
-        d = (ann * s / a_precision + d_p * n) * d
-            / ((ann - a_precision) * d / a_precision + n_1 * d_p);
+        d = ((ann * s / a_precision) + (d_p * n)) * d
+            / (((ann - a_precision) * d / a_precision) + (n_1 * d_p));
         println!("d: {d}");
 
         if is_abs_le_1(&d, &d_prev) {
@@ -244,17 +246,17 @@ fn get_y(
             continue;
         }
         s_ += _x;
-        c *= d / (_x * BigInt::from(n));
+        c = (c * d) / (_x * BigInt::from(n));
     }
 
-    c *= d * a_precision / (ann * n_big);
-    let b = s_ + d * a_precision / ann;
+    c = (c * d * a_precision) / (ann * n_big);
+    let b = s_ + ((d * a_precision) / ann);
     let mut y_prev;
     let mut y = d;
 
     for _i in 0..255 {
         y_prev = y;
-        y = (y * y + c) / (y * BigInt::from(2) + b - d);
+        y = ((y * y) + c) / ((y * BigInt::from(2)) + b - d);
 
         if is_abs_le_1(&y_prev, &y) {
             break;
@@ -314,5 +316,5 @@ async fn main() {
     //     .unwrap();
 }
 
-// 1160145787531774573692175
-// 1160145787531774573692176
+// 836278926734185578264
+// 834235838973616469531
