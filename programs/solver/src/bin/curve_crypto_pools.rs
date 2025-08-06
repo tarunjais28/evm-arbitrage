@@ -90,7 +90,7 @@ async fn get_pool_data(provider: &SolverProvider, pools: Pools) -> Output {
 
             let mut x = Vec::new();
             while let Ok(bal) = contract.balances(U256::from(n)).call().await {
-                x.push(bal);
+                x.push(bal.to_big_int());
                 n += 1;
             }
 
@@ -99,19 +99,19 @@ async fn get_pool_data(provider: &SolverProvider, pools: Pools) -> Output {
                 return;
             }
 
-            let mut rates = Vec::with_capacity(n);
-
             let mut multicall = provider.multicall().dynamic();
             for i in 0..n {
                 multicall = multicall.add_dynamic(contract.coins(U256::from(i)));
             }
 
             let coins = multicall.aggregate().await.unwrap();
+            let mut balances: Vec<BigInt> = Vec::with_capacity(n);
             for coin in coins {
                 let erc_20 = ERC20::new(coin, provider.clone());
                 let p = erc_20.decimals().call().await.unwrap();
+                let b = erc_20.balanceOf(coin).call().await.unwrap();
+                balances.push(b.to_big_int());
                 println!("decimals: {p}");
-                rates.push(BigInt::from(10u128.pow(u32::from(36 - p))));
                 precisions.push(BigInt::from(10u128.pow(u32::from(18 - p))));
             }
 
@@ -119,7 +119,9 @@ async fn get_pool_data(provider: &SolverProvider, pools: Pools) -> Output {
             let price_scale = _price_scale * precisions[1];
 
             let mut xp = x;
+            // let mut xp = balances;
             println!("xp: {xp:#?}");
+            println!("precisions: {precisions:#?}");
 
             let a = contract.A().call().await.unwrap().to_big_int();
             let gamma = contract.gamma().call().await.unwrap().to_big_int();
@@ -134,16 +136,16 @@ async fn get_pool_data(provider: &SolverProvider, pools: Pools) -> Output {
                 (xp[1].to_big_int() * precisions[1] * _price_scale) / precision,
             ];
 
+            println!("d: {d}");
+            println!("future_a_gamma_time: {future_a_gamma_time}");
             if future_a_gamma_time > U256::ZERO {
                 d = newton_d(a, gamma, n, _xp);
             }
 
-            let dx = U256::from(_dx);
+            let dx = BigInt::from(_dx);
             xp[i] += dx;
-            let mut xp = vec![
-                xp[0].to_big_int() * precisions[0],
-                (xp[i].to_big_int() * price_scale) / precision,
-            ];
+            let mut xp = vec![xp[0] * precisions[0], (xp[i] * price_scale) / precision];
+            println!("xp: {xp:#?}");
 
             let dy_exp = contract
                 .get_dy(U256::from(i), U256::from(j), U256::from(_dx))
@@ -152,7 +154,8 @@ async fn get_pool_data(provider: &SolverProvider, pools: Pools) -> Output {
                 .unwrap();
 
             let y = newton_y(a, gamma, xp.clone(), d, j, n);
-            println!("y: {y}");
+            println!("xp[j]: {}", xp[j]);
+            println!("    y: {y}");
 
             let mut dy = xp[j] - y - BigInt::ONE;
             xp[j] = y;
@@ -164,8 +167,9 @@ async fn get_pool_data(provider: &SolverProvider, pools: Pools) -> Output {
             };
 
             let fee = _fee(xp, fee_gamma, mid_fee, out_fee);
+            println!("fee: {fee}");
             dy -= (fee * dy) / fee_denomination;
-            
+
             out.lock().unwrap().data.push(PoolData {
                 pool,
                 dy: dy.to_string().parse().unwrap_or_default(),
@@ -293,16 +297,41 @@ fn newton_d(ann: BigInt, gamma: BigInt, n: usize, x_unsorted: Vec<BigInt>) -> Bi
 }
 
 fn newton_y(ann: BigInt, gamma: BigInt, x: Vec<BigInt>, d: BigInt, i: usize, n: usize) -> BigInt {
+    let ten_10 = BigInt::from(10u128.pow(10));
     let ten_14 = BigInt::from(10u128.pow(14));
+    let ten_15 = BigInt::from(10u128.pow(15));
     let ten_16 = BigInt::from(10u128.pow(16));
+    let ten_17 = BigInt::from(10u128.pow(17));
     let ten_18 = BigInt::from(10u128.pow(18));
     let ten_20 = BigInt::from(10u128.pow(20));
-    let a_multiplier = BigInt::from(1000);
+    let a_multiplier = BigInt::from(10000);
+
+    let n_u32 = n as u32;
+    let n_n = BigInt::from(n_u32.pow(n_u32));
+
+    let min_a = (n_n * a_multiplier) / BigInt::TEN;
+    let max_a = (n_n * a_multiplier) * BigInt::from(100000);
+    let min_gamma = ten_10;
+    let max_gamma = BigInt::TWO * ten_16;
+
+    if ann <= min_a - BigInt::ONE
+        || ann >= max_a + BigInt::ONE
+        || gamma <= min_gamma - BigInt::ONE
+        || gamma >= max_gamma + BigInt::ONE
+        || d <= ten_17 - BigInt::ONE
+        || d >= (ten_15 * ten_18) + BigInt::ONE
+    {
+        return BigInt::default();
+    }
 
     let n = BigInt::from(n);
     let x_j = x[1 - i];
     let mut y = (d * d) / (x_j * n * n);
     let k0_i = (ten_18 * n * x_j) / d;
+
+    if k0_i <= (ten_16 * n) - BigInt::ONE || k0_i >= (ten_20 * n) + BigInt::ONE {
+        return BigInt::default();
+    }
 
     let convergence_limit = BigInt::max(BigInt::max(x_j / ten_14, d / ten_14), BigInt::from(100));
 
@@ -321,7 +350,8 @@ fn newton_y(ann: BigInt, gamma: BigInt, x: Vec<BigInt>, d: BigInt, i: usize, n: 
     let mut y_plus;
     let mut diff;
     let frac;
-    for _ in 0..255 {
+    for count in 0..255 {
+        println!("{}", count + 1);
         y_prev = y;
 
         k0 = (k0_i * y * n) / d;
@@ -329,27 +359,27 @@ fn newton_y(ann: BigInt, gamma: BigInt, x: Vec<BigInt>, d: BigInt, i: usize, n: 
 
         _g1k0 = __g1k0;
         if _g1k0 > k0 {
-            _g1k0 -= k0 + BigInt::ONE;
+            _g1k0 = _g1k0 - k0 + BigInt::ONE;
         } else {
             _g1k0 = k0 - _g1k0 + BigInt::ONE;
         }
 
-        mul1 = (((((ten_18 * d) / gamma) * _g1k0) / gamma) * _g1k0 * a_multiplier) / ann;
+        mul1 = (ten_18 * d * _g1k0 * _g1k0 * a_multiplier) / (ann * gamma * gamma);
 
-        mul2 = (BigInt::TWO * ten_18 * n * k0) / _g1k0;
+        mul2 = ten_18 + ((BigInt::TWO * ten_18 * k0) / _g1k0);
 
-        yfprime = (ten_18 * y) + (s * mul2) + mul1;
+        yfprime = (ten_18 * y) + (s * (mul2 + mul1));
         _dyfprime = d * mul2;
         if yfprime < _dyfprime {
             y = y_prev / BigInt::TWO;
             continue;
         } else {
-            yfprime -= yfprime;
+            yfprime -= _dyfprime;
         }
         fprime = yfprime / y;
 
         y_minus = mul1 / fprime;
-        y_plus = (yfprime + (ten_18 * d)) / fprime + ((y_minus * ten_18) / k0);
+        y_plus = ((yfprime + (ten_18 * d)) / fprime) + ((y_minus * ten_18) / k0);
         y_minus += (ten_18 * s) / fprime;
 
         if y_plus < y_minus {
@@ -358,6 +388,7 @@ fn newton_y(ann: BigInt, gamma: BigInt, x: Vec<BigInt>, d: BigInt, i: usize, n: 
             y = y_plus - y_minus;
         }
 
+        println!("{y}");
         if y > y_prev {
             diff = y - y_prev;
         } else {
@@ -366,9 +397,9 @@ fn newton_y(ann: BigInt, gamma: BigInt, x: Vec<BigInt>, d: BigInt, i: usize, n: 
         if diff < BigInt::max(convergence_limit, y / ten_14) {
             frac = (y * ten_18) / d;
             if frac <= ten_16 - BigInt::ONE || frac >= ten_20 + BigInt::ONE {
-                return BigInt::ZERO;
+                return BigInt::default();
             }
-            return d;
+            return y;
         }
     }
 

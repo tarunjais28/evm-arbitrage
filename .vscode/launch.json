@@ -45,6 +45,18 @@
                 "/rustc/${env:RUSTC_VERSION}": "${env:USERPROFILE}/.rustup/toolchains/stable-x86_64-apple-darwin/lib/rustlib/src/rust/library"
             },
             "preLaunchTask": "cargo build --bin solver"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "curve_crypto",
+            "program": "${workspaceFolder}/target/debug/curve_crypto_pools",
+            "args": [],
+            "cwd": "${workspaceFolder}",
+            "sourceMap": {
+                "/rustc/${env:RUSTC_VERSION}": "${env:USERPROFILE}/.rustup/toolchains/stable-x86_64-apple-darwin/lib/rustlib/src/rust/library"
+            },
+            "preLaunchTask": "cargo build --bin curve_crypto_pools"
         }
     ]
 }
