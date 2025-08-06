@@ -42,6 +42,8 @@ sol!(
 
 // source: https://github.com/curvefi/curve-contract/blob/master/contracts/pools/dusd/StableSwapDUSD.vy
 
+const A_MULTIPLIER: u16 = 10000;
+
 #[derive(Debug, Deserialize, Serialize)]
 struct Pools {
     meta: Vec<Address>,
@@ -191,7 +193,7 @@ fn _fee(xp: Vec<BigInt>, fee_gamma: BigInt, mid_fee: BigInt, out_fee: BigInt) ->
     let precision = BigInt::from(10u128.pow(18));
     let mut f = xp.iter().sum::<BigInt>();
     f = (fee_gamma * precision)
-        / ((fee_gamma + precision) - (((precision * n_n * xp[0]) / (f * xp[1])) / f));
+        / ((fee_gamma + precision) - ((precision * n_n * xp[0]) / (f * f * xp[1])));
 
     ((mid_fee * f) + (out_fee * (precision - f))) / precision
 }
@@ -233,7 +235,7 @@ fn newton_d(ann: BigInt, gamma: BigInt, n: usize, x_unsorted: Vec<BigInt>) -> Bi
     let ten_16 = BigInt::from(10u128.pow(16));
     let ten_18 = BigInt::from(10u128.pow(18));
     let ten_20 = BigInt::from(10u128.pow(20));
-    let a_multiplier = BigInt::from(1000);
+    let a_multiplier = BigInt::from(A_MULTIPLIER);
 
     let mut d = n_big * geometric_mean(x.clone(), false, n_big);
     let s = x.iter().sum::<BigInt>();
@@ -304,7 +306,7 @@ fn newton_y(ann: BigInt, gamma: BigInt, x: Vec<BigInt>, d: BigInt, i: usize, n: 
     let ten_17 = BigInt::from(10u128.pow(17));
     let ten_18 = BigInt::from(10u128.pow(18));
     let ten_20 = BigInt::from(10u128.pow(20));
-    let a_multiplier = BigInt::from(10000);
+    let a_multiplier = BigInt::from(A_MULTIPLIER);
 
     let n_u32 = n as u32;
     let n_n = BigInt::from(n_u32.pow(n_u32));
@@ -351,7 +353,7 @@ fn newton_y(ann: BigInt, gamma: BigInt, x: Vec<BigInt>, d: BigInt, i: usize, n: 
     let mut diff;
     let frac;
     for count in 0..255 {
-        println!("{}", count + 1);
+        print!("{}    ", count + 1);
         y_prev = y;
 
         k0 = (k0_i * y * n) / d;
@@ -366,7 +368,7 @@ fn newton_y(ann: BigInt, gamma: BigInt, x: Vec<BigInt>, d: BigInt, i: usize, n: 
 
         mul1 = (ten_18 * d * _g1k0 * _g1k0 * a_multiplier) / (ann * gamma * gamma);
 
-        mul2 = ten_18 + ((BigInt::TWO * ten_18 * k0) / _g1k0);
+        mul2 = (ten_18 + (BigInt::TWO * ten_18 * k0)) / _g1k0;
 
         yfprime = (ten_18 * y) + (s * (mul2 + mul1));
         _dyfprime = d * mul2;
