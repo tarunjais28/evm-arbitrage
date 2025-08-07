@@ -257,7 +257,7 @@ fn newton_d(ann: BigInt, gamma: BigInt, n: usize, x_unsorted: Vec<BigInt>) -> Bi
             _g1k0 = k0 - _g1k0 + BigInt::ONE;
         }
 
-        let mul1 = (((((ten_18 * d) / gamma) * _g1k0) / gamma) * _g1k0 * a_multiplier) / ann;
+        let mul1 = ten_18 * d / gamma * _g1k0 / gamma * _g1k0 * a_multiplier / ann;
         let mul2 = (BigInt::TWO * ten_18 * n_big * k0) / _g1k0;
         let neg_fprime =
             (s + ((s * mul2) / ten_18)) + ((mul1 * n_big) / k0) - ((mul2 * d) / ten_18);
@@ -328,8 +328,8 @@ fn newton_y(ann: BigInt, gamma: BigInt, x: Vec<BigInt>, d: BigInt, i: usize, n: 
 
     let n = BigInt::from(n);
     let x_j = x[1 - i];
-    let mut y = (d * d) / (x_j * n * n);
-    let k0_i = (ten_18 * n * x_j) / d;
+    let mut y = d.pow(2) / (x_j * n.pow(2));
+    let k0_i = (ten_18 * n) * x_j / d;
 
     if k0_i <= (ten_16 * n) - BigInt::ONE || k0_i >= (ten_20 * n) + BigInt::ONE {
         return BigInt::default();
@@ -366,11 +366,11 @@ fn newton_y(ann: BigInt, gamma: BigInt, x: Vec<BigInt>, d: BigInt, i: usize, n: 
             _g1k0 = k0 - _g1k0 + BigInt::ONE;
         }
 
-        mul1 = (ten_18 * d * _g1k0 * _g1k0 * a_multiplier) / (ann * gamma * gamma);
+        mul1 = ten_18 * d / gamma * _g1k0 / gamma * _g1k0 * a_multiplier / ann;
 
-        mul2 = (ten_18 + (BigInt::TWO * ten_18 * k0)) / _g1k0;
+        mul2 = ten_18 + (BigInt::TWO * ten_18) * k0 / _g1k0;
 
-        yfprime = (ten_18 * y) + (s * (mul2 + mul1));
+        yfprime = ten_18 * y + s * mul2 + mul1;
         _dyfprime = d * mul2;
         if yfprime < _dyfprime {
             y = y_prev / BigInt::TWO;
@@ -381,8 +381,8 @@ fn newton_y(ann: BigInt, gamma: BigInt, x: Vec<BigInt>, d: BigInt, i: usize, n: 
         fprime = yfprime / y;
 
         y_minus = mul1 / fprime;
-        y_plus = ((yfprime + (ten_18 * d)) / fprime) + ((y_minus * ten_18) / k0);
-        y_minus += (ten_18 * s) / fprime;
+        y_plus = (yfprime + ten_18 * d) / fprime + y_minus * ten_18 / k0;
+        y_minus += ten_18 * s / fprime;
 
         if y_plus < y_minus {
             y = y_prev / BigInt::TWO;
@@ -445,3 +445,5 @@ async fn main() {
     // file.write_all(serde_json::to_string_pretty(&output).unwrap().as_bytes())
     //     .unwrap();
 }
+
+// 1161158061628187654303
