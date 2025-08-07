@@ -140,13 +140,17 @@ async fn get_pool_data(provider: &SolverProvider, pools: Pools) -> Output {
 
             println!("d: {d}");
             println!("future_a_gamma_time: {future_a_gamma_time}");
+            let d_calc = newton_d(a, gamma, n, _xp.clone());
             if future_a_gamma_time > U256::ZERO {
                 d = newton_d(a, gamma, n, _xp);
             }
+            println!("d: {d_calc}");
+            println!("diff: {}", d - d_calc);
+
 
             let dx = BigInt::from(_dx);
             xp[i] += dx;
-            let mut xp = vec![xp[0] * precisions[0], (xp[i] * price_scale) / precision];
+            let mut xp = vec![xp[0] * precisions[0], xp[i] * price_scale / precision];
             println!("xp: {xp:#?}");
 
             let dy_exp = contract
@@ -210,7 +214,7 @@ fn geometric_mean(unsorted_x: Vec<BigInt>, sort: bool, n: BigInt) -> BigInt {
     let mut diff;
     for _ in 0..255 {
         d_prev = d;
-        d = (d + ((x[0] * x[1]) / d)) / n;
+        d = (d + x[0] * x[1] / d) / n;
 
         if d > d_prev {
             diff = d - d_prev;
@@ -218,12 +222,12 @@ fn geometric_mean(unsorted_x: Vec<BigInt>, sort: bool, n: BigInt) -> BigInt {
             diff = d_prev - d
         }
 
-        if diff <= BigInt::ONE || (diff * precision) < d {
+        if diff <= BigInt::ONE || diff * precision < d {
             return d;
         }
     }
 
-    d
+    BigInt::default()
 }
 
 fn newton_d(ann: BigInt, gamma: BigInt, n: usize, x_unsorted: Vec<BigInt>) -> BigInt {
@@ -244,31 +248,39 @@ fn newton_d(ann: BigInt, gamma: BigInt, n: usize, x_unsorted: Vec<BigInt>) -> Bi
     let mut _g1k0;
     let mut d_prev;
     let mut k0;
+    let mut mul1;
+    let mut mul2;
+    let mut d_plus;
+    let mut d_minus;
+    let mut diff;
+    let mut frac;
     for _ in 0..255 {
         d_prev = d;
 
-        k0 = ((ten_18 * n_big * n_big * x[0]) / d) * x[1] / d;
+        k0 = (ten_18 * n_big.pow(2)) * x[0] / d * x[1] / d;
 
         _g1k0 = __g1k0;
 
         if _g1k0 > k0 {
-            _g1k0 -= k0 + BigInt::ONE;
+            _g1k0 = _g1k0 - k0 + BigInt::ONE;
         } else {
             _g1k0 = k0 - _g1k0 + BigInt::ONE;
         }
 
-        let mul1 = ten_18 * d / gamma * _g1k0 / gamma * _g1k0 * a_multiplier / ann;
-        let mul2 = (BigInt::TWO * ten_18 * n_big * k0) / _g1k0;
-        let neg_fprime =
-            (s + ((s * mul2) / ten_18)) + ((mul1 * n_big) / k0) - ((mul2 * d) / ten_18);
+        mul1 = ten_18 * d / gamma * _g1k0 / gamma * _g1k0 * a_multiplier / ann;
+        
+        mul2 = (BigInt::TWO * ten_18) * n_big * k0 / _g1k0;
 
-        let d_plus = (d * (neg_fprime + s)) / neg_fprime;
-        let mut d_minus = (d * d) / neg_fprime;
+        let neg_fprime =
+            (s + s * mul2 / ten_18) + mul1 * n_big / k0 - mul2 * d / ten_18;
+
+        d_plus = d * (neg_fprime + s) / neg_fprime;
+        d_minus = d.pow(2) / neg_fprime;
 
         if ten_18 > k0 {
-            d_minus += ((d * (mul1 / neg_fprime)) / ten_18) * ((ten_18 - k0) / k0);
+            d_minus += d * (mul1 / neg_fprime) / ten_18 * (ten_18 - k0) / k0;
         } else {
-            d_minus -= ((d * (mul1 / neg_fprime)) / ten_18) * ((k0 - ten_18) / k0);
+            d_minus -= d * (mul1 / neg_fprime) / ten_18 * (k0 - ten_18) / k0;
         }
 
         if d_plus > d_minus {
@@ -277,7 +289,6 @@ fn newton_d(ann: BigInt, gamma: BigInt, n: usize, x_unsorted: Vec<BigInt>) -> Bi
             d = (d_minus - d_plus) / BigInt::TWO;
         }
 
-        let diff;
         if d > d_prev {
             diff = d - d_prev;
         } else {
@@ -286,8 +297,8 @@ fn newton_d(ann: BigInt, gamma: BigInt, n: usize, x_unsorted: Vec<BigInt>) -> Bi
 
         if diff * ten_14 < BigInt::max(ten_16, d) {
             for _x in x {
-                let frac = (_x * ten_18) / d;
-                if frac <= ten_16 - BigInt::ONE || frac >= ten_20 + BigInt::ONE {
+                frac = _x * ten_18 / d;
+                if (frac <= ten_16 - BigInt::ONE) || (frac >= ten_20 + BigInt::ONE) {
                     return BigInt::ZERO;
                 }
             }
@@ -398,7 +409,7 @@ fn newton_y(ann: BigInt, gamma: BigInt, x: Vec<BigInt>, d: BigInt, i: usize, n: 
         }
         if diff < BigInt::max(convergence_limit, y / ten_14) {
             frac = (y * ten_18) / d;
-            if frac <= ten_16 - BigInt::ONE || frac >= ten_20 + BigInt::ONE {
+            if (frac <= ten_16 - BigInt::ONE) || (frac >= ten_20 + BigInt::ONE) {
                 return BigInt::default();
             }
             return y;
@@ -445,5 +456,3 @@ async fn main() {
     // file.write_all(serde_json::to_string_pretty(&output).unwrap().as_bytes())
     //     .unwrap();
 }
-
-// 1161158061628187654303
